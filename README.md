@@ -1,0 +1,2 @@
+# compoundint
+Compound Interest Simulator

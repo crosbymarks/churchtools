@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Presupuesto Familiar</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Setting 'Inter' as the main font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fc;
+        }
+        .budget-category-row {
+            transition: background-color 0.2s;
+        }
+        .budget-category-row:hover {
+            background-color: #f0f4f8;
+        }
+        /* Style for the adjustment inputs */
+        .input-style {
+            padding: 0.5rem;
+            border-radius: 0.375rem; /* rounded-md */
+            border: 1px solid #d1d5db; /* border-gray-300 */
+            width: 100%;
+            text-align: right;
+        }
+        /* Custom scrollbar style for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #9ca3af;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen">
+
+    <div id="app" class="max-w-4xl mx-auto bg-white shadow-xl rounded-xl p-6 md:p-10">
+
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-blue-800 mb-2">Administración del Presupuesto Familiar</h1>
+            <p class="text-gray-600 text-lg">Planifica, ajusta y administra tus Ingresos Netos Disponibles (IND).</p>
+        </header>
+
+        <!-- Income Input Section -->
+        <section class="bg-blue-50 p-6 rounded-lg shadow-inner mb-8">
+            <h2 class="text-xl font-semibold text-blue-700 mb-4">1. Ingresos Netos Disponibles (IND)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="md:col-span-2">
+                    <label for="income-amount" class="block text-sm font-medium text-gray-700 mb-1">Monto de Ingreso Neto:</label>
+                    <input type="number" id="income-amount" value="5000" min="0" class="input-style border-blue-300 focus:border-blue-500 focus:ring-blue-500" placeholder="Ej. 5000">
+                </div>
+                <div>
+                    <label for="income-frequency" class="block text-sm font-medium text-gray-700 mb-1">Frecuencia:</label>
+                    <select id="income-frequency" class="input-style border-blue-300 focus:border-blue-500 focus:ring-blue-500">
+                        <option value="monthly">Mensual</option>
+                        <option value="weekly">Semanal</option>
+                        <option value="annually">Anual</option>
+                    </select>
+                </div>
+            </div>
+            <p id="monthly-income-display" class="mt-4 text-lg font-bold text-blue-800 text-center md:text-left"></p>
+        </section>
+
+        <!-- Budget Table and Breakdown -->
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold text-blue-700 mb-4">2. Distribución del Presupuesto</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">Categoría</th>
+                            <th scope="col" class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Sugerido (%)</th>
+                            <th scope="col" class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Actual (%)</th>
+                            <th scope="col" class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">Monto ($)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="budget-table-body" class="bg-white divide-y divide-gray-200">
+                        <!-- Budget rows will be injected here by JavaScript -->
+                    </tbody>
+                    <tfoot>
+                        <tr id="total-assigned-row" class="bg-gray-100 font-bold text-gray-800 transition-colors">
+                            <td class="px-3 py-3 text-left text-sm">TOTAL ASIGNADO</td>
+                            <td class="px-3 py-3 text-center text-sm" id="total-percent"></td>
+                            <td class="px-3 py-3 text-center text-sm"></td>
+                            <td class="px-3 py-3 text-right text-sm" id="total-amount"></td>
+                        </tr>
+                        <tr id="remaining-balance-row" class="bg-blue-100 font-bold text-blue-800 transition-colors">
+                            <td class="px-3 py-3 text-left text-sm">BALANCE RESTANTE (IND - GASTOS)</td>
+                            <td colspan="2" class="px-3 py-3 text-center text-sm"></td>
+                            <td class="px-3 py-3 text-right text-sm" id="remaining-balance"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </section>
+
+        <!-- Visual Chart Summary -->
+        <section>
+            <h2 class="text-xl font-semibold text-blue-700 mb-4">3. Vista General de la Distribución</h2>
+            <div id="chart-container" class="w-full h-8 flex rounded-full overflow-hidden bg-gray-200 shadow-md">
+                <!-- Chart segments will be injected here -->
+            </div>
+            
+            <!-- Chart Legend (REMOVED) -->
+            <!-- <div id="chart-legend" class="mt-4 flex flex-wrap gap-x-6 gap-y-2 justify-center text-sm"> </div> -->
+
+            <p id="alert-message" class="mt-4 text-red-600 font-bold hidden text-center p-3 border border-red-300 rounded-lg bg-red-50">
+                ¡Advertencia! El total de sus gastos excede el 100% de sus Ingresos Netos Disponibles (IND). Por favor, ajuste las categorías.
+            </p>
+        </section>
+    </div>
+
+    <script>
+        // --- DATA SETUP ---
+        const budgetCategories = [
+            // Based on the text's priorities and common financial structure.
+            { id: 'diezmo', name: 'Dar (Diezmo/Caridad)', defaultPercent: 10, color: 'bg-green-600', percent: 10, amount: 0 },
+            { id: 'ahorro', name: 'Ahorro (Emergencia/Retiro)', defaultPercent: 15, color: 'bg-indigo-600', percent: 15, amount: 0 },
+            { id: 'vivienda', name: 'Vivienda (Alquiler/Hipoteca)', defaultPercent: 25, color: 'bg-blue-600', percent: 25, amount: 0 },
+            { id: 'alimentos', name: 'Alimentos y Hogar', defaultPercent: 10, color: 'bg-yellow-600', percent: 10, amount: 0 },
+            { id: 'transporte', name: 'Transporte', defaultPercent: 5, color: 'bg-purple-600', percent: 5, amount: 0 },
+            { id: 'deudas', name: 'Deudas (No Hipotecarias)', defaultPercent: 15, color: 'bg-red-600', percent: 15, amount: 0 },
+            { id: 'salud', name: 'Salud y Cuidado Personal', defaultPercent: 5, color: 'bg-pink-600', percent: 5, amount: 0 },
+            { id: 'educacion', name: 'Educación/Hijos', defaultPercent: 5, color: 'bg-teal-600', percent: 5, amount: 0 },
+            { id: 'otros', name: 'Entretenimiento/Misceláneos', defaultPercent: 10, color: 'bg-gray-600', percent: 10, amount: 0 },
+        ];
+
+        // --- DOM REFERENCES ---
+        const incomeAmountInput = document.getElementById('income-amount');
+        const incomeFrequencySelect = document.getElementById('income-frequency');
+        const monthlyIncomeDisplay = document.getElementById('monthly-income-display');
+        const budgetTableBody = document.getElementById('budget-table-body');
+        const totalPercentElement = document.getElementById('total-percent');
+        const totalAmountElement = document.getElementById('total-amount');
+        const totalAssignedRow = document.getElementById('total-assigned-row');
+        const remainingBalanceElement = document.getElementById('remaining-balance');
+        const remainingBalanceRow = document.getElementById('remaining-balance-row');
+        const chartContainer = document.getElementById('chart-container');
+        // const chartLegend = document.getElementById('chart-legend'); // REMOVED
+        const alertMessage = document.getElementById('alert-message');
+
+        // --- STATE ---
+        let monthlyIND = 0; // Ingresos Netos Disponibles Mensuales
+
+        // --- UTILITIES ---
+        const formatter = new Intl.NumberFormat('es-US', {
+            style: 'currency',
+            currency: 'USD',
+        });
+
+        // --- CORE LOGIC ---
+
+        function calculateMonthlyIND() {
+            const amount = parseFloat(incomeAmountInput.value) || 0;
+            const frequency = incomeFrequencySelect.value;
+            let annualIncome = 0;
+
+            // 1. Convert to Annual Income
+            switch (frequency) {
+                case 'weekly':
+                    // Weekly * 52 weeks
+                    annualIncome = amount * 52; 
+                    break;
+                case 'monthly':
+                    // Monthly * 12 months
+                    annualIncome = amount * 12;
+                    break;
+                case 'annually':
+                    // Annual income
+                    annualIncome = amount;
+                    break;
+            }
+
+            // 2. Convert to Monthly Net Income (IND)
+            // Note: This is a simplified calculation for a live tool. 
+            return annualIncome / 12;
+        }
+
+        function calculateBudgetBreakdown() {
+            monthlyIND = calculateMonthlyIND();
+            let totalAmountAssigned = 0;
+            let totalPercentAssigned = 0;
+
+            budgetCategories.forEach(category => {
+                // When income changes, recalculate amounts based on existing percentages
+                category.amount = (monthlyIND * category.percent) / 100;
+                
+                totalAmountAssigned += category.amount;
+                totalPercentAssigned += category.percent;
+            });
+
+            // Update state and UI
+            updateUI(totalAmountAssigned, totalPercentAssigned);
+        }
+
+        function handleCategoryUpdate(id, source, value) {
+            
+            // Find the category being edited
+            const category = budgetCategories.find(c => c.id === id);
+            const newValue = parseFloat(value) || 0;
+            
+            if (!category || monthlyIND === 0) return;
+
+            if (source === 'percent') {
+                // User edited the percentage
+                category.percent = Math.max(0, newValue);
+                // Update the corresponding amount
+                category.amount = (monthlyIND * category.percent) / 100;
+            } else if (source === 'amount') {
+                // User edited the dollar amount
+                category.amount = Math.max(0, newValue);
+                // Update the corresponding percentage
+                category.percent = (category.amount / monthlyIND) * 100;
+            }
+
+            // Recalculate all totals
+            let totalAssigned = 0;
+            let totalPercentAssigned = 0;
+
+            budgetCategories.forEach(c => {
+                totalAssigned += c.amount;
+                totalPercentAssigned += c.percent;
+            });
+
+            // Re-render UI
+            updateUI(totalAssigned, totalPercentAssigned);
+            renderBudgetTable();
+        }
+
+        function updateUI(totalAmountAssigned, totalPercentAssigned) {
+            const remainingBalance = monthlyIND - totalAmountAssigned;
+            // Use a small tolerance for floating point comparisons
+            const overBudget = totalPercentAssigned > 100.001; 
+
+            // 1. Update Monthly IND Display
+            monthlyIncomeDisplay.textContent = `Tu IND Mensual es: ${formatter.format(monthlyIND)}`;
+
+            // 2. Update Totals
+            totalPercentElement.textContent = `${totalPercentAssigned.toFixed(2)}%`;
+            totalAmountElement.textContent = formatter.format(totalAmountAssigned);
+
+            // Conditional styling for TOTAL ROW
+            if (overBudget) {
+                totalAssignedRow.classList.add('bg-red-200', 'text-red-800');
+                totalAssignedRow.classList.remove('bg-gray-100', 'text-gray-800');
+                alertMessage.classList.remove('hidden'); 
+            } else {
+                totalAssignedRow.classList.remove('bg-red-200', 'text-red-800');
+                totalAssignedRow.classList.add('bg-gray-100', 'text-gray-800');
+                alertMessage.classList.add('hidden');
+            }
+
+
+            // 3. Update Remaining Balance (Conditional Styling)
+            remainingBalanceElement.textContent = formatter.format(remainingBalance);
+            
+            if (remainingBalance < -0.01) { // Negative (Déficit)
+                remainingBalanceElement.classList.remove('text-blue-800');
+                remainingBalanceElement.classList.add('text-red-600');
+                remainingBalanceRow.classList.remove('bg-blue-100');
+                remainingBalanceRow.classList.add('bg-red-50');
+            } else { // Positive or Zero (Superávit or Balance)
+                remainingBalanceElement.classList.remove('text-red-600');
+                remainingBalanceElement.classList.add('text-blue-800'); // Use blue for positive/zero
+                remainingBalanceRow.classList.remove('bg-red-50');
+                remainingBalanceRow.classList.add('bg-blue-100');
+            }
+
+            // 4. Update Chart
+            renderChart();
+        }
+
+        function renderBudgetTable() {
+            budgetTableBody.innerHTML = ''; // Clear table
+            
+            budgetCategories.forEach(category => {
+                const row = document.createElement('tr');
+                row.classList.add('budget-category-row');
+                
+                // Determine the current value to display in the input fields
+                const displayPercent = isNaN(category.percent) ? 0.00 : category.percent;
+                const displayAmount = isNaN(category.amount) ? 0.00 : category.amount;
+                
+                row.innerHTML = `
+                    <td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <span class="inline-block w-3 h-3 rounded-full ${category.color} mr-2 align-middle"></span>
+                        ${category.name}
+                    </td>
+                    <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500 text-center">${category.defaultPercent}%</td>
+                    <td class="px-3 py-3 whitespace-nowrap text-sm">
+                        <input type="number" id="${category.id}-percent" value="${displayPercent.toFixed(2)}" min="0" max="1000" step="0.01"
+                               class="input-style text-center w-full max-w-[80px] mx-auto"
+                               data-category-id="${category.id}" data-type="percent">
+                    </td>
+                    <td class="px-3 py-3 whitespace-nowrap text-sm">
+                        <div class="relative flex items-center">
+                             <span class="absolute left-2 text-gray-500 text-xs">$</span>
+                             <input type="number" id="${category.id}-amount" value="${displayAmount.toFixed(2)}" min="0" step="0.01"
+                                class="input-style pl-5"
+                                data-category-id="${category.id}" data-type="amount">
+                        </div>
+                    </td>
+                `;
+                budgetTableBody.appendChild(row);
+            });
+
+            // Attach listeners to new inputs
+            document.querySelectorAll('#budget-table-body input').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const id = e.target.dataset.categoryId;
+                    const type = e.target.dataset.type;
+                    handleCategoryUpdate(id, type, e.target.value);
+                });
+            });
+        }
+
+        function renderChart() {
+            chartContainer.innerHTML = ''; // Clear chart
+            // chartLegend.innerHTML = ''; // REMOVED: No longer needed as legend is inline
+
+            let currentTotalPercent = 0;
+            budgetCategories.forEach(category => {
+                currentTotalPercent += category.percent;
+            });
+
+            // The proportional base for the bar's width.
+            const proportionalBase = Math.max(currentTotalPercent, 100);
+
+            // Render categories
+            budgetCategories.forEach(category => {
+                if (category.percent > 0) {
+                    // Calculate width based on proportion of total percentage
+                    const widthPercent = (category.percent / proportionalBase) * 100;
+                    
+                    // --- CHART SEGMENT ---
+                    const segment = document.createElement('div');
+                    segment.style.width = `${widthPercent.toFixed(2)}%`;
+                    segment.classList.add(category.color, 'h-full', 'transition-all', 'duration-300');
+                    segment.title = `${category.name}: ${category.percent.toFixed(2)}% (${formatter.format(category.amount)})`;
+                    chartContainer.appendChild(segment);
+                }
+            });
+
+            // Add remaining balance segment (ONLY if the total assigned is < 100%)
+            const remainingPercent = 100 - currentTotalPercent;
+            if (remainingPercent > 0) {
+                 const remainingSegment = document.createElement('div');
+                 remainingSegment.style.width = `${remainingPercent.toFixed(2)}%`;
+                 remainingSegment.classList.add('bg-gray-300', 'h-full', 'transition-all', 'duration-300');
+                 remainingSegment.title = `Balance Restante: ${remainingPercent.toFixed(2)}%`;
+                 chartContainer.appendChild(remainingSegment);
+                 
+            }
+        }
+
+        // --- INITIALIZATION AND EVENT LISTENERS ---
+        function init() {
+            // Apply default percentages to the initial state
+            calculateBudgetBreakdown();
+            renderBudgetTable();
+
+            // Event listeners for Income inputs
+            incomeAmountInput.addEventListener('input', () => {
+                // Recalculate based on default percentages when income changes
+                budgetCategories.forEach(c => c.percent = c.defaultPercent);
+                calculateBudgetBreakdown();
+                renderBudgetTable();
+            });
+
+            incomeFrequencySelect.addEventListener('change', () => {
+                // Recalculate based on default percentages when frequency changes
+                budgetCategories.forEach(c => c.percent = c.defaultPercent);
+                calculateBudgetBreakdown();
+                renderBudgetTable();
+            });
+        }
+
+        // Run initialization on page load
+        window.onload = init;
+    </script>
+</body>
+</html>

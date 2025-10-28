@@ -1,8 +1,95 @@
-<h1>choose file</h1>
-<a href="Compound.html">
-Compound Interest Simulator</a>
-<p></p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premarital Class Resources</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configure Tailwind for the Inter font -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Light gray background */
+        }
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* Style for external navigation links (No longer used, but kept for future links) */
+        .nav-link {
+            text-decoration: none;
+            background-color: white;
+            color: #2563eb; /* blue-600 */
+            border: 1px solid #2563eb;
+        }
+        .nav-link:hover {
+            background-color: #eff6ff; /* blue-50 */
+        }
+    </style>
+</head>
+<body class="min-h-screen">
 
-<a href="intfast.html">
-fast calendar</a>
-<p></p>
+    <div id="app" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Header -->
+        <header class="text-center mb-10 p-6 bg-white rounded-xl shadow-lg">
+            <h1 class="text-4xl font-extrabold text-blue-800 tracking-tight sm:text-5xl">
+                Preparing for Lifelong Partnership
+            </h1>
+            <p class="mt-2 text-xl text-gray-600">Financial & Resource Worksheets</p>
+        </header>
+
+        <!-- The previous Navigation Tabs block has been removed -->
+
+        <!-- Main Content Area -->
+        <main id="content-container" class="mt-8 p-6 bg-white rounded-xl shadow-lg min-h-[60vh]">
+            <div class="space-y-6">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Welcome to Your Partnership Worksheets</h2>
+                <p class="text-lg text-gray-600 text-center max-w-2xl mx-auto">
+                    Click on the resource you need below to navigate to the external financial planning tools and resources.
+                </p>
+
+                <!-- Cards linking to the main tools -->
+                <div class="grid md:grid-cols-2 gap-6 pt-8 max-w-4xl mx-auto">
+
+                    <!-- External Link Card: Budget Planner -->
+                    <!-- !!! IMPORTANT: Replace 'href' with your actual external Budget Plan link !!! -->
+                    <a href="https://your-external-budget-link.com" target="_blank" class="card block p-6 bg-green-50 rounded-xl border border-green-200 hover:shadow-xl hover:border-green-400">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-3xl text-green-600">💰</span>
+                            <div>
+                                <h3 class="text-xl font-semibold text-green-700">The Budget Planner</h3>
+                                <p class="text-gray-600 mt-1">Go to the external sample spending plan worksheet.</p>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- External Link Card: Compound Interest Calculator -->
+                    <!-- !!! IMPORTANT: Replace 'href' with your actual external Calculator link !!! -->
+                    <a href="https://your-external-calculator-link.com" target="_blank" class="card block p-6 bg-purple-50 rounded-xl border border-purple-200 hover:shadow-xl hover:border-purple-400">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-3xl text-purple-600">📈</span>
+                            <div>
+                                <h3 class="text-xl font-semibold text-purple-700">Compound Interest Calculator</h3>
+                                <p class="text-gray-600 mt-1">Go to the external calculator to model long-term savings.</p>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- Add new cards here for future pages! -->
+
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+    <!-- The entire JavaScript block has been removed as it is no longer needed -->
+
+</body>
+</html>

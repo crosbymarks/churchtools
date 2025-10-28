@@ -80,7 +80,7 @@
             margin-bottom: 10px;
         }
         
-        /* --- Instant Calculate Section (Now inside Advanced) --- */
+        /* --- Instant Calculate Section --- */
         #calculateSection {
             padding-top: 15px;
             margin-top: 15px;
@@ -122,7 +122,7 @@
             display: none; /* Hidden by default */
         }
         
-        /* --- Controls Styling --- */
+        /* --- Controls Styling (Speed, Action, Popout) --- */
         .controls {
             display: flex;
             justify-content: space-between;
@@ -131,7 +131,7 @@
             flex-wrap: wrap;
         }
 
-        .action-buttons button, .speed-controls button {
+        .action-buttons button, .speed-controls button, .size-controls button, #popoutButton {
             padding: 10px 15px;
             margin-right: 5px;
             border: none;
@@ -147,15 +147,25 @@
             margin-top: 10px;
         }
 
+        #popoutButton {
+            background-color: #ffc107; /* Popout color */
+            color: #333;
+            margin-left: 10px;
+        }
+        
+        #popoutButton:hover {
+            background-color: #e0a800;
+        }
+
         #startButton { background-color: #28a745; color: white; }
         #startButton:hover:not([disabled]) { background-color: #1e7e34; }
 
         #stopButton { background-color: #dc3545; color: white; }
         #stopButton:hover:not([disabled]) { background-color: #c82333; }
 
-        .speed-controls label { margin-right: 10px; font-weight: bold; }
-        .speed-controls button { background-color: #f0f0f0; color: #333; border: 1px solid #ccc; }
-        .speed-controls button.active { background-color: #007bff; color: white; border-color: #007bff; }
+        .speed-controls label, .size-controls label { margin-right: 10px; font-weight: bold; }
+        .speed-controls button, .size-controls button { background-color: #f0f0f0; color: #333; border: 1px solid #ccc; }
+        .speed-controls button.active, .size-controls button.active { background-color: #007bff; color: white; border-color: #007bff; }
 
         button:disabled { opacity: 0.6; cursor: not-allowed; }
 
@@ -174,12 +184,30 @@
             margin: 0;
         }
         
+        /* Dynamic size classes for Total Value */
+        .size-1x { font-size: 3.5em; } /* Default size */
+        .size-2x { font-size: 4.5em; }
+        .size-3x { font-size: 5.5em; }
+        
         #totalValue {
-            font-size: 3.5em; 
             font-weight: 900;
             color: #0056b3;
             display: block;
             margin-bottom: 10px;
+        }
+        
+        /* Font Size Controls Styling */
+        #fontSizeControlsContainer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin: 15px 0 0;
+            padding: 0 5px;
+        }
+
+        .size-controls {
+            display: flex;
+            align-items: center;
         }
         
         /* Main Breakdown & Comparison Breakdown Styles */
@@ -304,7 +332,50 @@
             -ms-transform: translateX(26px);
             transform: translateX(26px);
         }
+        
+        /* --- Popout Window Styles (Internal to JS) --- */
+        /* These styles will be injected into the new window */
+        .popout-styles-code {
+            display: none; /* Hide in main window */
+        }
     </style>
+    <script class="popout-styles-code">
+        const popoutStyles = `
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #1a1a2e;
+                color: #e6f7ff;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                margin: 0;
+                height: 100vh;
+                overflow: hidden;
+            }
+            #popout-container {
+                text-align: center;
+                padding: 20px;
+            }
+            #popout-value {
+                font-size: 14em; /* Massive size requested */
+                font-weight: 900;
+                color: #ffc107; /* Highlight color */
+                display: block;
+                line-height: 1em;
+            }
+            #popout-time {
+                font-size: 2em;
+                color: #fff;
+                margin-top: 15px;
+            }
+            #popout-label {
+                font-size: 1.5em;
+                color: #aaa;
+                margin-bottom: 20px;
+            }
+        `;
+    </script>
 </head>
 <body>
     <div class="container">
@@ -361,6 +432,7 @@
                 <button id="speed2x" data-speed="2">x2</button>
                 <button id="speed4x" data-speed="4">x4</button>
                 <button id="speed12x" data-speed="12">x12</button>
+                <button id="popoutButton">Popout 🚀</button>
             </div>
         </div>
 
@@ -372,7 +444,7 @@
 
         <div id="totalValueDisplay">
             <p id="label_yourTotalValue">YOUR TOTAL VALUE:</p>
-            <span id="totalValue">$0.00</span>
+            <span id="totalValue" class="size-1x">$0.00</span>
             <div class="breakdown">
                 <span class="label" id="label_principal">Principal:</span> <span id="principalEntered">$0.00</span> 
                 | <span class="label" id="label_totalInterest">Total Interest:</span> <span id="totalInterestPaid">$0.00</span>
@@ -380,6 +452,15 @@
             </div>
         </div>
         
+        <div id="fontSizeControlsContainer">
+            <div class="size-controls">
+                <label id="label_size">Size:</label>
+                <button id="size1x" class="active" data-size="1">1x</button>
+                <button id="size2x" data-size="2">2x</button>
+                <button id="size3x" data-size="3">3x</button>
+            </div>
+        </div>
+
         <div id="comparisonSection">
             <strong id="compTitle">If you invested $5 more per month (and stopped at the same time):</strong>
             
@@ -414,6 +495,15 @@
         // --- Configuration ---
         const BASE_INTERVAL_MS = 60000; // 1 minute = 60000 ms
         const EXTRA_MONTHLY_INVESTMENT = 5.00; // $5.00 extra for comparison
+        // Popout configuration
+        const POPOUT_WIDTH = 1200; // 800 * 1.5 = 1200
+        const POPOUT_HEIGHT = 600;
+        // Font size classes map (used for dynamic styling)
+        const FONT_SIZE_CLASSES = {
+            1: 'size-1x',
+            2: 'size-2x',
+            3: 'size-3x'
+        };
 
         // --- State Variables ---
         let regularMonthlyDeposit = 0; 
@@ -426,15 +516,21 @@
         let months = 0;
         let intervalId = null; 
         let currentSpeedFactor = 1; 
+        let popoutWindow = null; // Reference to the new window
         
         let compMonthlyDeposit = 0;
         let compTotalValue = 0;
         let compPrincipalEntered = 0;
         
+        // --- TIME DRIFT TRACKING ---
+        let lastUpdateTime = 0; 
+        
         // --- Language Data (English / Spanish) ---
         const LANGUAGES = {
             'en': {
                 'docTitle': 'Ultimate Real-Time Compound Interest Simulator',
+                'popoutTitle': 'Real-Time Total Value',
+                'popoutLabel': 'YOUR TOTAL VALUE:',
                 'mainTitle': 'Ultimate Compound Growth Simulator 🚀',
                 'label_monthlyDeposit': 'Regular Monthly Deposit ($):',
                 'label_yearlyRate': 'Yearly Percentage Rate (%):',
@@ -449,6 +545,8 @@
                 'startButton': 'Start Simulation',
                 'stopButton': 'Stop Simulation',
                 'label_speed': 'Speed:',
+                'label_size': 'Size:',
+                'popoutButton': 'Popout 🚀',
                 'resultsTitle': 'Simulation Results',
                 'label_timeElapsed': 'Time Elapsed:',
                 'label_yourTotalValue': 'YOUR TOTAL VALUE:',
@@ -465,6 +563,8 @@
             },
             'es': {
                 'docTitle': 'Simulador de Interés Compuesto en Tiempo Real',
+                'popoutTitle': 'Valor Total en Tiempo Real',
+                'popoutLabel': 'SU VALOR TOTAL:',
                 'mainTitle': 'Simulador de Crecimiento Compuesto Máximo 🚀',
                 'label_monthlyDeposit': 'Depósito Mensual Regular ($):',
                 'label_yearlyRate': 'Tasa de Porcentaje Anual (%):',
@@ -479,6 +579,8 @@
                 'startButton': 'Iniciar Simulación',
                 'stopButton': 'Detener Simulación',
                 'label_speed': 'Velocidad:',
+                'label_size': 'Tamaño:',
+                'popoutButton': 'Ventana Flotante 🚀',
                 'resultsTitle': 'Resultados de la Simulación',
                 'label_timeElapsed': 'Tiempo Transcurrido:',
                 'label_yourTotalValue': 'SU VALOR TOTAL:',
@@ -495,10 +597,33 @@
             }
         };
 
-        // --- DOM Elements (Language Switch) ---
+        // --- DOM Elements ---
         const languageSwitch = document.getElementById('languageSwitch');
-        
-        // --- DOM Elements (Language mapping) ---
+        const totalValueEl = document.getElementById('totalValue');
+        const timeElapsedEl = document.getElementById('timeElapsed');
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const speedButtons = document.querySelectorAll('.speed-controls button');
+        const sizeButtons = document.querySelectorAll('.size-controls button'); 
+        const popoutButton = document.getElementById('popoutButton');
+        const regularMonthlyDepositInput = document.getElementById('initialInvestment');
+        const yearlyRateInput = document.getElementById('yearlyRate');
+        const initialDepositInput = document.getElementById('initialDeposit');
+        const stopMonthsInput = document.getElementById('stopMonths');
+        const projectionMonthsInput = document.getElementById('projectionMonths');
+        const projectionResultEl = document.getElementById('projectionResult');
+        const projectedTotalValueEl = document.getElementById('projectedTotalValue');
+        const projectedTimeEl = document.getElementById('projectedTime');
+        const principalEnteredEl = document.getElementById('principalEntered');
+        const totalInterestPaidEl = document.getElementById('totalInterestPaid');
+        const lastInterestPaidEl = document.getElementById('lastInterestPaid');
+        const compTotalValueEl = document.getElementById('compTotalValue');
+        const compPrincipalEl = document.getElementById('compPrincipal');
+        const compTotalInterestEl = document.getElementById('compTotalInterest');
+        const compLastInterestEl = document.getElementById('compLastInterest');
+        const totalDifferenceEl = document.getElementById('totalDifference');
+
+        // Language mapping (re-defined for clarity)
         const labeledElements = {
             'docTitle': document.getElementById('docTitle'),
             'mainTitle': document.getElementById('mainTitle'),
@@ -515,6 +640,8 @@
             'startButton': document.getElementById('startButton'),
             'stopButton': document.getElementById('stopButton'),
             'label_speed': document.getElementById('label_speed'),
+            'label_size': document.getElementById('label_size'),
+            'popoutButton': popoutButton,
             'resultsTitle': document.getElementById('resultsTitle'),
             'label_timeElapsed': document.getElementById('label_timeElapsed'),
             'label_yourTotalValue': document.getElementById('label_yourTotalValue'),
@@ -530,28 +657,15 @@
             'noteText': document.getElementById('noteText')
         };
         
-        // --- Other DOM Elements (Inputs/Results) ---
-        const regularMonthlyDepositInput = document.getElementById('initialInvestment');
-        const yearlyRateInput = document.getElementById('yearlyRate');
-        const initialDepositInput = document.getElementById('initialDeposit');
-        const stopMonthsInput = document.getElementById('stopMonths');
-        const projectionMonthsInput = document.getElementById('projectionMonths');
-        const projectionResultEl = document.getElementById('projectionResult');
-        const projectedTotalValueEl = document.getElementById('projectedTotalValue');
-        const projectedTimeEl = document.getElementById('projectedTime');
-        const timeElapsedEl = document.getElementById('timeElapsed');
-        const totalValueEl = document.getElementById('totalValue');
-        const principalEnteredEl = document.getElementById('principalEntered');
-        const totalInterestPaidEl = document.getElementById('totalInterestPaid');
-        const lastInterestPaidEl = document.getElementById('lastInterestPaid');
-        const compTotalValueEl = document.getElementById('compTotalValue');
-        const compPrincipalEl = document.getElementById('compPrincipal');
-        const compTotalInterestEl = document.getElementById('compTotalInterest');
-        const compLastInterestEl = document.getElementById('compLastInterest');
-        const totalDifferenceEl = document.getElementById('totalDifference');
-        const startButton = document.getElementById('startButton');
-        const stopButton = document.getElementById('stopButton');
-        const speedButtons = document.querySelectorAll('.speed-controls button');
+        // Retrieve popout styles from script tag (defined in HTML head)
+        const popoutStylesScript = document.querySelector('.popout-styles-code');
+        let popoutStylesContent = '';
+        if (popoutStylesScript) {
+            const match = popoutStylesScript.textContent.match(/const popoutStyles = `([\s\S]*?)`;/);
+            if (match && match[1]) {
+                popoutStylesContent = match[1].trim();
+            }
+        }
 
         // --- Helper Functions ---
 
@@ -569,8 +683,10 @@
                         document.title = lang[id];
                     } else if (id.startsWith('label_') || id.endsWith('Title') || id.endsWith('Toggle') || id.endsWith('Text') || id === 'calcTitle') {
                         el.textContent = lang[id];
-                    } else if (el.tagName === 'BUTTON') {
+                    } else if (el.tagName === 'BUTTON' && id !== 'popoutButton') {
                         el.textContent = lang[id];
+                    } else if (id === 'popoutButton') {
+                         el.textContent = lang[id];
                     } else if (el.tagName === 'H1' || el.tagName === 'STRONG') {
                         el.textContent = lang[id];
                     }
@@ -578,6 +694,8 @@
             }
             // Update the time display after language change too
             updateTimeDisplay();
+            // Update the popout if it's open
+            updatePopout();
         };
 
         /**
@@ -618,54 +736,11 @@
             const newValue = currentValue + interest + investment;
             return { newValue, interest };
         };
-
+        
         /**
-         * Instant calculation function for a specific number of months.
+         * The combined function to calculate and update a single month.
          */
-        const calculateProjection = (totalMonths, initial, regular, rate, stopAtMonth, isComparison = false) => {
-            let currentValue = initial;
-            let principal = initial;
-            let lastInterest = 0;
-            const regularInvestment = isComparison ? regular + EXTRA_MONTHLY_INVESTMENT : regular;
-
-            for (let m = 0; m < totalMonths; m++) {
-                let monthlyInvestment = 0;
-                
-                // Check if monthly deposit should be added (applies to both main and comparison)
-                if (stopAtMonth === 0 || m < stopAtMonth) {
-                    monthlyInvestment = regularInvestment;
-                }
-                
-                const { newValue, interest } = calculateMonth(currentValue, monthlyInvestment, rate);
-                currentValue = newValue;
-                principal += monthlyInvestment;
-                lastInterest = interest;
-            }
-
-            return { finalValue: currentValue, finalPrincipal: principal, finalInterest: lastInterest };
-        };
-
-        /**
-         * Runs the core calculations and updates the display (for the real-time simulator).
-         */
-        const updateCalculation = () => {
-            
-            let monthlyInvestment = 0;
-            let compMonthlyInvestment = 0;
-            const compInvestmentWithExtra = regularMonthlyDeposit + EXTRA_MONTHLY_INVESTMENT;
-
-            // Determine deposit for main investment
-            if (stopMonths === 0 || months < stopMonths) {
-                 monthlyInvestment = regularMonthlyDeposit;
-            }
-
-            // Determine deposit for comparison investment (also respects stopMonths)
-            if (stopMonths === 0 || months < stopMonths) {
-                 compMonthlyInvestment = compInvestmentWithExtra;
-            } else {
-                 compMonthlyInvestment = 0; // Stop depositing
-            }
-            
+        const processSingleMonth = (monthlyInvestment, compMonthlyInvestment) => {
             // --- 1. Main Calculation ---
             const mainResults = calculateMonth(totalValue, monthlyInvestment, monthlyRate);
             totalValue = mainResults.newValue;
@@ -680,14 +755,81 @@
 
             // --- 3. Update Month Count ---
             months++;
+            
+            return { mainInterest, compInterest };
+        };
 
+        /**
+         * Updates the popout window content if it is open.
+         */
+        const updatePopout = () => {
+            if (popoutWindow && !popoutWindow.closed) {
+                const popoutDoc = popoutWindow.document;
+                const langKey = languageSwitch.checked ? 'es' : 'en';
+                const lang = LANGUAGES[langKey];
+                
+                // Update text elements
+                popoutDoc.title = lang['popoutTitle'];
+                popoutDoc.getElementById('popout-label').textContent = lang['popoutLabel'];
+                popoutDoc.getElementById('popout-value').textContent = formatCurrency(totalValue);
+                popoutDoc.getElementById('popout-time').textContent = formatMonthsToTime(months); 
+            }
+        };
+
+
+        /**
+         * Runs the core calculations and updates the display (for the real-time simulator).
+         */
+        const updateCalculation = () => {
+            
+            const now = Date.now();
+            
+            // Calculate expected interval time for current speed
+            const expectedInterval = BASE_INTERVAL_MS / currentSpeedFactor;
+            
+            // Calculate how much time has actually passed
+            const timePassed = now - lastUpdateTime;
+            
+            // Determine how many months should have elapsed (minimum 1, due to setInterval fire)
+            const monthsToProcess = Math.max(1, Math.floor(timePassed / expectedInterval)); 
+            
+            // Get the current deposits based on simulation parameters
+            const compInvestmentWithExtra = regularMonthlyDeposit + EXTRA_MONTHLY_INVESTMENT;
+
+            let lastMainInterest = 0;
+            let lastCompInterest = 0;
+            
+            // Loop to catch up on skipped months
+            for (let i = 0; i < monthsToProcess; i++) {
+                let monthlyInvestment = 0;
+                let compMonthlyInvestment = 0;
+                const currentMonth = months + i; 
+
+                // Determine deposit for main investment
+                if (stopMonths === 0 || currentMonth < stopMonths) {
+                     monthlyInvestment = regularMonthlyDeposit;
+                }
+
+                // Determine deposit for comparison investment (also respects stopMonths)
+                if (stopMonths === 0 || currentMonth < stopMonths) {
+                     compMonthlyInvestment = compInvestmentWithExtra;
+                } else {
+                     compMonthlyInvestment = 0; 
+                }
+
+                // Run the core calculation for one month
+                const { mainInterest, compInterest } = processSingleMonth(monthlyInvestment, compMonthlyInvestment);
+                lastMainInterest = mainInterest;
+                lastCompInterest = compInterest;
+            }
+            
             // --- 4. Update the Display (Main) ---
             const totalInterestPaid = totalValue - principalEntered;
             updateTimeDisplay();
             totalValueEl.textContent = formatCurrency(totalValue);
             principalEnteredEl.textContent = formatCurrency(principalEntered);
             totalInterestPaidEl.textContent = formatCurrency(totalInterestPaid);
-            lastInterestPaidEl.textContent = formatCurrency(mainInterest); 
+            lastInterestPaidEl.textContent = formatCurrency(lastMainInterest); 
             
             // --- 5. Update the Display (Comparison) ---
             const compTotalInterestPaid = compTotalValue - compPrincipalEntered;
@@ -696,8 +838,14 @@
             compTotalValueEl.textContent = formatCurrency(compTotalValue); 
             compPrincipalEl.textContent = formatCurrency(compPrincipalEntered);
             compTotalInterestEl.textContent = formatCurrency(compTotalInterestPaid);
-            compLastInterestEl.textContent = formatCurrency(compInterest);
+            compLastInterestEl.textContent = formatCurrency(lastCompInterest);
             totalDifferenceEl.textContent = formatCurrency(totalDifference);
+            
+            // --- 6. Update Popout Window ---
+            updatePopout();
+            
+            // Update last update time for next drift check
+            lastUpdateTime = now; 
         };
 
         /**
@@ -711,7 +859,10 @@
             // Interval time is the base time divided by the speed factor
             const intervalDuration = BASE_INTERVAL_MS / currentSpeedFactor;
             
-            // CRITICAL FIX: The first update must run here to show initial values and start the loop correctly
+            // Set the last update time to now before the first calculation
+            lastUpdateTime = Date.now();
+            
+            // Run the first update immediately
             updateCalculation(); 
             
             intervalId = setInterval(updateCalculation, intervalDuration); 
@@ -767,7 +918,7 @@
             stopMonthsInput.disabled = true;
             startButton.disabled = true;
             stopButton.disabled = false;
-            // FIX: Enable speed buttons immediately after starting the simulation setup
+            
             speedButtons.forEach(btn => btn.disabled = false); 
             
             projectionResultEl.style.display = 'none';
@@ -795,7 +946,7 @@
         };
 
         /**
-         * Handles the instant "Calculate" button click
+         * Handles the instant "Calculate" button click (simplified, logic is now external)
          */
         const handleProjectionCalculation = () => {
             const inputs = getAndValidateInputs();
@@ -807,6 +958,27 @@
                 return;
             }
 
+            // Simple calculation function 
+            const calculateProjection = (totalMonths, initial, regular, rate, stopAtMonth, isComparison = false) => {
+                let currentValue = initial;
+                let principal = initial;
+                let lastInterest = 0;
+                const regularInvestment = isComparison ? regular + EXTRA_MONTHLY_INVESTMENT : regular;
+
+                for (let m = 0; m < totalMonths; m++) {
+                    let monthlyInvestment = 0;
+                    if (stopAtMonth === 0 || m < stopAtMonth) {
+                        monthlyInvestment = regularInvestment;
+                    }
+                    
+                    const { newValue, interest } = calculateMonth(currentValue, monthlyInvestment, rate);
+                    currentValue = newValue;
+                    principal += monthlyInvestment;
+                    lastInterest = interest;
+                }
+                return { finalValue: currentValue, finalPrincipal: principal, finalInterest: lastInterest };
+            };
+            
             // Calculate the projection based on all current inputs
             const projection = calculateProjection(
                 projectionMonths,
@@ -814,7 +986,7 @@
                 inputs.regular,
                 inputs.monthlyRate,
                 inputs.stop,
-                false // Not the comparison
+                false
             );
 
             // Update the display
@@ -827,7 +999,6 @@
          * Handles speed button clicks
          */
         const setSpeed = (event) => {
-            // This check ensures speed can only be changed when simulation is active
             if (startButton.disabled === false) return; 
 
             const newSpeed = parseInt(event.target.dataset.speed);
@@ -835,8 +1006,70 @@
                 currentSpeedFactor = newSpeed;
                 speedButtons.forEach(btn => btn.classList.remove('active'));
                 event.target.classList.add('active');
-                // Restart the interval with the new duration
-                resetInterval();
+                // The crucial line: reset the interval to take effect immediately
+                resetInterval(); 
+            }
+        };
+
+        /**
+         * Handles font size button clicks
+         */
+        const setFontSize = (event) => {
+            const newSize = parseInt(event.target.dataset.size);
+            
+            totalValueEl.classList.remove(FONT_SIZE_CLASSES[1], FONT_SIZE_CLASSES[2], FONT_SIZE_CLASSES[3]);
+            totalValueEl.classList.add(FONT_SIZE_CLASSES[newSize]);
+            
+            sizeButtons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        };
+        
+        /**
+         * Creates and manages the popout window.
+         */
+        const togglePopout = () => {
+            if (popoutWindow && !popoutWindow.closed) {
+                popoutWindow.close();
+                popoutWindow = null;
+                return;
+            }
+            
+            const langKey = languageSwitch.checked ? 'es' : 'en';
+            const lang = LANGUAGES[langKey];
+            
+            // UPDATED: Use the new POPOUT_WIDTH constant (1200px)
+            const features = `width=${POPOUT_WIDTH},height=${POPOUT_HEIGHT},resizable=yes,scrollbars=no`;
+            
+            popoutWindow = window.open("", "TotalValuePopout", features);
+            
+            if (popoutWindow) {
+                const popoutDoc = popoutWindow.document;
+                
+                // Write the initial HTML content
+                popoutDoc.write(`
+                    <html>
+                        <head>
+                            <title>${lang['popoutTitle']}</title>
+                            <style>${popoutStylesContent}</style>
+                        </head>
+                        <body>
+                            <div id="popout-container">
+                                <div id="popout-label">${lang['popoutLabel']}</div>
+                                <div id="popout-value">${formatCurrency(totalValue)}</div>
+                                <div id="popout-time">${formatMonthsToTime(months)}</div>
+                            </div>
+                        </body>
+                    </html>
+                `);
+                popoutDoc.close();
+                
+                // Set up event to null the reference when the popout is closed by the user
+                popoutWindow.addEventListener('unload', () => {
+                    popoutWindow = null;
+                });
+                
+                // Run an immediate update to ensure the popout is current right after creation
+                updatePopout();
             }
         };
 
@@ -846,14 +1079,21 @@
         stopButton.addEventListener('click', stopSimulation);
         document.getElementById('calculateButton').addEventListener('click', handleProjectionCalculation);
         languageSwitch.addEventListener('change', updateLanguage); 
+        popoutButton.addEventListener('click', togglePopout); 
         
         speedButtons.forEach(button => {
             button.addEventListener('click', setSpeed);
         });
 
+        sizeButtons.forEach(button => {
+            button.addEventListener('click', setFontSize);
+        });
+
+
         // Initial setup
         speedButtons.forEach(btn => btn.disabled = true);
-        updateLanguage(); // Apply English on load
+        updateLanguage();
+        totalValueEl.classList.add(FONT_SIZE_CLASSES[1]); 
     </script>
 </body>
 </html>

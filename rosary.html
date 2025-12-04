@@ -131,7 +131,7 @@
             <div class="w-full max-w-xl bg-white rounded-xl shadow-2xl p-2 mb-4">
                 <!-- Image source will be updated by JS -->
                 <img id="modal-image" class="contemplation-image rounded-lg" alt="Contemplation Image" 
-                     onerror="this.onerror=null; this.src='https://placehold.co/800x400/cccccc/000000?text=Image+Unavailable';">
+                     onerror="this.onerror=null; this.src='https://placehold.co/800x400/cccccc/000000?text=Placeholder+Image';">
             </div>
             
             <!-- Description/Prayer Prompt Area -->
@@ -144,35 +144,36 @@
     </div>
 
     <script>
-        // Data structure for all 20 mysteries, organized by group, now including public domain image URLs
+        // Data structure for all 20 mysteries, organized by group.
+        // Replaced external links with reliable placeholder URLs (using the Mystery name in the text)
         const allMysteries = {
             "Joyful Mysteries": [
-                { title: "The Annunciation", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/e/e9/Fra_Angelico_-_Annunciation_-_WGA00555.jpg" },
-                { title: "The Visitation", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/a/a2/Albertinelli_Visitation_Uffizi.jpg" },
-                { title: "The Nativity", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Correggio_-_Adoration_of_the_Shepherds_%28The_Night%29_-_Google_Art_Project.jpg" },
-                { title: "The Presentation in the Temple", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/0/07/Giovanni_Bellini_-_Presentation_of_Christ_in_the_Temple_-_Google_Art_Project.jpg" },
-                { title: "The Finding in the Temple", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/5/52/Beschey_Christ_among_the_Doctors.jpg" }
+                { title: "The Annunciation", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Annunciation" },
+                { title: "The Visitation", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Visitation" },
+                { title: "The Nativity", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Nativity" },
+                { title: "The Presentation in the Temple", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Presentation+in+the+Temple" },
+                { title: "The Finding in the Temple", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Finding+in+the+Temple" }
             ],
             "Sorrowful Mysteries": [
-                { title: "The Agony in the Garden", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/77/Giovanni_Bellini_-_The_Agony_in_the_Garden_-_National_Gallery.jpg" },
-                { title: "The Scourging at the Pillar", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/d/dc/Caravaggio_Flagellation.jpg" },
-                { title: "The Crowning with Thorns", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/5/5a/Titian_-_The_Crowning_with_Thorns_-_1570.jpg" },
-                { title: "The Carrying of the Cross", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/a/a7/Hieronymus_Bosch_-_The_Carrying_of_the_Cross_%28Ghent%29.jpg" },
-                { title: "The Crucifixion", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/b/b8/Christ_on_the_Cross_by_Diego_Vel%C3%A1zquez.jpg" }
+                { title: "The Agony in the Garden", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Agony+in+the+Garden" },
+                { title: "The Scourging at the Pillar", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Scourging+at+the+Pillar" },
+                { title: "The Crowning with Thorns", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Crowning+with+Thorns" },
+                { title: "The Carrying of the Cross", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Carrying+of+the+Cross" },
+                { title: "The Crucifixion", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Crucifixion" }
             ],
             "Glorious Mysteries": [
-                { title: "The Resurrection", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/3/36/Piero_della_Francesca_-_Resurrection.jpg" },
-                { title: "The Ascension", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/4/41/Giotto_-_Scrovegni_Chapel_-_The_Ascension.jpg" },
-                { title: "The Descent of the Holy Spirit", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/b/b3/El_Greco_-_Pentecost.jpg" },
-                { title: "The Assumption of Mary", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/a/aa/Tizian_057.jpg" },
-                { title: "The Coronation of Mary", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/9/9f/Fra_Angelico_-_Coronation_of_the_Virgin_-_WGA00551.jpg" }
+                { title: "The Resurrection", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Resurrection" },
+                { title: "The Ascension", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Ascension" },
+                { title: "The Descent of the Holy Spirit", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Descent+of+the+Holy+Spirit" },
+                { title: "The Assumption of Mary", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Assumption+of+Mary" },
+                { title: "The Coronation of Mary", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Coronation+of+Mary" }
             ],
             "Luminous Mysteries": [
-                { title: "The Baptism of Jesus in the Jordan", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/1/18/Piero_della_Francesca_-_Baptism_of_Christ_-_National_Gallery.jpg" },
-                { title: "The Wedding Feast at Cana", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Paolo_Veronese_-_The_Wedding_Feast_at_Cana.jpg" },
-                { title: "The Proclamation of the Kingdom of God", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/0/0c/Carl_Heinrich_Bloch_-_Sermon_on_the_Mount.jpg" },
-                { title: "The Transfiguration", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/9/91/Raphael_-_Transfiguration_-_Vatican.jpg" },
-                { title: "The Institution of the Eucharist", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/77/Dieric_Bouts_-_The_Last_Supper_-_WGA03011.jpg" }
+                { title: "The Baptism of Jesus in the Jordan", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Baptism+of+Jesus" },
+                { title: "The Wedding Feast at Cana", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Wedding+Feast+at+Cana" },
+                { title: "The Proclamation of the Kingdom of God", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=Proclamation+of+the+Kingdom" },
+                { title: "The Transfiguration", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Transfiguration" },
+                { title: "The Institution of the Eucharist", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=Institution+of+the+Eucharist" }
             ]
         };
 
@@ -270,7 +271,7 @@
             const modalImageEl = document.getElementById('modal-image');
             
             modalTitleEl.textContent = title;
-            // Use the actual image URL for the modal view
+            // Use the actual image URL for the modal view (which is now a placeholder)
             modalImageEl.src = imageUrl;
             modalImageEl.alt = `${title} Visio Divina Image`;
 
@@ -294,20 +295,19 @@
          */
         function createMysteryCard(mystery, index) {
             const title = mystery.title;
-            const imageUrl = mystery.imageUrl; // Use the provided public domain URL
+            const imageUrl = mystery.imageUrl; // Use the provided placeholder URL
             
-            // Added onclick event handler here
-            // Note: The imageUrl is passed to the openContemplationView function
             return `
                 <div id="mystery-${index}" 
                      class="mystery-box bg-white rounded-lg overflow-hidden shadow-md"
                      onclick="openContemplationView('${title.replace(/'/g, "\\'")}', '${imageUrl.replace(/'/g, "\\'")}')">
                     <!-- Image Area -->
                     <div class="relative h-48 bg-gray-200 flex items-center justify-center overflow-hidden">
+                        <!-- Placeholder Image is now used here -->
                         <img src="${imageUrl}" 
                              alt="${title} contemplation image" 
                              class="w-full h-full object-cover opacity-80"
-                             onerror="this.onerror=null; this.src='https://placehold.co/400x200/cccccc/000000?text=Image+Unavailable';">
+                             onerror="this.onerror=null; this.src='https://placehold.co/400x200/cccccc/000000?text=Placeholder+Error';">
                         
                         <!-- Header Overlay -->
                         <div class="absolute inset-0 bg-gradient-to-t from-gray-900/70 to-transparent p-4 flex flex-col justify-end">

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Rosary Mystery</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f7f3f1; /* Soft, light background */
+        }
+        .card {
+            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .mystery-box {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .mystery-box:hover {
+            border-color: #4f46e5;
+            transform: translateY(-2px);
+        }
+        /* Custom styles for the Modal/Contemplation View */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f7f3f1;
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .contemplation-image {
+            max-height: 65vh; /* Responsive height limit */
+            width: 100%;
+            object-fit: contain; /* Ensure the image fits within the container */
+        }
+    </style>
+</head>
+<body class="p-4">
+
+    <!-- Background Audio Element -->
+    <audio id="background-music" loop autoplay playsinline>
+        <source src="http://googleusercontent.com/file_content/5" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- Main Container - List View -->
+    <div id="list-view" class="card bg-white w-full max-w-lg mx-auto rounded-xl p-6 md:p-8 transition-all duration-300">
+
+        <!-- Header with Mute Button -->
+        <header class="flex justify-between items-start mb-6">
+            <div class="flex-shrink-0 w-8"></div> <!-- Left Spacer for alignment -->
+            <div class="text-center flex-grow">
+                <h1 class="text-3xl font-bold text-gray-800 mb-1">
+                    <span class="text-indigo-600">Visio Divina</span> Rosary
+                </h1>
+                <p class="text-base text-gray-500">
+                    Contemplation through sacred images.
+                </p>
+            </div>
+            <!-- Mute/Unmute Button -->
+            <button id="mute-button" onclick="toggleMute()" class="flex-shrink-0 p-2 text-indigo-600 hover:text-indigo-800 rounded-full hover:bg-indigo-100 transition">
+                <svg id="speaker-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                    <!-- Icon will be set by JavaScript on load -->
+                </svg>
+            </button>
+        </header>
+
+        <!-- Current Mystery Group Display -->
+        <div class="text-center p-4 bg-indigo-50 rounded-lg border-2 border-indigo-200 mb-6">
+            <p class="text-sm font-semibold text-indigo-700 uppercase tracking-wider mb-2" id="current-day-text">
+                Today is...
+            </p>
+            <h2 id="mystery-group-name" class="text-3xl sm:text-4xl leading-tight font-extrabold text-indigo-800 transition-opacity duration-500">
+                Loading...
+            </h2>
+        </div>
+        
+        <!-- VISUAL CONTENT AREA (The 5 Daily Mysteries) -->
+        <h3 class="text-lg font-semibold text-gray-700 border-b pb-2 mb-4">The Five Daily Mysteries</h3>
+        <div id="daily-mysteries-container" class="space-y-4">
+            <!-- Specific mysteries will be populated here by JS -->
+        </div>
+        
+        <!-- The Cycle List (Hidden by default for focus, but can be revealed) -->
+        <div class="mt-8 pt-4 border-t border-gray-200">
+            <button onclick="document.getElementById('cycle-list-wrapper').classList.toggle('hidden')" 
+                    class="w-full text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+                Show Full Weekly Cycle
+            </button>
+            <div id="cycle-list-wrapper" class="hidden">
+                <div id="cycle-list" class="space-y-2 text-gray-600 text-sm mt-3">
+                    <!-- Mysteries are populated here by JS for reference -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+    
+    <!-- Contemplation View Modal -->
+    <div id="contemplation-view" class="modal">
+        <div class="p-4 flex justify-between items-center bg-white shadow-md">
+            <h3 id="modal-mystery-title" class="text-xl font-bold text-gray-800 truncate pr-4"></h3>
+            <button onclick="closeContemplationView()" class="p-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="flex-grow flex flex-col items-center justify-center p-4 overflow-y-auto">
+            <!-- Image Area -->
+            <div class="w-full max-w-xl bg-white rounded-xl shadow-2xl p-2 mb-4">
+                <!-- Image source will be updated by JS -->
+                <img id="modal-image" class="contemplation-image rounded-lg" alt="Contemplation Image" 
+                     onerror="this.onerror=null; this.src='https://placehold.co/800x400/cccccc/000000?text=Image+Unavailable';">
+            </div>
+            
+            <!-- Description/Prayer Prompt Area -->
+            <div class="w-full max-w-xl bg-white rounded-xl shadow-lg p-6 text-center">
+                <p class="text-gray-700 italic">
+                    "Gaze upon this image. What emotion does it evoke? What detail catches your attention? How does it connect you to the life of Christ or Mary?"
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data structure for all 20 mysteries, organized by group, now including public domain image URLs
+        const allMysteries = {
+            "Joyful Mysteries": [
+                { title: "The Annunciation", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/e/e9/Fra_Angelico_-_Annunciation_-_WGA00555.jpg" },
+                { title: "The Visitation", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/a/a2/Albertinelli_Visitation_Uffizi.jpg" },
+                { title: "The Nativity", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Correggio_-_Adoration_of_the_Shepherds_%28The_Night%29_-_Google_Art_Project.jpg" },
+                { title: "The Presentation in the Temple", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/0/07/Giovanni_Bellini_-_Presentation_of_Christ_in_the_Temple_-_Google_Art_Project.jpg" },
+                { title: "The Finding in the Temple", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/5/52/Beschey_Christ_among_the_Doctors.jpg" }
+            ],
+            "Sorrowful Mysteries": [
+                { title: "The Agony in the Garden", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/77/Giovanni_Bellini_-_The_Agony_in_the_Garden_-_National_Gallery.jpg" },
+                { title: "The Scourging at the Pillar", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/d/dc/Caravaggio_Flagellation.jpg" },
+                { title: "The Crowning with Thorns", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/5/5a/Titian_-_The_Crowning_with_Thorns_-_1570.jpg" },
+                { title: "The Carrying of the Cross", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/a/a7/Hieronymus_Bosch_-_The_Carrying_of_the_Cross_%28Ghent%29.jpg" },
+                { title: "The Crucifixion", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/b/b8/Christ_on_the_Cross_by_Diego_Vel%C3%A1zquez.jpg" }
+            ],
+            "Glorious Mysteries": [
+                { title: "The Resurrection", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/3/36/Piero_della_Francesca_-_Resurrection.jpg" },
+                { title: "The Ascension", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/4/41/Giotto_-_Scrovegni_Chapel_-_The_Ascension.jpg" },
+                { title: "The Descent of the Holy Spirit", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/b/b3/El_Greco_-_Pentecost.jpg" },
+                { title: "The Assumption of Mary", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/a/aa/Tizian_057.jpg" },
+                { title: "The Coronation of Mary", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/9/9f/Fra_Angelico_-_Coronation_of_the_Virgin_-_WGA00551.jpg" }
+            ],
+            "Luminous Mysteries": [
+                { title: "The Baptism of Jesus in the Jordan", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/1/18/Piero_della_Francesca_-_Baptism_of_Christ_-_National_Gallery.jpg" },
+                { title: "The Wedding Feast at Cana", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Paolo_Veronese_-_The_Wedding_Feast_at_Cana.jpg" },
+                { title: "The Proclamation of the Kingdom of God", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/0/0c/Carl_Heinrich_Bloch_-_Sermon_on_the_Mount.jpg" },
+                { title: "The Transfiguration", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/9/91/Raphael_-_Transfiguration_-_Vatican.jpg" },
+                { title: "The Institution of the Eucharist", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/77/Dieric_Bouts_-_The_Last_Supper_-_WGA03011.jpg" }
+            ]
+        };
+
+        // The day index from Date() is 0 (Sunday) to 6 (Saturday)
+        const mysterySchedule = {
+            0: { name: "Glorious Mysteries", color: "gold" }, // Sunday
+            1: { name: "Joyful Mysteries", color: "green" }, // Monday
+            2: { name: "Sorrowful Mysteries", color: "red" }, // Tuesday
+            3: { name: "Glorious Mysteries", color: "gold" }, // Wednesday
+            4: { name: "Luminous Mysteries", color: "blue" }, // Thursday
+            5: { name: "Sorrowful Mysteries", color: "red" }, // Friday
+            6: { name: "Joyful Mysteries", color: "green" }  // Saturday
+        };
+
+        const dayNames = [
+            "Sunday", "Monday", "Tuesday", "Wednesday",
+            "Thursday", "Friday", "Saturday"
+        ];
+        
+        // --- Audio Management Variables and Functions ---
+        let audio;
+        let isMuted = false;
+
+        /**
+         * Updates the speaker icon based on the current muted state.
+         * @param {boolean} muted - True if muted, false otherwise.
+         */
+        function updateMuteButton(muted) {
+            const iconEl = document.getElementById('speaker-icon');
+            if (!iconEl) return;
+
+            // Speaker icon SVGs
+            const speakerHigh = `
+                <path d="M11.517 12.073c-.176.07-.357.149-.545.234A12.145 12.145 0 0 1 7.21 15.6l-3.265 3.324A2.35 2.35 0 1 1 1.637 17.5l3.245-3.303a11.972 11.972 0 0 0-.294-2.228 12.145 12.145 0 0 1 4.316-2.522l3.213 3.268Z" />
+                <path d="M15.485 18.79a3.793 3.793 0 0 0 2.923-3.996 3.793 3.793 0 0 0-3.996-3.923c-.347.013-.695.027-1.041.041l1.114 1.134 1.348 1.371Z" />
+                <path d="M21.5 12.5a9 9 0 0 0-18-1 9 9 0 0 0 18 1Z" opacity="0.4" />
+            `;
+            const speakerMute = `
+                <path d="M11.517 12.073c-.176.07-.357.149-.545.234A12.145 12.145 0 0 1 7.21 15.6l-3.265 3.324A2.35 2.35 0 1 1 1.637 17.5l3.245-3.303a11.972 11.972 0 0 0-.294-2.228 12.145 12.145 0 0 1 4.316-2.522l3.213 3.268Z" />
+                <path d="m3.116 2.028 17.756 17.962a1.5 1.5 0 0 1-2.122 2.1l-1.077-1.091A12.19 12.19 0 0 1 9.94 17.75l-4.707 4.757a2.35 2.35 0 1 1-3.323-3.323l4.743-4.759a11.956 11.956 0 0 0-.012-4.045L4.78 4.673a2.35 2.35 0 1 1 3.323-3.322l1.69 1.706 1.874 1.893 3.868 3.916 2.62-2.651a1.5 1.5 0 0 1 2.122 2.12l-1.895 1.914 2.876 2.91a1.5 1.5 0 0 1-2.122 2.121l-3.527-3.565-3.69-3.731Zm17.756.962a1.5 1.5 0 0 0-2.122 0l-17.756 17.962a1.5 1.5 0 0 0 2.122 2.12l17.756-17.962a1.5 1.5 0 0 0 0-2.12Z" fill-rule="evenodd" clip-rule="evenodd"/>
+            `;
+
+            iconEl.innerHTML = muted ? speakerMute : speakerHigh;
+        }
+
+        /**
+         * Toggles the mute state of the background music.
+         */
+        window.toggleMute = function() {
+            if (!audio) return;
+            
+            isMuted = !isMuted;
+            audio.muted = isMuted;
+            updateMuteButton(isMuted);
+
+            // If unmuting, attempt to play (to handle initial browser autoplay blocks)
+            if (!isMuted && audio.paused) {
+                audio.play().catch(e => {
+                    console.error("Autoplay required user interaction.", e);
+                });
+            }
+        }
+
+        /**
+         * Initializes the audio element and attempts to play the music.
+         */
+        function initAudio() {
+            audio = document.getElementById('background-music');
+            if (!audio) return;
+
+            // Set a lower volume for pleasant background sound
+            audio.volume = 0.4;
+            isMuted = false;
+            audio.muted = false;
+            updateMuteButton(isMuted);
+
+            // Attempt to play automatically (may fail due to browser policies)
+            audio.play().catch(e => {
+                console.info("Autoplay blocked by browser. Music is paused until user interaction.");
+                // Ensure the icon still shows unmuted, as that is the intended state.
+                updateMuteButton(false);
+            });
+        }
+
+
+        // --- View Management Functions ---
+
+        const modalEl = document.getElementById('contemplation-view');
+
+        /**
+         * Opens the full-screen contemplation view for a specific mystery.
+         */
+        window.openContemplationView = function(title, imageUrl) {
+            const modalTitleEl = document.getElementById('modal-mystery-title');
+            const modalImageEl = document.getElementById('modal-image');
+            
+            modalTitleEl.textContent = title;
+            // Use the actual image URL for the modal view
+            modalImageEl.src = imageUrl;
+            modalImageEl.alt = `${title} Visio Divina Image`;
+
+            // Activate the modal view
+            modalEl.classList.add('active');
+            document.getElementById('list-view').style.display = 'none';
+        }
+
+        /**
+         * Closes the contemplation view and returns to the list view.
+         */
+        window.closeContemplationView = function() {
+            modalEl.classList.remove('active');
+            document.getElementById('list-view').style.display = 'block';
+        }
+
+        // --- Helper Functions ---
+
+        /**
+         * Creates the HTML block for a single Mystery with the provided image URL.
+         */
+        function createMysteryCard(mystery, index) {
+            const title = mystery.title;
+            const imageUrl = mystery.imageUrl; // Use the provided public domain URL
+            
+            // Added onclick event handler here
+            // Note: The imageUrl is passed to the openContemplationView function
+            return `
+                <div id="mystery-${index}" 
+                     class="mystery-box bg-white rounded-lg overflow-hidden shadow-md"
+                     onclick="openContemplationView('${title.replace(/'/g, "\\'")}', '${imageUrl.replace(/'/g, "\\'")}')">
+                    <!-- Image Area -->
+                    <div class="relative h-48 bg-gray-200 flex items-center justify-center overflow-hidden">
+                        <img src="${imageUrl}" 
+                             alt="${title} contemplation image" 
+                             class="w-full h-full object-cover opacity-80"
+                             onerror="this.onerror=null; this.src='https://placehold.co/400x200/cccccc/000000?text=Image+Unavailable';">
+                        
+                        <!-- Header Overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900/70 to-transparent p-4 flex flex-col justify-end">
+                            <span class="text-xs font-medium text-white opacity-80">Mystery ${index + 1}</span>
+                            <h4 class="text-xl font-bold text-white leading-snug">${title}</h4>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Initializes the application logic.
+         */
+        function initApp() {
+            const today = new Date();
+            const dayIndex = today.getDay(); // 0-6
+            const currentDayName = dayNames[dayIndex];
+            const mysteryGroupName = mysterySchedule[dayIndex].name;
+            const currentMysteries = allMysteries[mysteryGroupName];
+
+            const mysteryGroupNameEl = document.getElementById('mystery-group-name');
+            const dayEl = document.getElementById('current-day-text');
+            const dailyMysteriesContainerEl = document.getElementById('daily-mysteries-container');
+            const cycleListEl = document.getElementById('cycle-list');
+
+            // 1. Update the main display
+            dayEl.textContent = `Today, ${currentDayName}, we contemplate the:`;
+            mysteryGroupNameEl.textContent = mysteryGroupName;
+
+            // 2. Populate the five specific daily mysteries
+            dailyMysteriesContainerEl.innerHTML = currentMysteries.map((mystery, index) => 
+                createMysteryCard(mystery, index)
+            ).join('');
+
+            // 3. Populate the full cycle list (for the hidden toggle)
+            cycleListEl.innerHTML = ''; // Clear previous content
+            for (let i = 0; i < 7; i++) {
+                const day = dayNames[i];
+                const mystery = mysterySchedule[i].name;
+
+                const listItem = document.createElement('p');
+                listItem.className = (i === dayIndex)
+                    ? "font-semibold text-indigo-600 flex justify-between items-center bg-indigo-100 p-2 rounded-md"
+                    : "flex justify-between items-center p-2";
+
+                listItem.innerHTML = `
+                    <span class="font-medium">${day}</span>
+                    <span class="text-right">${mystery}</span>
+                `;
+                cycleListEl.appendChild(listItem);
+            }
+            
+            // 4. Initialize Audio
+            initAudio();
+        }
+
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
+

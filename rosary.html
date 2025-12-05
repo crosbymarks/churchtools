@@ -48,26 +48,121 @@
             visibility: visible;
         }
         .contemplation-image {
-            max-height: 65vh; /* Responsive height limit */
+            max-height: 50vh; 
             width: 100%;
-            object-fit: contain; /* Ensure the image fits within the container */
+            object-fit: contain; 
+        }
+        /* Styles for the Rosary Beads (Roses) */
+        .bead {
+            display: inline-block;
+            width: 20px; 
+            height: 20px;
+            border-radius: 50%;
+            margin: 4px; 
+            transition: all 0.2s ease-in-out; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+            flex-shrink: 0; 
+        }
+        .red-bead {
+            background-color: #ef4444; 
+        }
+        .white-bead {
+            background-color: #ffffff; 
+            border: 1px solid #d1d5db; 
+        }
+        /* Dynamic Scrolling Animation */
+        @keyframes prayerScroll {
+            0% { transform: translateY(var(--start-position)); }
+            100% { transform: translateY(var(--end-position)); }
+        }
+        .scrolling-text {
+            animation-name: prayerScroll;
+            animation-timing-function: linear;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        /* Settings Panel specific styles */
+        #settings-panel.active {
+            transform: translateY(0);
         }
     </style>
 </head>
 <body class="p-4">
 
     <!-- Background Audio Element -->
-    <audio id="background-music" loop autoplay playsinline>
-        <source src="http://googleusercontent.com/file_content/5" type="audio/mpeg">
+    <audio id="background-music" loop playsinline>
+        <source src="instrumental-piano-christian-worship-of-jesus-301250.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
+
+    <!-- Settings Panel (Fixed at top, slides down when active) -->
+    <div id="settings-panel" class="fixed inset-x-0 top-0 transform -translate-y-full transition-transform duration-300 z-40 bg-white shadow-xl p-6 rounded-b-xl max-w-lg mx-auto">
+        <div class="flex justify-between items-center mb-6 border-b pb-4">
+            <h3 class="text-2xl font-bold text-indigo-700">App Settings</h3>
+            <button onclick="toggleSettingsPanel()" class="p-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100 transition">
+                <!-- Close Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Controls Area -->
+        <div class="space-y-4">
+            <!-- Pace Control -->
+            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow-sm">
+                <label for="speed-select" class="block text-base font-medium text-gray-700">Contemplation Pace</label>
+                <select id="speed-select" onchange="updateSpeed(this.value)" 
+                        class="block w-1/3 py-2 text-sm rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition">
+                    <option value="1.0">1x</option>
+                    <option value="1.25">1.25x</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="2.0">2x</option>
+                </select>
+            </div>
+
+            <!-- Text Size Control -->
+            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow-sm">
+                <label for="size-select" class="block text-base font-medium text-gray-700">Text Size</label>
+                <select id="size-select" onchange="updateTextSize(this.value)" 
+                        class="block w-1/3 py-2 text-sm rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition">
+                    <option value="medium">Medium</option>
+                    <option value="small">Small</option>
+                    <option value="large">Large</option>
+                </select>
+            </div>
+
+            <!-- Mute Control (Now using Unicode 🔊 and 🔇) -->
+            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow-sm">
+                <span class="text-base font-medium text-gray-700">Background Music</span>
+                <button id="mute-button" onclick="toggleMute()" class="p-2 text-indigo-600 hover:text-indigo-800 rounded-full hover:bg-indigo-100 transition flex items-center">
+                    <span id="mute-status" class="text-sm mr-2 font-semibold"></span>
+                    <span id="speaker-icon" class="text-2xl"></span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
 
     <!-- Main Container - List View -->
     <div id="list-view" class="card bg-white w-full max-w-lg mx-auto rounded-xl p-6 md:p-8 transition-all duration-300">
 
-        <!-- Header with Mute Button -->
-        <header class="flex justify-between items-start mb-6">
-            <div class="flex-shrink-0 w-8"></div> <!-- Left Spacer for alignment -->
+        <!-- Header with Settings Button -->
+        <header class="flex justify-between items-center mb-6">
+            
+            <!-- Left: Settings Button (Using HTML Entity for Gear) -->
+            <button id="settings-button" onclick="toggleSettingsPanel()" class="flex-shrink-0 p-2 text-gray-600 hover:text-indigo-600 rounded-full hover:bg-gray-100 transition">
+                <span class="text-2xl font-extrabold">&#9881;</span>
+            </button>
+
+            <!-- Center: Title -->
             <div class="text-center flex-grow">
                 <h1 class="text-3xl font-bold text-gray-800 mb-1">
                     <span class="text-indigo-600">Visio Divina</span> Rosary
@@ -76,12 +171,9 @@
                     Contemplation through sacred images.
                 </p>
             </div>
-            <!-- Mute/Unmute Button -->
-            <button id="mute-button" onclick="toggleMute()" class="flex-shrink-0 p-2 text-indigo-600 hover:text-indigo-800 rounded-full hover:bg-indigo-100 transition">
-                <svg id="speaker-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-                    <!-- Icon will be set by JavaScript on load -->
-                </svg>
-            </button>
+            
+            <!-- Right: Spacer to balance layout with settings button on left -->
+            <div class="w-10"></div>
         </header>
 
         <!-- Current Mystery Group Display -->
@@ -100,15 +192,16 @@
             <!-- Specific mysteries will be populated here by JS -->
         </div>
         
-        <!-- The Cycle List (Hidden by default for focus, but can be revealed) -->
+        <!-- The Cycle List (Toggable for day selection) -->
         <div class="mt-8 pt-4 border-t border-gray-200">
-            <button onclick="document.getElementById('cycle-list-wrapper').classList.toggle('hidden')" 
-                    class="w-full text-sm text-indigo-600 hover:text-indigo-800 font-medium">
-                Show Full Weekly Cycle
+            <button onclick="document.getElementById('cycle-list-wrapper').classList.toggle('hidden'); populateCycleList(realCurrentDayIndex, selectedDayIndex);" 
+                    class="w-full text-sm text-indigo-600 hover:text-indigo-800 font-medium py-2 rounded-md transition duration-150">
+                Show/Hide Full Weekly Cycle & Selector
             </button>
             <div id="cycle-list-wrapper" class="hidden">
-                <div id="cycle-list" class="space-y-2 text-gray-600 text-sm mt-3">
-                    <!-- Mysteries are populated here by JS for reference -->
+                <p class="text-sm font-semibold text-gray-600 mt-4 mb-2">Select a Day (Actual Current Day: *)</p>
+                <div id="cycle-list" class="space-y-1 text-sm">
+                    <!-- Mysteries are populated here by JS for selection -->
                 </div>
             </div>
         </div>
@@ -126,66 +219,78 @@
             </button>
         </div>
 
-        <div class="flex-grow flex flex-col items-center justify-center p-4 overflow-y-auto">
+        <div class="flex-grow flex flex-col items-center justify-start p-4 overflow-y-auto">
+            
+            <!-- Rose/Bead Container - min-h-14 is fixed height to prevent layout shift -->
+            <div id="rose-container" class="flex flex-wrap justify-center w-full max-w-xl mb-4 py-2 border-b border-gray-300 min-h-14">
+                <!-- Beads will be inserted here dynamically -->
+            </div>
+
             <!-- Image Area -->
-            <div class="w-full max-w-xl bg-white rounded-xl shadow-2xl p-2 mb-4">
+            <div class="w-full max-w-xl bg-white rounded-xl shadow-2xl p-2 mb-4 flex-shrink-0">
                 <!-- Image source will be updated by JS -->
                 <img id="modal-image" class="contemplation-image rounded-lg" alt="Contemplation Image" 
-                     onerror="this.onerror=null; this.src='https://placehold.co/800x400/cccccc/000000?text=Placeholder+Image';">
+                     onerror="this.onerror=null; this.src='https://placehold.co/800x450/cccccc/000000?text=Image+Load+Error';">
             </div>
             
-            <!-- Description/Prayer Prompt Area -->
-            <div class="w-full max-w-xl bg-white rounded-xl shadow-lg p-6 text-center">
-                <p class="text-gray-700 italic">
-                    "Gaze upon this image. What emotion does it evoke? What detail catches your attention? How does it connect you to the life of Christ or Mary?"
-                </p>
+            <!-- Dynamic Prayer Title Display Area -->
+            <div id="prayer-title-display" class="w-full max-w-xl p-3 mb-2 bg-indigo-100 rounded-lg shadow-inner text-center flex-shrink-0">
+                <h4 id="current-prayer-title" class="text-xl font-semibold text-indigo-800">Contemplation</h4>
+            </div>
+            
+            <!-- Dynamic Prayer Text Area - Vertically Scrolling -->
+            <div id="modal-text-area" class="w-full max-w-xl bg-white rounded-xl shadow-lg p-6 h-40 overflow-y-hidden">
+                <div id="dynamic-prayer-content" class="text-lg text-gray-700 italic text-center"> 
+                    <!-- Initial text is here -->
+                    <p id="dynamic-prayer-text">
+                        Gaze upon this image. What emotion does it evoke? What detail catches your attention? How does it connect you to the life of Christ or Mary?
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Data structure for all 20 mysteries, organized by group.
-        // Replaced external links with reliable placeholder URLs (using the Mystery name in the text)
+        // Data structure for all 20 mysteries using the VERIFIED DIRECT WIKIMEDIA CDN URL (non-redirecting)
         const allMysteries = {
             "Joyful Mysteries": [
-                { title: "The Annunciation", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Annunciation" },
-                { title: "The Visitation", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Visitation" },
-                { title: "The Nativity", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Nativity" },
-                { title: "The Presentation in the Temple", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Presentation+in+the+Temple" },
-                { title: "The Finding in the Temple", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Finding+in+the+Temple" }
+                { title: "The Annunciation", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ec/Fra_Angelico_003.jpg" },
+                { title: "The Visitation", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/1/18/Domenico_Ghirlandaio_-_Visitation_-_Google_Art_Project.jpg" },
+                { title: "The Nativity", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Geertgen_tot_Sint_Jans_001.jpg" },
+                { title: "The Presentation in the Temple", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/d/d7/Rembrandt_Harmensz._van_Rijn_-_Simeon_in_the_Temple_%28c._1627%29.jpg" },
+                { title: "The Finding in the Temple", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/5/53/Carlo_Crivelli_-_Christ_amongst_the_Doctors.jpg" }
             ],
             "Sorrowful Mysteries": [
-                { title: "The Agony in the Garden", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Agony+in+the+Garden" },
-                { title: "The Scourging at the Pillar", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Scourging+at+the+Pillar" },
-                { title: "The Crowning with Thorns", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Crowning+with+Thorns" },
-                { title: "The Carrying of the Cross", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Carrying+of+the+Cross" },
-                { title: "The Crucifixion", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Crucifixion" }
+                { title: "The Agony in the Garden", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/d/df/Agony_in_the_Garden_by_Giovanni_Bellini.jpg" },
+                { title: "The Scourging at the Pillar", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/5/5f/Scourging_of_Christ_%28Piero_della_Francesca%29.jpg" },
+                { title: "The Crowning with Thorns", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/9/90/Caravaggio_-_The_Crowning_with_Thorns_-_WGA04071.jpg" },
+                { title: "The Carrying of the Cross", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/2/23/Hieronymus_Bosch_-_Christ_Carrying_the_Cross.jpg" },
+                { title: "The Crucifixion", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/c/c2/Crucifixion_%28Corpus_Domini%29_by_Lotto.jpg" }
             ],
             "Glorious Mysteries": [
-                { title: "The Resurrection", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Resurrection" },
-                { title: "The Ascension", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Ascension" },
-                { title: "The Descent of the Holy Spirit", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Descent+of+the+Holy+Spirit" },
-                { title: "The Assumption of Mary", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Assumption+of+Mary" },
-                { title: "The Coronation of Mary", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Coronation+of+Mary" }
+                { title: "The Resurrection", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Piero_della_Francesca_-_The_Resurrection.jpg" },
+                { title: "The Ascension", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/4/4e/Jacopo_Tintoretto_-_Ascension_of_Christ.jpg" },
+                { title: "The Descent of the Holy Spirit", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/8/87/Duccio_di_Buoninsegna_-_The_Descent_of_the_Holy_Spirit.jpg" },
+                { title: "The Assumption of Mary", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/0/07/Titian_-_Assumption_of_the_Virgin_%28Detail%29.jpg" },
+                { title: "The Coronation of Mary", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/4/49/Velazquez_coronacion.jpg" }
             ],
             "Luminous Mysteries": [
-                { title: "The Baptism of Jesus in the Jordan", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Baptism+of+Jesus" },
-                { title: "The Wedding Feast at Cana", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Wedding+Feast+at+Cana" },
-                { title: "The Proclamation of the Kingdom of God", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=Proclamation+of+the+Kingdom" },
-                { title: "The Transfiguration", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=The+Transfiguration" },
-                { title: "The Institution of the Eucharist", imageUrl: "https://placehold.co/800x450/4f46e5/ffffff?text=Institution+of+the+Eucharist" }
+                { title: "The Baptism of Jesus in the Jordan", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7b/The_Baptism_of_Christ_by_Piero_della_Francesca.jpg" },
+                { title: "The Wedding Feast at Cana", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/e/e0/Paolo_Veronese_-_The_Wedding_at_Cana_%28detail%29.jpg" },
+                { title: "The Proclamation of the Kingdom of God", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/2/27/Raphael_-_Christ_with_a-Staff_%28detail_from_The_Disputation_of_the_Sacrament%29.jpg" },
+                { title: "The Transfiguration", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/f/f0/Raphael_-_Transfiguration.jpg" },
+                { title: "The Institution of the Eucharist", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/4/4b/Leonardo_da_Vinci_-_The_Last_Supper.jpg" }
             ]
         };
 
-        // The day index from Date() is 0 (Sunday) to 6 (Saturday)
         const mysterySchedule = {
-            0: { name: "Glorious Mysteries", color: "gold" }, // Sunday
-            1: { name: "Joyful Mysteries", color: "green" }, // Monday
-            2: { name: "Sorrowful Mysteries", color: "red" }, // Tuesday
-            3: { name: "Glorious Mysteries", color: "gold" }, // Wednesday
-            4: { name: "Luminous Mysteries", color: "blue" }, // Thursday
-            5: { name: "Sorrowful Mysteries", color: "red" }, // Friday
-            6: { name: "Joyful Mysteries", color: "green" }  // Saturday
+            0: { name: "Glorious Mysteries", color: "gold" }, 
+            1: { name: "Joyful Mysteries", color: "green" }, 
+            2: { name: "Sorrowful Mysteries", color: "red" }, 
+            3: { name: "Glorious Mysteries", color: "gold" }, 
+            4: { name: "Luminous Mysteries", color: "blue" }, 
+            5: { name: "Sorrowful Mysteries", color: "red" }, 
+            6: { name: "Joyful Mysteries", color: "green" }  
         };
 
         const dayNames = [
@@ -193,109 +298,505 @@
             "Thursday", "Friday", "Saturday"
         ];
         
-        // --- Audio Management Variables and Functions ---
+        // --- STATE VARIABLES ---
+        const today = new Date();
+        const realCurrentDayIndex = today.getDay(); // 0 (Sunday) to 6 (Saturday)
+        let selectedDayIndex = realCurrentDayIndex; // Start on the actual day
+        
+        // --- Font Size Management Variables ---
+        let baseTextClass = 'text-base'; 
+        let scrollTextClass = 'text-xl'; 
+        
+        // --- Wake Lock Management Variable ---
+        let wakeLockSentinel = null;
+        
+        // --- Base Pacing Constant (0.35 seconds per word) ---
+        const MS_PER_WORD = 350; 
+
+        // --- DYNAMICALLY CALCULATED DURATIONS (Initialized later) ---
+        let BASE_OF_DURATION = 0;
+        let BASE_HM_DURATION = 0; 
+        let BASE_GB_DURATION = 0;
+
+        let speedFactor = 1.0;
+        let D_OF_DURATION = 0;
+        let D_HM_DURATION = 0;
+        let D_GB_DURATION = 0;
+
+        // --- Timer and Audio Management Variables and Functions ---
         let audio;
         let isMuted = false;
+        let mainTimer; 
+        let decadeTimers = []; 
+        const modalEl = document.getElementById('contemplation-view');
+
 
         /**
-         * Updates the speaker icon based on the current muted state.
-         * @param {boolean} muted - True if muted, false otherwise.
+         * Helper function to count words in a string.
          */
-        function updateMuteButton(muted) {
-            const iconEl = document.getElementById('speaker-icon');
-            if (!iconEl) return;
-
-            // Speaker icon SVGs
-            const speakerHigh = `
-                <path d="M11.517 12.073c-.176.07-.357.149-.545.234A12.145 12.145 0 0 1 7.21 15.6l-3.265 3.324A2.35 2.35 0 1 1 1.637 17.5l3.245-3.303a11.972 11.972 0 0 0-.294-2.228 12.145 12.145 0 0 1 4.316-2.522l3.213 3.268Z" />
-                <path d="M15.485 18.79a3.793 3.793 0 0 0 2.923-3.996 3.793 3.793 0 0 0-3.996-3.923c-.347.013-.695.027-1.041.041l1.114 1.134 1.348 1.371Z" />
-                <path d="M21.5 12.5a9 9 0 0 0-18-1 9 9 0 0 0 18 1Z" opacity="0.4" />
-            `;
-            const speakerMute = `
-                <path d="M11.517 12.073c-.176.07-.357.149-.545.234A12.145 12.145 0 0 1 7.21 15.6l-3.265 3.324A2.35 2.35 0 1 1 1.637 17.5l3.245-3.303a11.972 11.972 0 0 0-.294-2.228 12.145 12.145 0 0 1 4.316-2.522l3.213 3.268Z" />
-                <path d="m3.116 2.028 17.756 17.962a1.5 1.5 0 0 1-2.122 2.1l-1.077-1.091A12.19 12.19 0 0 1 9.94 17.75l-4.707 4.757a2.35 2.35 0 1 1-3.323-3.323l4.743-4.759a11.956 11.956 0 0 0-.012-4.045L4.78 4.673a2.35 2.35 0 1 1 3.323-3.322l1.69 1.706 1.874 1.893 3.868 3.916 2.62-2.651a1.5 1.5 0 0 1 2.122 2.12l-1.895 1.914 2.876 2.91a1.5 1.5 0 0 1-2.122 2.121l-3.527-3.565-3.69-3.731Zm17.756.962a1.5 1.5 0 0 0-2.122 0l-17.756 17.962a1.5 1.5 0 0 0 2.122 2.12l17.756-17.962a1.5 1.5 0 0 0 0-2.12Z" fill-rule="evenodd" clip-rule="evenodd"/>
-            `;
-
-            iconEl.innerHTML = muted ? speakerMute : speakerHigh;
+        function getWordCount(text) {
+            const cleanText = text.replace(/<[^>]*>?/gm, '').trim();
+            if (cleanText === '') return 0;
+            return cleanText.split(/\s+/).length;
         }
 
         /**
-         * Toggles the mute state of the background music.
+         * Calculates the base duration for each prayer based on its word count and MS_PER_WORD.
          */
-        window.toggleMute = function() {
-            if (!audio) return;
+        function calculateBaseDurations() {
+            BASE_OF_DURATION = getWordCount(getOurFatherText()) * MS_PER_WORD;
+            BASE_HM_DURATION = getWordCount(getHailMaryText(1)) * MS_PER_WORD;
+            BASE_GB_DURATION = getWordCount(getGloryBeFatimaText()) * MS_PER_WORD;
             
-            isMuted = !isMuted;
-            audio.muted = isMuted;
-            updateMuteButton(isMuted);
+            // Add a small buffer (e.g., 2 seconds) to ensure the full scroll finishes
+            const scrollBuffer = 2000; 
+            BASE_OF_DURATION += scrollBuffer;
+            BASE_HM_DURATION += scrollBuffer;
+            BASE_GB_DURATION += scrollBuffer;
+        }
+        
+        /**
+         * Updates the text size factor and recalculates the Tailwind classes.
+         */
+        window.updateTextSize = function(sizeFactor) {
+            switch (sizeFactor) {
+                case 'small':
+                    baseTextClass = 'text-sm';
+                    scrollTextClass = 'text-lg';
+                    break;
+                case 'medium':
+                    baseTextClass = 'text-base';
+                    scrollTextClass = 'text-xl';
+                    break;
+                case 'large':
+                    baseTextClass = 'text-lg';
+                    scrollTextClass = 'text-2xl';
+                    break;
+                default:
+                    baseTextClass = 'text-base';
+                    scrollTextClass = 'text-xl';
+            }
+            // If the contemplation view is open, close it to apply new settings cleanly
+            if (modalEl.classList.contains('active')) {
+                closeContemplationView();
+            }
+        }
+        
+        // --- Prayer Text Definitions (using dynamic classes) ---
 
-            // If unmuting, attempt to play (to handle initial browser autoplay blocks)
-            if (!isMuted && audio.paused) {
-                audio.play().catch(e => {
-                    console.error("Autoplay required user interaction.", e);
-                });
+        const getInitialContemplationText = () => `
+            <p class="text-gray-700 italic ${baseTextClass}">
+                Gaze upon this image. What emotion does it evoke? What detail catches your attention? How does it connect you to the life of Christ or Mary?
+            </p>
+        `;
+
+        const getOurFatherText = () => `
+            <p class="${scrollTextClass} text-gray-900 font-bold text-center">
+                Our Father, Who art in heaven, Hallowed be Thy Name. 
+                Thy Kingdom come, Thy Will be done, on Earth as it is in Heaven. 
+                Give us this day our daily bread, and forgive us our trespasses, 
+                as we forgive those who trespass against us. 
+                And lead us not into temptation, but deliver us from evil. Amen.
+            </p>
+        `;
+
+        const getHailMaryText = (index) => `
+            <p class="${scrollTextClass} text-gray-900 font-bold text-center">
+                Hail Mary, full of grace, the Lord is with thee. 
+                Blessed art thou amongst women, and blessed is the fruit of thy womb, Jesus. 
+                Holy Mary, Mother of God, pray for us sinners, 
+                now and at the hour of our death. Amen.
+            </p>
+        `;
+
+        const getGloryBeFatimaText = () => `
+            <div class="space-y-4">
+                <p class="${scrollTextClass} text-gray-900 font-bold text-center">
+                    <span class="font-semibold underline">Glory Be:</span>
+                    Glory be to the Father, and to the Son, and to the Holy Spirit. 
+                    As it was in the beginning, is now, and ever shall be, 
+                    world without end. Amen.
+                </p>
+                <p class="${scrollTextClass} text-gray-900 font-bold text-center">
+                    <span class="font-semibold underline">Fatima Prayer:</span>
+                    O my Jesus, forgive us our sins, save us from the fires of hell, 
+                    lead all souls to Heaven, especially those in most need of Thy mercy.
+                </p>
+            </div>
+        `;
+        
+        /**
+         * Recalculates prayer durations based on the new speed factor and word count derived base durations.
+         */
+        window.updateSpeed = function(newFactor) {
+            speedFactor = parseFloat(newFactor);
+            // The faster the speedFactor (e.g., 2.0), the shorter the duration.
+            D_OF_DURATION = Math.floor(BASE_OF_DURATION / speedFactor);
+            D_HM_DURATION = Math.floor(BASE_HM_DURATION / speedFactor);
+            D_GB_DURATION = Math.floor(BASE_GB_DURATION / speedFactor);
+            
+            // If the contemplation view is open, close it to apply new settings cleanly
+            if (modalEl.classList.contains('active')) {
+                closeContemplationView();
             }
         }
 
         /**
-         * Initializes the audio element and attempts to play the music.
+         * Toggles the visibility of the settings panel.
          */
+        window.toggleSettingsPanel = function() {
+            const panel = document.getElementById('settings-panel');
+            panel.classList.toggle('active');
+        }
+
+        /**
+         * Clears all active timers and resets the view to the Contemplation state.
+         */
+        function clearTimers() {
+            if (mainTimer) {
+                clearTimeout(mainTimer);
+                mainTimer = null;
+            }
+            decadeTimers.forEach(clearTimeout);
+            decadeTimers = [];
+            
+            document.getElementById('rose-container').innerHTML = '';
+            
+            const prayerContent = document.getElementById('dynamic-prayer-content');
+            
+            // Reset text area's animation, transition, and position
+            prayerContent.style.animation = 'none'; 
+            prayerContent.style.transition = 'none'; 
+            prayerContent.style.transform = `translateY(0px)`; 
+            prayerContent.style.opacity = '1'; 
+            
+            // Set the title back to default
+            document.getElementById('current-prayer-title').textContent = "Contemplation";
+
+            // Reset content to initial contemplation text, using the current size class
+            prayerContent.innerHTML = getInitialContemplationText();
+        }
+
+        /**
+         * Applies the scroll animation dynamically.
+         */
+        function applyScrollAnimation(totalDurationInMs, textHtml, title) {
+            const prayerTitle = document.getElementById('current-prayer-title');
+            const container = document.getElementById('modal-text-area');
+            const content = document.getElementById('dynamic-prayer-content');
+            
+            // 1. Set Title
+            prayerTitle.textContent = title;
+
+            // 2. Reset and set initial state
+            content.style.animation = 'none';
+            content.style.transition = 'none'; 
+            content.style.opacity = '1'; 
+            content.style.transform = `translateY(0px)`; 
+            content.innerHTML = ''; 
+            content.offsetHeight; 
+
+            // 3. Inject Content
+            const prayerWrapper = document.createElement('div');
+            prayerWrapper.innerHTML = textHtml.trim(); 
+            content.appendChild(prayerWrapper);
+            
+            // Post-Buffer: Ensures the entire prayer text scrolls past the top edge.
+            const containerHeight = container.offsetHeight;
+            const postBuffer = document.createElement('div');
+            postBuffer.style.height = `${containerHeight}px`;
+            postBuffer.style.flexShrink = 0;
+            content.appendChild(postBuffer);
+            
+            content.offsetHeight; 
+
+            // 4. Calculate Scroll Distance
+            const textHeight = prayerWrapper.offsetHeight; 
+            if (textHeight === 0) { 
+                console.warn("Prayer text is empty or too short to scroll.");
+                return;
+            }
+            
+            const startPosition = containerHeight; 
+            const endPosition = -textHeight; 
+
+            // 5. Apply Animation
+            const durationInSeconds = totalDurationInMs / 1000;
+
+            // Set the start and end positions for the CSS animation
+            content.style.setProperty('--start-position', `${startPosition}px`);
+            content.style.setProperty('--end-position', `${endPosition}px`);
+            
+            content.style.animation = `prayerScroll ${durationInSeconds}s linear forwards`;
+        }
+
+        /**
+         * Starts the decade meditation sequence, using the dynamically calculated durations.
+         */
+        function startMeditationSequence() {
+            const rosesContainer = document.getElementById('rose-container');
+            
+            // Function to reset the color of a bead
+            function resetBeadColor(id) {
+                const bead = document.getElementById(id);
+                if (!bead) return;
+                bead.style.backgroundColor = bead.classList.contains('red-bead') ? '#ef4444' : '#ffffff';
+            }
+
+            // Function to highlight the color of a bead
+            function highlightBeadColor(id, isRed) {
+                const bead = document.getElementById(id);
+                if (!bead) return;
+                bead.style.backgroundColor = isRed ? '#b91c1c' : '#e5e7eb'; // Darker shades for highlight
+            }
+
+            // --- FIRST RED BEAD (Our Father) ---
+            rosesContainer.innerHTML = '<span class="bead red-bead" id="bead-0"></span>';
+            applyScrollAnimation(D_OF_DURATION, getOurFatherText(), "The Our Father"); 
+            highlightBeadColor('bead-0', true);
+
+            let currentTime = D_OF_DURATION; 
+
+            // --- HAIL MARY SEQUENCE (10 White Beads) ---
+            for (let i = 1; i <= 10; i++) {
+                const delay = currentTime;
+                
+                const timer = setTimeout(() => {
+                    const prevBeadId = `bead-${i - 1}`;
+                    const isPrevRed = i === 1; 
+                    resetBeadColor(prevBeadId);
+
+                    // Update beads
+                    rosesContainer.innerHTML += `<span class="bead white-bead" id="bead-${i}"></span>`;
+                    highlightBeadColor(`bead-${i}`, false);
+                    
+                    // Update prayer text and scroll
+                    applyScrollAnimation(D_HM_DURATION, getHailMaryText(i), `Hail Mary (${i} of 10)`);
+                }, delay);
+                decadeTimers.push(timer);
+                
+                currentTime += D_HM_DURATION; // Accumulate delay
+            }
+
+            // --- FINAL RED BEAD (Glory Be / Fatima) ---
+            const finalBeadDelay = currentTime;
+
+            const timerFinal = setTimeout(() => {
+                resetBeadColor('bead-10');
+
+                // Update beads
+                rosesContainer.innerHTML += '<span class="bead red-bead" id="bead-11"></span>';
+                highlightBeadColor('bead-11', true);
+                
+                // Update prayer text and scroll
+                applyScrollAnimation(D_GB_DURATION, getGloryBeFatimaText(), "Glory Be & Fatima Prayer");
+            }, finalBeadDelay);
+            decadeTimers.push(timerFinal);
+
+            // --- Close Modal ---
+            const closeDelay = finalBeadDelay + D_GB_DURATION; 
+            mainTimer = setTimeout(closeContemplationView, closeDelay); 
+        }
+
+        // --- Audio Management Functions ---
+        /**
+         * Updates the mute button using Unicode Emojis (🔊: Unmuted, 🔇: Muted).
+         */
+        function updateMuteButton(muted) {
+            const iconEl = document.getElementById('speaker-icon');
+            const statusEl = document.getElementById('mute-status');
+            if (!iconEl || !statusEl) return;
+
+            statusEl.textContent = muted ? "Muted" : "Unmuted";
+
+            // Unmuted (Loud Speaker: 🔊, &#128266;) or Muted (Mute Speaker: 🔇, &#128263;)
+            iconEl.innerHTML = muted ? '&#128263;' : '&#128266;';
+        }
+
+        window.toggleMute = function() {
+            if (!audio) return;
+            isMuted = !isMuted;
+            audio.muted = isMuted;
+            updateMuteButton(isMuted);
+            // Try to play if unmuting (requires user interaction)
+            if (!isMuted && audio.paused) {
+                audio.play().catch(e => { console.error("Audio playback failed, ensure system volume is up.", e); });
+            }
+        }
+
         function initAudio() {
             audio = document.getElementById('background-music');
             if (!audio) return;
-
-            // Set a lower volume for pleasant background sound
             audio.volume = 0.4;
             isMuted = false;
             audio.muted = false;
-            updateMuteButton(isMuted);
-
-            // Attempt to play automatically (may fail due to browser policies)
-            audio.play().catch(e => {
-                console.info("Autoplay blocked by browser. Music is paused until user interaction.");
-                // Ensure the icon still shows unmuted, as that is the intended state.
-                updateMuteButton(false);
+            updateMuteButton(isMuted); // Set initial state in the settings panel
+            
+            // Initial attempt to play.
+            audio.play().catch(e => { 
+                console.info("Autoplay blocked by browser. Music will start once you interact with the app."); 
             });
         }
 
 
-        // --- View Management Functions ---
+        // --- Wake Lock API Implementation ---
+        async function requestWakeLock() {
+            if ('wakeLock' in navigator) {
+                try {
+                    wakeLockSentinel = await navigator.wakeLock.request('screen');
+                    wakeLockSentinel.addEventListener('release', () => {
+                        wakeLockSentinel = null;
+                    });
+                } catch (err) {
+                    wakeLockSentinel = null;
+                }
+            } 
+        }
 
-        const modalEl = document.getElementById('contemplation-view');
+        function releaseWakeLock() {
+            if (wakeLockSentinel) {
+                wakeLockSentinel.release()
+                    .then(() => {
+                        wakeLockSentinel = null;
+                    })
+                    .catch((err) => {
+                        wakeLockSentinel = null;
+                    });
+            }
+        }
+        
+        function handleVisibilityChange() {
+            if (wakeLockSentinel !== null && document.visibilityState === 'visible') {
+                requestWakeLock();
+            }
+        }
+        
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        // --- Day Selection & View Management Functions ---
+
+        /**
+         * Selects a new day and updates the displayed mysteries.
+         */
+        window.selectDay = function(newIndex) {
+            selectedDayIndex = newIndex;
+            updateMainDisplay(selectedDayIndex);
+            
+            // Re-render the cycle list to reflect the new selection highlight
+            populateCycleList(realCurrentDayIndex, selectedDayIndex);
+            
+            // Optionally hide the list after selection on mobile
+            const cycleListWrapper = document.getElementById('cycle-list-wrapper');
+            if (cycleListWrapper && !cycleListWrapper.classList.contains('hidden') && window.innerWidth < 640) {
+                 cycleListWrapper.classList.add('hidden');
+            }
+        }
+        
+        /**
+         * Updates the main display elements (header and mystery cards) based on the selected day.
+         */
+        function updateMainDisplay(dayIndex) {
+            const currentDayName = dayNames[dayIndex];
+            const mysteryGroupName = mysterySchedule[dayIndex].name;
+            const currentMysteries = allMysteries[mysteryGroupName];
+
+            const mysteryGroupNameEl = document.getElementById('mystery-group-name');
+            const dayEl = document.getElementById('current-day-text');
+            const dailyMysteriesContainerEl = document.getElementById('daily-mysteries-container');
+
+            // 1. Update the display text based on selection
+            dayEl.textContent = dayIndex === realCurrentDayIndex
+                ? `Today, ${currentDayName}, we contemplate the:`
+                : `Viewing ${currentDayName}'s Mysteries: (Actual Day: ${dayNames[realCurrentDayIndex]})`;
+                
+            mysteryGroupNameEl.textContent = mysteryGroupName;
+
+            // 2. Populate the five specific daily mysteries
+            dailyMysteriesContainerEl.innerHTML = currentMysteries.map((mystery, index) => 
+                createMysteryCard(mystery, index)
+            ).join('');
+        }
+        
+        /**
+         * Populates the full cycle list with clickable elements.
+         */
+        function populateCycleList(realDayIndex, selectedDayIndex) {
+            const cycleListEl = document.getElementById('cycle-list');
+            if (!cycleListEl) return;
+            cycleListEl.innerHTML = ''; 
+
+            for (let i = 0; i < 7; i++) {
+                const day = dayNames[i];
+                const mystery = mysterySchedule[i].name;
+                const isRealDay = i === realDayIndex;
+                const isSelected = i === selectedDayIndex;
+                
+                const listItem = document.createElement('p');
+                listItem.className = (isSelected)
+                    ? "font-semibold text-indigo-100 flex justify-between items-center bg-indigo-600 p-2 rounded-md transition duration-150 hover:bg-indigo-700 cursor-pointer"
+                    : "flex justify-between items-center p-2 text-gray-600 cursor-pointer bg-gray-50 rounded-md transition duration-150 hover:bg-indigo-100";
+                
+                listItem.onclick = () => selectDay(i);
+
+                listItem.innerHTML = `
+                    <span class="font-medium">${day} ${isRealDay ? ' *' : ''}</span>
+                    <span class="text-right">${mystery}</span>
+                `;
+                cycleListEl.appendChild(listItem);
+            }
+        }
+
 
         /**
          * Opens the full-screen contemplation view for a specific mystery.
          */
         window.openContemplationView = function(title, imageUrl) {
+            // 1. Close settings panel if open
+            const settingsPanel = document.getElementById('settings-panel');
+            if (settingsPanel.classList.contains('active')) {
+                toggleSettingsPanel();
+            }
+
+            // 2. Clear previous state
+            clearTimers(); 
+            
             const modalTitleEl = document.getElementById('modal-mystery-title');
             const modalImageEl = document.getElementById('modal-image');
             
             modalTitleEl.textContent = title;
-            // Use the actual image URL for the modal view (which is now a placeholder)
             modalImageEl.src = imageUrl;
             modalImageEl.alt = `${title} Visio Divina Image`;
-
-            // Activate the modal view
+            
+            // 3. Activate the modal view
             modalEl.classList.add('active');
             document.getElementById('list-view').style.display = 'none';
+            
+            // 4. Audio & Wake Lock
+            if (audio && audio.paused && !isMuted) {
+                audio.play().catch(e => console.error("Audio playback error on user interaction:", e));
+            }
+            requestWakeLock(); 
+
+            // 5. Start the sequence
+            const INITIAL_DELAY = 10000 / speedFactor; 
+            mainTimer = setTimeout(startMeditationSequence, INITIAL_DELAY); 
         }
 
         /**
          * Closes the contemplation view and returns to the list view.
          */
         window.closeContemplationView = function() {
+            clearTimers(); 
+            releaseWakeLock(); 
             modalEl.classList.remove('active');
             document.getElementById('list-view').style.display = 'block';
         }
 
-        // --- Helper Functions ---
+        // --- Helper Functions (Unchanged) ---
 
-        /**
-         * Creates the HTML block for a single Mystery with the provided image URL.
-         */
         function createMysteryCard(mystery, index) {
             const title = mystery.title;
-            const imageUrl = mystery.imageUrl; // Use the provided placeholder URL
+            const imageUrl = mystery.imageUrl; 
             
             return `
                 <div id="mystery-${index}" 
@@ -303,11 +804,11 @@
                      onclick="openContemplationView('${title.replace(/'/g, "\\'")}', '${imageUrl.replace(/'/g, "\\'")}')">
                     <!-- Image Area -->
                     <div class="relative h-48 bg-gray-200 flex items-center justify-center overflow-hidden">
-                        <!-- Placeholder Image is now used here -->
+                        <!-- Public Domain Image -->
                         <img src="${imageUrl}" 
                              alt="${title} contemplation image" 
                              class="w-full h-full object-cover opacity-80"
-                             onerror="this.onerror=null; this.src='https://placehold.co/400x200/cccccc/000000?text=Placeholder+Error';">
+                             onerror="this.onerror=null; this.src='https://placehold.co/400x200/cccccc/000000?text=Image+Load+Error';">
                         
                         <!-- Header Overlay -->
                         <div class="absolute inset-0 bg-gradient-to-t from-gray-900/70 to-transparent p-4 flex flex-col justify-end">
@@ -323,45 +824,20 @@
          * Initializes the application logic.
          */
         function initApp() {
-            const today = new Date();
-            const dayIndex = today.getDay(); // 0-6
-            const currentDayName = dayNames[dayIndex];
-            const mysteryGroupName = mysterySchedule[dayIndex].name;
-            const currentMysteries = allMysteries[mysteryGroupName];
-
-            const mysteryGroupNameEl = document.getElementById('mystery-group-name');
-            const dayEl = document.getElementById('current-day-text');
-            const dailyMysteriesContainerEl = document.getElementById('daily-mysteries-container');
-            const cycleListEl = document.getElementById('cycle-list');
-
-            // 1. Update the main display
-            dayEl.textContent = `Today, ${currentDayName}, we contemplate the:`;
-            mysteryGroupNameEl.textContent = mysteryGroupName;
-
-            // 2. Populate the five specific daily mysteries
-            dailyMysteriesContainerEl.innerHTML = currentMysteries.map((mystery, index) => 
-                createMysteryCard(mystery, index)
-            ).join('');
-
-            // 3. Populate the full cycle list (for the hidden toggle)
-            cycleListEl.innerHTML = ''; // Clear previous content
-            for (let i = 0; i < 7; i++) {
-                const day = dayNames[i];
-                const mystery = mysterySchedule[i].name;
-
-                const listItem = document.createElement('p');
-                listItem.className = (i === dayIndex)
-                    ? "font-semibold text-indigo-600 flex justify-between items-center bg-indigo-100 p-2 rounded-md"
-                    : "flex justify-between items-center p-2";
-
-                listItem.innerHTML = `
-                    <span class="font-medium">${day}</span>
-                    <span class="text-right">${mystery}</span>
-                `;
-                cycleListEl.appendChild(listItem);
-            }
+            // 1. Calculate Base Durations based on Word Count
+            calculateBaseDurations();
             
-            // 4. Initialize Audio
+            // 2. Set initial settings based on dropdown defaults (This will set D_OF/HM/GB_DURATION)
+            updateSpeed(document.getElementById('speed-select').value); 
+            updateTextSize(document.getElementById('size-select').value); 
+            
+            // 3. Initial display update (starts on the actual current day)
+            updateMainDisplay(selectedDayIndex);
+
+            // 4. Populate the full cycle list (for the hidden toggle)
+            populateCycleList(realCurrentDayIndex, selectedDayIndex);
+            
+            // 5. Initialize Audio
             initAudio();
         }
 

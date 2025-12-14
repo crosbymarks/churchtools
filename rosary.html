@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Daily Rosary Mystery Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -14,6 +14,7 @@
             align-items: center;
             justify-content: center;
             background-color: #f7f3f1;
+            overscroll-behavior: none; /* Prevents pull-to-refresh on mobile */
         }
         .card {
             box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -39,16 +40,17 @@
         }
         .modal.active { opacity: 1; visibility: visible; }
         
+        /* ADJUSTED: Reduced max-height to fit mobile screens better */
         .contemplation-image {
-            max-height: 35vh; 
+            max-height: 25vh; 
             width: 100%;
             object-fit: contain;
             transition: opacity 0.3s ease;
         }
         
         .bead {
-            display: inline-block; width: 20px; height: 20px;
-            border-radius: 50%; margin: 4px; flex-shrink: 0;
+            display: inline-block; width: 18px; height: 18px; /* Slightly smaller beads */
+            border-radius: 50%; margin: 3px; flex-shrink: 0;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             transition: all 0.2s ease;
         }
@@ -68,9 +70,11 @@
 
         #settings-panel.active { transform: translateY(0); }
         .control-btn {
-            padding: 0.75rem 1rem; border-radius: 9999px;
+            padding: 0.5rem 0.75rem; /* Compact buttons */
+            border-radius: 9999px;
             font-weight: 600; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: all 0.2s ease;
+            font-size: 0.9rem;
         }
     </style>
 </head>
@@ -164,38 +168,38 @@
     </div>
     
     <div id="contemplation-view" class="modal">
-        <div class="p-4 flex justify-end items-center bg-white shadow-md flex-shrink-0 relative">
-            <h3 id="modal-top-title" class="absolute inset-x-4 text-center text-xl font-bold text-gray-800 truncate"></h3>
+        <div class="p-2 flex justify-end items-center bg-white shadow-md flex-shrink-0 relative h-12">
+            <h3 id="modal-top-title" class="absolute inset-x-8 text-center text-lg font-bold text-gray-800 truncate"></h3>
             <button onclick="finishSession(false)" class="p-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100 transition z-10">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
         </div>
 
-        <div class="flex-grow flex flex-col items-center justify-start p-4 overflow-y-auto">
-            <div id="rose-container" class="flex flex-wrap justify-center w-full max-w-xl mb-4 py-2 border-b border-gray-300 min-h-[60px] flex-shrink-0 items-center">
+        <div class="flex-grow flex flex-col items-center justify-start p-2 overflow-y-hidden">
+            <div id="rose-container" class="flex flex-wrap justify-center w-full max-w-xl mb-1 py-1 min-h-[30px] flex-shrink-0 items-center">
             </div>
 
-            <div class="w-full max-w-xl bg-white rounded-xl shadow-2xl p-2 mb-4 flex-shrink-0">
+            <div class="w-full max-w-xl bg-white rounded-xl shadow-xl p-1 mb-2 flex-shrink-0">
                 <img id="modal-image" class="contemplation-image rounded-lg full-color" alt="Contemplation Image" 
                      onerror="this.onerror=null; this.src='https://placehold.co/800x400/cccccc/000000?text=Image+Load+Error';">
             </div>
             
-            <div id="prayer-title-display" class="w-full max-w-xl p-3 mb-2 bg-indigo-100 rounded-lg shadow-inner text-center flex-shrink-0">
-                <h4 id="current-prayer-title" class="text-xl font-semibold text-indigo-800">Contemplation</h4>
+            <div id="prayer-title-display" class="w-full max-w-xl p-2 mb-1 bg-indigo-100 rounded-lg shadow-inner text-center flex-shrink-0">
+                <h4 id="current-prayer-title" class="text-lg font-semibold text-indigo-800">Contemplation</h4>
             </div>
             
-            <div id="modal-text-area" class="w-full max-w-xl bg-white rounded-xl shadow-lg p-6 h-40 flex-shrink-0 relative">
-                <div id="dynamic-prayer-content" class="text-lg text-gray-700 italic text-center"></div>
+            <div id="modal-text-area" class="w-full max-w-xl bg-white rounded-xl shadow-lg p-4 h-28 flex-shrink-0 relative">
+                <div id="dynamic-prayer-content" class="text-base text-gray-700 italic text-center"></div>
                 <div id="scroll-instruction" class="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-500 pointer-events-none">
-                    <span class="bg-white/80 px-4 py-2 rounded-full text-indigo-600 font-bold text-sm shadow-sm border border-indigo-100">
+                    <span class="bg-white/90 px-3 py-1 rounded-full text-indigo-600 font-bold text-xs shadow-md border border-indigo-100 backdrop-blur-sm">
                         Press Play or Next to continue
                     </span>
                 </div>
             </div>
 
-            <div class="flex justify-center flex-wrap gap-3 w-full max-w-xl mt-6 pb-4 flex-shrink-0">
-                <button id="play-pause-btn" onclick="togglePlayPause()" class="control-btn bg-indigo-600 text-white hover:bg-indigo-700 w-24">Play</button>
-                <button id="next-btn" onclick="userNextStep()" class="control-btn bg-gray-500 text-white hover:bg-gray-600 w-24">Next</button>
+            <div class="flex justify-center flex-wrap gap-2 w-full max-w-xl mt-3 pb-2 flex-shrink-0">
+                <button id="play-pause-btn" onclick="togglePlayPause()" class="control-btn bg-indigo-600 text-white hover:bg-indigo-700 w-20">Play</button>
+                <button id="next-btn" onclick="userNextStep()" class="control-btn bg-gray-500 text-white hover:bg-gray-600 w-20">Next</button>
                 <button id="finish-section-btn" onclick="finishCurrentSection()" class="control-btn bg-red-500 text-white hover:bg-red-600 flex-grow">Finish Mystery</button>
             </div>
         </div>
@@ -626,7 +630,6 @@
             } 
             
             if (nextType) {
-                // NO DELAY
                 startRosarySession(currentGroupKey, nextType, nextIndex, wasPlaying);
             } else {
                 finishSession(true);

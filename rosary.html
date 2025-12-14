@@ -13,7 +13,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #f7f3f1; /* Soft, light background */
+            background-color: #f7f3f1;
         }
         .card {
             box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -27,104 +27,50 @@
             border-color: #4f46e5;
             transform: translateY(-2px);
         }
-        .mystery-image-container img {
-            transition: filter 0.5s ease-in-out;
-        }
-        .grayscale {
-            filter: grayscale(100%);
-        }
-        .full-color {
-            filter: none;
-        }
+        .grayscale { filter: grayscale(100%); }
+        .full-color { filter: none; }
 
-        /* Custom styles for the Modal/Contemplation View */
         .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #f7f3f1;
-            z-index: 50;
-            opacity: 0;
-            visibility: hidden;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #f7f3f1; z-index: 50;
+            opacity: 0; visibility: hidden;
             transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
         }
-        .modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
+        .modal.active { opacity: 1; visibility: visible; }
+        
         .contemplation-image {
-            max-height: 40vh; 
+            max-height: 35vh; 
             width: 100%;
-            object-fit: contain; 
+            object-fit: contain;
+            transition: opacity 0.3s ease;
         }
-        /* Styles for the Rosary Beads (Roses) */
+        
         .bead {
-            display: inline-block;
-            width: 20px; 
-            height: 20px;
-            border-radius: 50%;
-            margin: 4px; 
-            transition: all 0.2s ease-in-out; 
+            display: inline-block; width: 20px; height: 20px;
+            border-radius: 50%; margin: 4px; flex-shrink: 0;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            opacity: 0;
-            animation: fadeIn 0.5s forwards;
-            flex-shrink: 0; 
+            transition: all 0.2s ease;
         }
-        .red-bead {
-            background-color: #ef4444; 
-        }
-        .white-bead {
-            background-color: #ffffff; 
-            border: 1px solid #d1d5db; 
-        }
-        .bead.current {
-            transform: scale(1.2);
-            box-shadow: 0 0 0 4px #a78bfa; /* Ring highlight */
-        }
-        /* Dynamic Scrolling Animation */
+        .red-bead { background-color: #ef4444; }
+        .white-bead { background-color: #ffffff; border: 1px solid #d1d5db; }
+        .bead.current { transform: scale(1.3); box-shadow: 0 0 0 4px #a78bfa; border-color: #a78bfa; }
+        
         @keyframes prayerScroll {
             0% { transform: translateY(var(--start-position)); }
             100% { transform: translateY(var(--end-position)); }
         }
-        .scrolling-text {
-            animation-name: prayerScroll;
-            animation-timing-function: linear;
-            animation-fill-mode: forwards;
+        #modal-text-area { overflow-y: hidden; position: relative; }
+        #dynamic-prayer-content {
+            position: absolute; width: 100%; padding: 0 24px; top: 0; left: 0;
+            transform: translateY(var(--start-position, 0)); 
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.5); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        /* Settings Panel specific styles */
-        #settings-panel.active {
-            transform: translateY(0);
-        }
-        /* Button styles */
+        #settings-panel.active { transform: translateY(0); }
         .control-btn {
-            padding: 0.75rem 1rem;
-            border-radius: 9999px; /* full rounded */
-            font-weight: 600;
+            padding: 0.75rem 1rem; border-radius: 9999px;
+            font-weight: 600; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: all 0.2s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        /* Text area for the scrolling content to handle overflow */
-        #modal-text-area {
-            overflow-y: hidden;
-            position: relative; /* Ensure the content wrapper is relative */
-        }
-        #dynamic-prayer-content {
-            position: absolute;
-            width: 100%;
-            padding: 0 24px; /* Match parent padding-x */
-            top: 0;
-            left: 0;
-            /* Ensure text starts off-screen when scrolling begins */
-            transform: translateY(var(--start-position, 0)); 
         }
     </style>
 </head>
@@ -132,139 +78,102 @@
 
     <audio id="background-music" loop playsinline>
         <source src="instrumental-piano-christian-worship-of-jesus-301250.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
     </audio>
 
     <div id="settings-panel" class="fixed inset-x-0 top-0 transform -translate-y-full transition-transform duration-300 z-40 bg-white shadow-xl p-6 rounded-b-xl max-w-lg mx-auto">
         <div class="flex justify-between items-center mb-6 border-b pb-4">
             <h3 class="text-2xl font-bold text-indigo-700">App Settings</h3>
             <button onclick="toggleSettingsPanel()" class="p-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
         </div>
-        
         <div class="space-y-4">
-            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow-sm">
-                <label for="mode-select" class="block text-base font-medium text-gray-700">Default Mode</label>
-                <select id="mode-select" onchange="updateDefaultMode(this.value)" 
-                        class="block w-1/3 py-2 text-sm rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition">
+            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                <label class="font-medium text-gray-700">Rosary Structure</label>
+                <select id="structure-select" onchange="updateRosaryStructure(this.value)" class="py-2 text-sm rounded-lg border-gray-300">
+                    <option value="daily">Daily Mystery</option>
+                    <option value="full">Full Rosary</option>
+                </select>
+            </div>
+            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                <label class="font-medium text-gray-700">Default Mode</label>
+                <select id="mode-select" onchange="updateDefaultMode(this.value)" class="py-2 text-sm rounded-lg border-gray-300">
                     <option value="manual">Manual</option>
                     <option value="auto">Auto Play</option>
                 </select>
             </div>
-
-            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow-sm">
-                <label for="speed-select" class="block text-base font-medium text-gray-700">Contemplation Pace</label>
-                <select id="speed-select" onchange="updateSpeed(this.value)" 
-                        class="block w-1/3 py-2 text-sm rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition">
-                    <option value="1.0">1x</option>
+            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                <label class="font-medium text-gray-700">Contemplation Pace</label>
+                <select id="speed-select" onchange="updateSpeed(this.value)" class="py-2 text-sm rounded-lg border-gray-300">
+                    <option value="1">1x</option>
                     <option value="1.25">1.25x</option>
                     <option value="1.5">1.5x</option>
-                    <option value="2.0">2x</option>
+                    <option value="2">2x</option>
                 </select>
             </div>
-
-            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow-sm">
-                <label for="size-select" class="block text-base font-medium text-gray-700">Text Size</label>
-                <select id="size-select" onchange="updateTextSize(this.value)" 
-                        class="block w-1/3 py-2 text-sm rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition">
+            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                <label class="font-medium text-gray-700">Text Size</label>
+                <select id="size-select" onchange="updateTextSize(this.value)" class="py-2 text-sm rounded-lg border-gray-300">
                     <option value="medium">Medium</option>
                     <option value="small">Small</option>
                     <option value="large">Large</option>
                 </select>
             </div>
-
-            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow-sm">
-                <span class="text-base font-medium text-gray-700">Background Music</span>
-                <button id="mute-button" onclick="toggleMute()" class="p-2 text-indigo-600 hover:text-indigo-800 rounded-full hover:bg-indigo-100 transition flex items-center">
-                    <span id="mute-status" class="text-sm mr-2 font-semibold"></span>
-                    <span id="speaker-icon" class="text-2xl"></span>
-                </button>
+            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                <label class="font-medium text-gray-700">Background Music</label>
+                <input type="checkbox" id="music-checkbox" onchange="updateMusicEnabled(this.checked)" class="h-6 w-6 text-indigo-600 rounded cursor-pointer">
             </div>
-            
-            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow-sm">
-                <label for="auto-continue-checkbox" class="block text-base font-medium text-gray-700 select-none">Auto Continue Mysteries</label>
-                <input type="checkbox" id="auto-continue-checkbox" onchange="updateAutoContinue(this.checked)" 
-                       class="h-6 w-6 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 transition cursor-pointer">
+            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                <label class="font-medium text-gray-700">Auto Continue</label>
+                <input type="checkbox" id="auto-continue-checkbox" onchange="updateAutoContinue(this.checked)" class="h-6 w-6 text-indigo-600 rounded cursor-pointer">
             </div>
-
         </div>
     </div>
 
-
     <div id="list-view" class="card bg-white w-full max-w-lg mx-auto rounded-xl p-6 md:p-8 transition-all duration-300">
-
-        <header id="list-view-header" class="flex justify-between items-start mb-6">
-            
-            <button id="settings-button" onclick="toggleSettingsPanel()" class="flex-shrink-0 p-2 text-gray-600 hover:text-indigo-600 rounded-full hover:bg-gray-100 transition mt-2">
+        <header class="flex justify-between items-start mb-6">
+            <button onclick="toggleSettingsPanel()" class="p-2 text-gray-600 hover:text-indigo-600 rounded-full transition mt-2">
                 <span class="text-2xl font-extrabold">&#9881;</span>
             </button>
-
             <div class="text-center flex-grow mx-4">
-                <h1 class="text-3xl font-bold text-gray-800 mb-1">
-                    <span class="text-indigo-600">Visio Divina</span> Rosary
-                </h1>
-                <p class="text-base text-gray-500">
-                    Contemplation through sacred images.
-                </p>
+                <h1 class="text-3xl font-bold text-gray-800 mb-1"><span class="text-indigo-600">Visio Divina</span> Rosary</h1>
+                <p class="text-base text-gray-500">Contemplation through sacred images.</p>
             </div>
-            
-            <button class="flex-shrink-0 p-2 mt-2 invisible">
-                <span class="text-2xl font-extrabold">&#9881;</span>
-            </button>
+            <button class="p-2 mt-2 invisible"><span class="text-2xl font-extrabold">&#9881;</span></button>
         </header>
 
         <div class="text-center p-4 bg-indigo-50 rounded-lg border-2 border-indigo-200 mb-6">
-            <p class="text-sm font-semibold text-indigo-700 uppercase tracking-wider mb-2" id="current-day-text">
-                Loading schedule...
-            </p>
-            <h2 id="mystery-group-name" class="text-3xl sm:text-4xl leading-tight font-extrabold text-indigo-800 transition-opacity duration-500">
-                Loading...
-            </h2>
+            <p class="text-sm font-semibold text-indigo-700 uppercase tracking-wider mb-2" id="current-day-text">Loading...</p>
+            <h2 id="mystery-group-name" class="text-3xl sm:text-4xl leading-tight font-extrabold text-indigo-800">Loading...</h2>
         </div>
         
         <div class="flex justify-between items-center border-b pb-2 mb-4">
-            <h3 class="text-lg font-semibold text-gray-700">The Five Daily Mysteries</h3>
-            
-            <button id="reset-button" onclick="window.confirmReset()" class="px-3 py-1 text-sm bg-red-100 text-red-600 rounded-full shadow-sm hover:bg-red-200 transition font-medium flex-shrink-0" style="min-width: 100px;">
-                Reset Day
-            </button>
+            <h3 class="text-lg font-semibold text-gray-700" id="mystery-list-title">The Rosary Contemplations</h3>
+            <button id="reset-button" onclick="window.confirmReset()" class="px-3 py-1 text-sm bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition font-medium">Reset Day</button>
         </div>
         
-        <div id="daily-mysteries-container" class="space-y-4">
-            </div>
+        <div id="daily-mysteries-container" class="space-y-4"></div>
         
         <div class="mt-8 pt-4 border-t border-gray-200">
-            <button onclick="document.getElementById('cycle-list-wrapper').classList.toggle('hidden'); if(!document.getElementById('cycle-list-wrapper').classList.contains('hidden')) populateCycleList(realCurrentDayIndex, selectedDayIndex);" 
-                    class="w-full text-sm text-indigo-600 hover:text-indigo-800 font-medium py-2 rounded-md transition duration-150">
-                Show/Hide Full Weekly Cycle & Selector
-            </button>
+            <button onclick="document.getElementById('cycle-list-wrapper').classList.toggle('hidden'); if(!document.getElementById('cycle-list-wrapper').classList.contains('hidden')) populateCycleList(realCurrentDayIndex, selectedDayIndex);" class="w-full text-sm text-indigo-600 hover:text-indigo-800 font-medium py-2">Show/Hide Full Weekly Cycle</button>
             <div id="cycle-list-wrapper" class="hidden">
-                <p class="text-sm font-semibold text-gray-600 mt-4 mb-2">Select a Day (Actual Current Day: *)</p>
-                <div id="cycle-list" class="space-y-1 text-sm">
-                    </div>
+                <p class="text-sm font-semibold text-gray-600 mt-4 mb-2">Select a Day (Actual: *)</p>
+                <div id="cycle-list" class="space-y-1 text-sm"></div>
             </div>
         </div>
-
     </div>
     
     <div id="contemplation-view" class="modal">
         <div class="p-4 flex justify-end items-center bg-white shadow-md flex-shrink-0 relative">
-            <h3 id="modal-mystery-title" class="absolute inset-x-4 text-center text-xl font-bold text-gray-800 truncate"></h3>
-            
-            <button onclick="closeContemplationView()" class="p-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100 transition flex-shrink-0 z-10">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+            <h3 id="modal-top-title" class="absolute inset-x-4 text-center text-xl font-bold text-gray-800 truncate"></h3>
+            <button onclick="finishSession(false)" class="p-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100 transition z-10">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
         </div>
 
         <div class="flex-grow flex flex-col items-center justify-start p-4 overflow-y-auto">
-            
-            <div id="rose-container" class="flex flex-wrap justify-center w-full max-w-xl mb-4 py-2 border-b border-gray-300 min-h-14 flex-shrink-0">
-                </div>
+            <div id="rose-container" class="flex flex-wrap justify-center w-full max-w-xl mb-4 py-2 border-b border-gray-300 min-h-[60px] flex-shrink-0 items-center">
+            </div>
 
             <div class="w-full max-w-xl bg-white rounded-xl shadow-2xl p-2 mb-4 flex-shrink-0">
                 <img id="modal-image" class="contemplation-image rounded-lg full-color" alt="Contemplation Image" 
@@ -275,27 +184,19 @@
                 <h4 id="current-prayer-title" class="text-xl font-semibold text-indigo-800">Contemplation</h4>
             </div>
             
-            <div id="modal-text-area" class="w-full max-w-xl bg-white rounded-xl shadow-lg p-6 h-40 flex-shrink-0">
-                <div id="dynamic-prayer-content" class="text-lg text-gray-700 italic text-center"> 
-                    <p id="dynamic-prayer-text">
-                        Gaze upon this image. What emotion does it evoke? What detail catches your attention? How does it connect you to the life of Christ or Mary?
-                    </p>
+            <div id="modal-text-area" class="w-full max-w-xl bg-white rounded-xl shadow-lg p-6 h-40 flex-shrink-0 relative">
+                <div id="dynamic-prayer-content" class="text-lg text-gray-700 italic text-center"></div>
+                <div id="scroll-instruction" class="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-500 pointer-events-none">
+                    <span class="bg-white/80 px-4 py-2 rounded-full text-indigo-600 font-bold text-sm shadow-sm border border-indigo-100">
+                        Press Play or Next to continue
+                    </span>
                 </div>
             </div>
 
             <div class="flex justify-center flex-wrap gap-3 w-full max-w-xl mt-6 pb-4 flex-shrink-0">
-                <button id="manual-btn" onclick="setManualMode()" class="control-btn bg-yellow-500 text-white hover:bg-yellow-600">
-                    Manual
-                </button>
-                <button id="auto-play-btn" onclick="setAutoMode()" class="control-btn bg-indigo-600 text-white hover:bg-indigo-700">
-                    Auto Play
-                </button>
-                <button id="skip-btn" onclick="skipPrayer()" class="control-btn bg-gray-500 text-white hover:bg-gray-600">
-                    Skip Prayer
-                </button>
-                <button id="skip-to-end-btn" onclick="closeContemplationView()" class="control-btn bg-red-500 text-white hover:bg-red-600">
-                    Finish Mystery
-                </button>
+                <button id="play-pause-btn" onclick="togglePlayPause()" class="control-btn bg-indigo-600 text-white hover:bg-indigo-700 w-24">Play</button>
+                <button id="next-btn" onclick="userNextStep()" class="control-btn bg-gray-500 text-white hover:bg-gray-600 w-24">Next</button>
+                <button id="finish-section-btn" onclick="finishCurrentSection()" class="control-btn bg-red-500 text-white hover:bg-red-600 flex-grow">Finish Mystery</button>
             </div>
         </div>
     </div>
@@ -305,12 +206,11 @@
             <h3 id="modal-title" class="text-xl font-bold text-gray-800 mb-4"></h3>
             <p id="modal-message" class="text-gray-600 mb-6"></p>
             <div class="flex justify-center space-x-4">
-                <button id="modal-confirm" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition shadow">Confirm</button>
-                <button id="modal-cancel" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition shadow">Cancel</button>
+                <button id="modal-confirm" class="px-4 py-2 bg-red-500 text-white hover:bg-red-600 rounded-lg transition shadow">Confirm</button>
+                <button id="modal-cancel" class="px-4 py-2 bg-gray-200 text-gray-800 hover:bg-gray-300 rounded-lg transition shadow">Cancel</button>
             </div>
         </div>
     </div>
-
 
     <script>
         // --- DATA ---
@@ -345,556 +245,559 @@
             ]
         };
 
-        const mysterySchedule = {
-            0: { name: "Glorious Mysteries", color: "gold" }, // Sunday
-            1: { name: "Joyful Mysteries", color: "green" }, // Monday
-            2: { name: "Sorrowful Mysteries", color: "red" }, // Tuesday
-            3: { name: "Glorious Mysteries", color: "gold" }, // Wednesday
-            4: { name: "Luminous Mysteries", color: "blue" }, // Thursday
-            5: { name: "Sorrowful Mysteries", color: "red" }, // Friday
-            6: { name: "Joyful Mysteries", color: "green" }  // Saturday
+        const SPECIAL = {
+            'intro': { id: 'intro', title: "Introduction", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/4/4d/Rosary_2006-01-16.jpg" },
+            'conclusion': { id: 'conclusion', title: "Conclusion", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/4/4e/Antonio_de_Pereda_y_Salgado_-_The_Holy_Trinity_-_WGA17176.jpg" }
         };
 
-        const dayNames = [
-            "Sunday", "Monday", "Tuesday", "Wednesday",
-            "Thursday", "Friday", "Saturday"
+        const mysterySchedule = [
+            { name: "Glorious Mysteries" }, // Sun
+            { name: "Joyful Mysteries" },   // Mon
+            { name: "Sorrowful Mysteries" },// Tue
+            { name: "Glorious Mysteries" }, // Wed
+            { name: "Luminous Mysteries" }, // Thu
+            { name: "Sorrowful Mysteries" },// Fri
+            { name: "Joyful Mysteries" }    // Sat
         ];
-        
-        // --- CONSTANTS & STATE (App Config) ---
+        const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+        const rosaryPrayers = {
+            'sotc': { title: "Sign of the Cross", text: "In the name of the Father, and of the Son, and of the Holy Spirit. Amen.", isBead: false, cls: 'red-bead' },
+            'ac': { title: "The Apostles' Creed", text: "I believe in God, the Father Almighty, Creator of heaven and earth; and in Jesus Christ, His only Son, our Lord: Who was conceived by the Holy Spirit, born of the Virgin Mary, suffered under Pontius Pilate, was crucified, died, and was buried. He descended into hell; the third day He arose again from the dead. He ascended into heaven, sitteth at the right hand of God the Father Almighty; from thence He shall come to judge the living and the dead. I believe in the Holy Spirit, the holy Catholic Church, the communion of Saints, the forgiveness of sins, the resurrection of the body, and life everlasting. Amen.", isBead: false, cls: 'red-bead' },
+            'of': { title: "The Our Father", text: "Our Father, Who art in heaven, Hallowed be Thy Name. Thy Kingdom come, Thy Will be done, on Earth as it is in Heaven. Give us this day our daily bread, and forgive us our trespasses, as we forgive those who trespass against us. And lead us not into temptation, but deliver us from evil. Amen.", isBead: true, cls: 'red-bead' },
+            'hm': { title: "Hail Mary", text: "Hail Mary, full of grace, the Lord is with thee. Blessed art thou amongst women, and blessed is the fruit of thy womb, Jesus. Holy Mary, Mother of God, pray for us sinners, now and at the hour of our death. Amen.", isBead: true, cls: 'white-bead' },
+            'gb': { title: "Glory Be", text: "Glory be to the Father, and to the Son, and to the Holy Spirit. As it was in the beginning, is now, and ever shall be, world without end. Amen.", isBead: true, cls: 'red-bead' },
+            'gbf': { title: "Glory Be & Fatima", text: "Glory be to the Father, and to the Son, and to the Holy Spirit. As it was in the beginning, is now, and ever shall be, world without end. Amen. O my Jesus, forgive us our sins, save us from the fires of hell, lead all souls to Heaven, especially those in most need of Thy mercy.", isBead: true, cls: 'red-bead' },
+            'hhq': { title: "Hail Holy Queen", text: "Hail, holy Queen, Mother of Mercy! Our life, our sweetness, and our hope! To thee do we cry, poor banished children of Eve; to thee do we send up our sighs, mourning and weeping in this valley of tears. Turn then, most gracious advocate, thine eyes of mercy toward us; and after this, our exile, show unto us the blessed fruit of thy womb, Jesus. O clement, O loving, O sweet Virgin Mary. Pray for us, O Holy Mother of God, that we may be made worthy of the promises of Christ. Amen.", isBead: false, cls: 'red-bead' },
+            'ogws': { title: "O God, Whose", text: "O God, whose only begotten Son, by His life, death, and resurrection, has purchased for us the rewards of eternal life, grant, we beseech Thee, that meditating upon these mysteries of the most holy Rosary of the Blessed Virgin Mary, we may imitate what they contain and obtain what they promise, through the same Christ our Lord. Amen.", isBead: false, cls: 'red-bead' },
+            'contemplation': { title: "Contemplation", text: "Gaze upon this image. What emotion does it evoke? What detail catches your attention? How does it connect you to the life of Christ or Mary?", isBead: false, cls: 'contemplation' }
+        };
+
+        // --- STATE ---
         const today = new Date();
         const realCurrentDayIndex = today.getDay(); 
         let selectedDayIndex = realCurrentDayIndex; 
-
+        
         let appConfig = {
-            pace: 1.0,
-            textSize: 'medium',
-            defaultMode: 'manual',
-            autoContinue: false
+            pace: 1, 
+            textSize: 'medium', 
+            defaultMode: 'manual', 
+            autoContinue: false, 
+            rosaryStructure: 'daily',
+            musicEnabled: false 
         };
         
-        let baseTextClass = 'text-base'; 
-        let scrollTextClass = 'text-xl'; 
-        let wakeLockSentinel = null;
-        const MS_PER_WORD = 350; 
-
-        let BASE_OF_DURATION = 0;
-        let BASE_HM_DURATION = 0; 
-        let BASE_GB_DURATION = 0;
-
-        let speedFactor = 1.0;
-        let D_OF_DURATION = 0;
-        let D_HM_DURATION = 0;
-        let D_GB_DURATION = 0;
-
-        // Runtime State (Contemplation View)
-        let currentMysteryGroupKey = ''; // Key (e.g., 'Joyful Mysteries')
-        let currentMysteryIndex = 0; // 0 to 4
-        let currentPrayerIndex = -1; // -1 for contemplation, 0-11 for prayers
-        let isAutoMode = false; 
-        let isScrolling = false; 
-
-        // Timer Refs
+        let currentSequence = [];
+        let currentIndex = 0;
+        let isAutoMode = false;
+        let isScrolling = false;
+        let activeWakeLock = null;
         let audio;
-        let isMuted = false;
-        let scrollCompletionTimer; 
-        const modalEl = document.getElementById('contemplation-view');
-        const manualBtn = document.getElementById('manual-btn');
-        const autoPlayBtn = document.getElementById('auto-play-btn');
+        let stepTimer = null;
+        let DURATION = {};
+        let currentGroupKey = ''; 
+        const MS_PER_WORD = 350;
 
+        // --- GENERATOR ---
+        function generateSequence(mode, mysteryGroupKey, startMysteryIndex = -1) {
+            const sequence = [];
+            let globalStepCounter = 0;
+            const mysteries = allMysteries[mysteryGroupKey];
 
-        // --- LOCAL STORAGE UTILS ---
+            const addStep = (key, section, titleOverride, imgUrl, beadCount, beadIndex) => {
+                sequence.push({
+                    index: globalStepCounter++,
+                    key: key,
+                    section: section,
+                    flowTitle: titleOverride || rosaryPrayers[key].title,
+                    imageUrl: imgUrl,
+                    beadCount: beadCount,
+                    beadIndex: beadIndex
+                });
+            };
 
-        function getCurrentDateKey() {
-            // Key format: 'rosary_2025-12-05'
-            return 'rosary_' + new Date().toISOString().split('T')[0];
-        }
-
-        /**
-         * Loads the completion status for the current day from Local Storage.
-         * The stored data looks like: { 'Joyful Mysteries_1': true, 'Joyful Mysteries_2': true, ... }
-         */
-        function loadCompletedStatus() {
-            const key = getCurrentDateKey();
-            const stored = localStorage.getItem(key);
-            try {
-                // Return status for the current day, or an empty object
-                return stored ? JSON.parse(stored) : {};
-            } catch (e) {
-                console.error("Error parsing progress from Local Storage:", e);
-                return {};
+            if (mode === 'full' || startMysteryIndex === 'intro') {
+                const introKeys = ['sotc', 'ac', 'of', 'hm', 'hm', 'hm', 'gb']; 
+                const beadCount = 5;
+                let beadIdx = 0;
+                addStep('contemplation', 'intro', SPECIAL.intro.title, SPECIAL.intro.imageUrl, beadCount, -1);
+                introKeys.forEach(k => {
+                    const isBead = rosaryPrayers[k].isBead;
+                    addStep(k, 'intro', null, SPECIAL.intro.imageUrl, beadCount, isBead ? beadIdx++ : -1);
+                });
             }
-        }
 
-        /**
-         * Marks a specific mystery as completed in Local Storage.
-         * @param {string} mysteryKey - The key (e.g., 'Joyful Mysteries_1')
-         */
-        function markAsCompleted(mysteryKey) {
-            const key = getCurrentDateKey();
-            const status = loadCompletedStatus();
-            
-            // Filter status to only keep keys relevant to the currently selected mystery group
-            // This prevents status for other days from accumulating unnecessarily if the user switches days.
-            const currentGroupStatus = {};
-            const groupKey = mysteryKey.split('_')[0];
-            Object.keys(status).forEach(k => {
-                 if (k.startsWith(groupKey)) {
-                     currentGroupStatus[k] = status[k];
-                 }
+            mysteries.forEach((m, mIdx) => {
+                if (mode === 'daily' && mIdx !== startMysteryIndex) return;
+                const sectionId = `mystery_${mIdx+1}`;
+                const decadeKeys = ['of', ...Array(10).fill('hm'), 'gbf'];
+                const beadCount = 12;
+                let beadIdx = 0;
+                addStep('contemplation', sectionId, `Mystery ${m.id}: ${m.title}`, m.imageUrl, beadCount, -1);
+                decadeKeys.forEach((k, i) => {
+                    const isBead = rosaryPrayers[k].isBead;
+                    let title = rosaryPrayers[k].title;
+                    if (k === 'hm') title = `Hail Mary (${i} of 10)`;
+                    addStep(k, sectionId, title, m.imageUrl, beadCount, isBead ? beadIdx++ : -1);
+                });
             });
+
+            if (mode === 'full' || startMysteryIndex === 'conclusion') {
+                const closeKeys = ['hhq', 'ogws', 'sotc'];
+                const beadCount = 0;
+                addStep('contemplation', 'conclusion', SPECIAL.conclusion.title, SPECIAL.conclusion.imageUrl, beadCount, -1);
+                closeKeys.forEach(k => {
+                    addStep(k, 'conclusion', null, SPECIAL.conclusion.imageUrl, beadCount, -1);
+                });
+            }
+            return sequence;
+        }
+
+        // --- NAVIGATION ---
+        function startRosarySession(groupKey, type, index, preservePlayState = null) {
+            resetState();
+            currentGroupKey = groupKey; 
+            let mode = appConfig.rosaryStructure;
+            if (type === 'special') mode = 'daily'; 
+
+            currentSequence = generateSequence(mode, groupKey, index);
             
-            currentGroupStatus[mysteryKey] = true;
-            localStorage.setItem(key, JSON.stringify(currentGroupStatus));
+            if (mode === 'full' && type === 'mystery') {
+                const targetSection = `mystery_${index + 1}`;
+                const foundIndex = currentSequence.findIndex(step => step.section === targetSection);
+                currentIndex = foundIndex !== -1 ? foundIndex : 0;
+            } else {
+                currentIndex = 0; 
+            }
+
+            if (currentSequence.length === 0) return; 
+
+            document.getElementById('contemplation-view').classList.add('active');
+            document.getElementById('list-view').style.display = 'none';
+            
+            if (appConfig.musicEnabled && audio) {
+                audio.currentTime = 0;
+                audio.play().catch(()=>{});
+            }
+            
+            requestWakeLock();
+            
+            if (preservePlayState !== null) {
+                isAutoMode = preservePlayState;
+            } else {
+                isAutoMode = (appConfig.defaultMode === 'auto');
+            }
+
+            if (isAutoMode) {
+                updatePlayButtonUI("Pause"); 
+            } else {
+                updatePlayButtonUI("Play");
+            }
+
+            renderStep();
         }
         
-        window.confirmReset = function() {
-            showCustomModal(
-                'Confirm Reset',
-                'Are you sure you want to clear your completion status for TODAY? This cannot be undone.',
-                () => { // Confirm Action
-                    const key = getCurrentDateKey();
-                    localStorage.removeItem(key);
-                    updateMainDisplay(selectedDayIndex); // Re-render to show reset
-                    hideCustomModal();
-                },
-                () => hideCustomModal() // Cancel Action
-            );
-        }
+        function renderStep() {
+            const step = currentSequence[currentIndex];
+            const prayer = rosaryPrayers[step.key];
+            const isContemplation = step.key === 'contemplation';
 
-        // Custom Modal UI
-        function showCustomModal(title, message, onConfirm, onCancel) {
-            const modal = document.getElementById('custom-modal');
-            document.getElementById('modal-title').textContent = title;
-            document.getElementById('modal-message').textContent = message;
+            document.getElementById('scroll-instruction').classList.remove('opacity-100');
+            document.getElementById('scroll-instruction').classList.add('opacity-0');
+
+            document.getElementById('modal-top-title').textContent = step.flowTitle;
+            document.getElementById('current-prayer-title').textContent = isContemplation ? "Contemplation" : step.flowTitle;
+
+            const imgEl = document.getElementById('modal-image');
+            imgEl.src = step.imageUrl;
+            imgEl.classList.remove('grayscale'); 
+            imgEl.classList.add('full-color');
+
+            updateBeads(step);
+
+            const finishBtn = document.getElementById('finish-section-btn');
+            if (step.section === 'intro') finishBtn.textContent = "Skip Intro";
+            else if (step.section === 'conclusion') finishBtn.textContent = "Finish Rosary";
+            else finishBtn.textContent = "Finish Mystery";
+
+            const contentEl = document.getElementById('dynamic-prayer-content');
+            contentEl.innerHTML = '';
+            contentEl.style.animation = 'none';
+            contentEl.offsetHeight; 
             
-            const confirmBtn = document.getElementById('modal-confirm');
-            const cancelBtn = document.getElementById('modal-cancel');
+            let textHtml = '';
+            let duration = 0;
 
-            // Clear previous listeners
-            confirmBtn.onclick = null;
-            cancelBtn.onclick = null;
-
-            // Set new listeners
-            confirmBtn.onclick = onConfirm;
-            cancelBtn.onclick = onCancel;
-            
-            modal.classList.remove('hidden');
-        }
-
-        function hideCustomModal() {
-            document.getElementById('custom-modal').classList.add('hidden');
-        }
-
-
-        // --- PRAYER CONTENT & UTILS ---
-
-        function getWordCount(text) {
-            const cleanText = text.replace(/<[^>]*>?/gm, '').trim();
-            if (cleanText === '') return 0;
-            return cleanText.split(/\s+/).length;
-        }
-
-        function calculateBaseDurations() {
-            const p_HM = "Hail Mary, full of grace, the Lord is with thee. Blessed art thou amongst women, and blessed is the fruit of thy womb, Jesus. Holy Mary, Mother of God, pray for us sinners, now and at the hour of our death. Amen.";
-            const p_OF = "Our Father, Who art in heaven, Hallowed be Thy Name. Thy Kingdom come, Thy Will be done, on Earth as it is in Heaven. Give us this day our daily bread, and forgive us our trespasses, as we forgive those who trespass against us. And lead us not into temptation, but deliver us from evil. Amen.";
-            const p_GB = "Glory be to the Father, and to the Son, and to the Holy Spirit. As it was in the beginning, is now, and ever shall be, world without end. Amen. O my Jesus, forgive us our sins, save us from the fires of hell, lead all souls to Heaven, especially those in most need of Thy mercy.";
-            
-            BASE_OF_DURATION = getWordCount(p_OF) * MS_PER_WORD + 2000;
-            BASE_HM_DURATION = getWordCount(p_HM) * MS_PER_WORD + 2000;
-            BASE_GB_DURATION = getWordCount(p_GB) * MS_PER_WORD + 2000;
-        }
-        
-        function recalcDurations() {
-            const speed = appConfig.pace;
-            D_OF_DURATION = Math.floor(BASE_OF_DURATION / speed);
-            D_HM_DURATION = Math.floor(BASE_HM_DURATION / speed);
-            D_GB_DURATION = Math.floor(BASE_GB_DURATION / speed);
-        }
-
-        const getInitialContemplationText = (mysteryTitle) => `
-            <p class="text-gray-700 italic ${baseTextClass}">
-                Meditating on: <span class="font-bold text-indigo-800">${mysteryTitle}</span>
-                <br>
-                Gaze upon this image. What emotion does it evoke? What detail catches your attention? How does it connect you to the life of Christ or Mary?
-                <br><br>
-                Press <span class="font-bold">Manual</span> or <span class="font-bold">Auto Play</span> to begin.
-            </p>
-        `;
-        const getOurFatherText = () => `<p class="${scrollTextClass} text-gray-900 font-bold text-center leading-relaxed">Our Father, Who art in heaven, Hallowed be Thy Name. Thy Kingdom come, Thy Will be done, on Earth as it is in Heaven. Give us this day our daily bread, and forgive us our trespasses, as we forgive those who trespass against us. And lead us not into temptation, but deliver us from evil. Amen.</p>`;
-        const getHailMaryText = () => `<p class="${scrollTextClass} text-gray-900 font-bold text-center leading-relaxed">Hail Mary, full of grace, the Lord is with thee. Blessed art thou amongst women, and blessed is the fruit of thy womb, Jesus. Holy Mary, Mother of God, pray for us sinners, now and at the hour of our death. Amen.</p>`;
-        const getGloryBeFatimaText = () => `<div class="space-y-4"><p class="${scrollTextClass} text-gray-900 font-bold text-center leading-relaxed"><span class="font-semibold underline">Glory Be:</span> Glory be to the Father, and to the Son, and to the Holy Spirit. As it was in the beginning, is now, and ever shall be, world without end. Amen.</p><p class="${scrollTextClass} text-gray-900 font-bold text-center leading-relaxed"><span class="font-semibold underline">Fatima Prayer:</span> O my Jesus, forgive us our sins, save us from the fires of hell, lead all souls to Heaven, especially those in most need of Thy mercy.</p></div>`;
-
-
-        // --- UI & CORE LOGIC ---
-
-        function saveSettings() {
-            localStorage.setItem('rosarySettings', JSON.stringify(appConfig));
-        }
-
-        function loadSettings() {
-            const saved = localStorage.getItem('rosarySettings');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    // Merge loaded settings, allowing new settings to default if not present
-                    appConfig = { ...appConfig, ...parsed }; 
-                } catch (e) { 
-                    console.error("Error loading settings", e); 
-                }
+            if (isContemplation) {
+                textHtml = `
+                    <p class="text-gray-700 italic ${baseTextClass}">
+                        Meditating on: <span class="font-bold text-indigo-800">${step.flowTitle}</span><br><br>
+                        ${prayer.text}
+                    </p>`;
+                duration = DURATION.contemplation;
+            } else {
+                textHtml = `<p class="${scrollTextClass} text-gray-900 font-bold text-center leading-relaxed">${prayer.text}</p>`;
+                duration = DURATION[step.key];
             }
-            
-            // Set UI elements based on loaded settings
-            const modeSelect = document.getElementById('mode-select');
-            if(modeSelect) modeSelect.value = appConfig.defaultMode;
-            const speedSelect = document.getElementById('speed-select');
-            if(speedSelect) speedSelect.value = appConfig.pace.toString();
-            const sizeSelect = document.getElementById('size-select');
-            if(sizeSelect) sizeSelect.value = appConfig.textSize;
-            
-            // Set autoContinue checkbox state
-            const autoContinueCheckbox = document.getElementById('auto-continue-checkbox');
-            if(autoContinueCheckbox) autoContinueCheckbox.checked = appConfig.autoContinue;
-        }
-        
-        function applyTextSizeClass() {
-            switch (appConfig.textSize) {
-                case 'small':  baseTextClass = 'text-sm'; scrollTextClass = 'text-lg'; break;
-                case 'medium': baseTextClass = 'text-base'; scrollTextClass = 'text-xl'; break;
-                case 'large':  baseTextClass = 'text-lg'; scrollTextClass = 'text-2xl'; break;
-                default:       baseTextClass = 'text-base'; scrollTextClass = 'text-xl';
-            }
-            // Update modal text if active
-            if (modalEl.classList.contains('active') && currentPrayerIndex === -1) {
-                 const titleEl = document.getElementById('modal-mystery-title');
-                 document.getElementById('dynamic-prayer-content').innerHTML = getInitialContemplationText(titleEl.textContent);
-            }
-        }
 
-        window.updateSpeed = function(newVal) { appConfig.pace = parseFloat(newVal); saveSettings(); recalcDurations(); }
-        window.updateTextSize = function(newVal) { appConfig.textSize = newVal; saveSettings(); applyTextSizeClass(); }
-        window.updateDefaultMode = function(newVal) { appConfig.defaultMode = newVal; saveSettings(); }
-        window.updateAutoContinue = function(isChecked) { appConfig.autoContinue = isChecked; saveSettings(); }
-        window.toggleSettingsPanel = function() { document.getElementById('settings-panel').classList.toggle('active'); }
-
-        function clearStepTimer() {
-            if (scrollCompletionTimer) {
-                clearTimeout(scrollCompletionTimer);
-                scrollCompletionTimer = null;
-            }
-            const content = document.getElementById('dynamic-prayer-content');
-            if(content) {
-                content.style.animation = 'none';
-                content.offsetHeight; 
-                content.style.transform = `translateY(0px)`; 
-            }
-            isScrolling = false;
-        }
-
-        function resetContemplationState() {
-            clearStepTimer();
-            currentPrayerIndex = -1;
-            document.getElementById('rose-container').innerHTML = '';
-            document.getElementById('current-prayer-title').textContent = "Contemplation";
-            
-            manualBtn.classList.remove('bg-yellow-600');
-            autoPlayBtn.classList.remove('bg-indigo-700'); 
-        }
-
-        function updateBeadHighlight() {
-            const beads = document.querySelectorAll('#rose-container .bead');
-            beads.forEach(bead => bead.classList.remove('current'));
-            if (currentPrayerIndex >= 0 && currentPrayerIndex <= 11) {
-                const target = document.getElementById(`bead-${currentPrayerIndex}`);
-                if (target) target.classList.add('current');
-            }
-        }
-
-        function applyScrollAnimation(durationMs, textHtml, title) {
-            const content = document.getElementById('dynamic-prayer-content');
-            const container = document.getElementById('modal-text-area');
-            document.getElementById('current-prayer-title').textContent = title;
-
-            // Reset
-            content.style.animation = 'none';
-            content.style.transform = `translateY(0px)`;
-            content.innerHTML = '';
-            
-            // Inject
             const wrapper = document.createElement('div');
             wrapper.innerHTML = textHtml.trim();
-            content.appendChild(wrapper);
+            contentEl.appendChild(wrapper);
             
-            // Buffer
-            const buf = document.createElement('div');
-            buf.style.height = `${container.offsetHeight}px`;
-            buf.style.flexShrink = 0;
-            content.appendChild(buf);
-            
-            // Calc
-            const textH = wrapper.offsetHeight;
-            if(textH===0) return durationMs;
+            const spacer = document.createElement('div');
+            spacer.style.height = document.getElementById('modal-text-area').offsetHeight + 'px';
+            contentEl.appendChild(spacer);
 
-            const startPos = container.offsetHeight; 
-            const endPos = -textH; 
+            const textHeight = wrapper.offsetHeight;
+            const containerHeight = document.getElementById('modal-text-area').offsetHeight;
             
-            // CSS Vars
-            content.style.setProperty('--start-position', `${startPos}px`);
-            content.style.setProperty('--end-position', `${endPos}px`);
-            
-            // Start
-            content.style.animation = `prayerScroll ${durationMs/1000}s linear forwards`;
-            isScrolling = true;
-            
-            return durationMs;
+            if (!isContemplation) {
+                if (textHeight > 0) {
+                    contentEl.style.setProperty('--start-position', `${containerHeight}px`);
+                    contentEl.style.setProperty('--end-position', `-${textHeight}px`);
+                    contentEl.style.animation = `prayerScroll ${duration/1000}s linear forwards`;
+                    isScrolling = true;
+
+                    contentEl.addEventListener('animationend', () => {
+                        isScrolling = false;
+                        if (!isAutoMode) {
+                            document.getElementById('scroll-instruction').classList.remove('opacity-0');
+                            document.getElementById('scroll-instruction').classList.add('opacity-100');
+                        }
+                    }, { once: true });
+                } else {
+                    if (!isAutoMode) {
+                        document.getElementById('scroll-instruction').classList.remove('opacity-0');
+                        document.getElementById('scroll-instruction').classList.add('opacity-100');
+                    }
+                }
+            }
+
+            if (isContemplation) {
+                stepTimer = setTimeout(() => {
+                    if (isAutoMode) {
+                        handleNextStep();
+                    } else {
+                        document.getElementById('scroll-instruction').classList.remove('opacity-0');
+                        document.getElementById('scroll-instruction').classList.add('opacity-100');
+                    }
+                }, duration);
+            } else {
+                if (isAutoMode) {
+                    stepTimer = setTimeout(() => {
+                        isScrolling = false;
+                        handleNextStep();
+                    }, duration);
+                }
+            }
         }
 
-        function executePrayerStep(index) {
-            clearStepTimer();
-            currentPrayerIndex = index;
-            
+        function updateBeads(step) {
             const roseCont = document.getElementById('rose-container');
-            let dur=0, txt='', tit='', cls='';
-            
-            if(index===0) { dur=D_OF_DURATION; txt=getOurFatherText(); tit="The Our Father"; cls='red-bead'; }
-            else if(index<=10) { dur=D_HM_DURATION; txt=getHailMaryText(); tit=`Hail Mary (${index} of 10)`; cls='white-bead'; }
-            else if(index===11) { dur=D_GB_DURATION; txt=getGloryBeFatimaText(); tit="Glory Be & Fatima"; cls='red-bead'; }
-            else { closeContemplationView(true); return; } // Should not be hit if handleNextStep logic is correct
-            
-            // Add Bead if new
-            if(!document.getElementById(`bead-${index}`)) {
-                roseCont.innerHTML += `<span class="bead ${cls}" id="bead-${index}"></span>`;
-            }
-            updateBeadHighlight();
-            
-            // Start Animation
-            applyScrollAnimation(dur, txt, tit);
-            
-            // Set completion timer
-            scrollCompletionTimer = setTimeout(() => {
-                isScrolling = false;
-                if(isAutoMode) {
-                    handleNextStep();
+            const currentSection = roseCont.dataset.section;
+            if (currentSection !== step.section) {
+                roseCont.innerHTML = '';
+                roseCont.dataset.section = step.section;
+                if (step.beadCount === 0) {
+                    roseCont.innerHTML = `<span class="text-gray-500 font-medium uppercase text-sm tracking-widest">${step.section.toUpperCase()}</span>`;
+                } else if (step.beadCount === 5) {
+                    ['red-bead', 'white-bead', 'white-bead', 'white-bead', 'red-bead'].forEach((cls, i) => {
+                        roseCont.innerHTML += `<span class="bead ${cls}" id="bead-${i}"></span>`;
+                    });
+                } else if (step.beadCount === 12) {
+                    let html = `<span class="bead red-bead" id="bead-0"></span>`; 
+                    for(let i=1; i<=10; i++) html += `<span class="bead white-bead" id="bead-${i}"></span>`; 
+                    html += `<span class="bead red-bead" id="bead-11"></span>`; 
+                    roseCont.innerHTML = html;
                 }
-            }, dur);
+            }
+            const beads = roseCont.querySelectorAll('.bead');
+            beads.forEach(b => b.classList.remove('current'));
+            if (step.beadIndex >= 0 && beads[step.beadIndex]) {
+                beads[step.beadIndex].classList.add('current');
+            }
         }
 
         function handleNextStep() {
-            const next = currentPrayerIndex + 1;
-            if(next <= 11) executePrayerStep(next);
-            else closeContemplationView(true); // <--- Passed true for automatic completion
-        }
-
-        window.setManualMode = function() {
-            isAutoMode = false;
-            autoPlayBtn.classList.remove('bg-indigo-700');
-            manualBtn.classList.add('bg-yellow-600');
-            if (!isScrolling) {
-                handleNextStep();
+            clearTimer();
+            if (currentIndex + 1 < currentSequence.length) {
+                const currentSec = currentSequence[currentIndex].section;
+                const nextSec = currentSequence[currentIndex+1].section;
+                if (currentSec !== nextSec) {
+                    if (appConfig.autoContinue) {
+                        markSectionComplete(currentSec);
+                        attemptAutoContinue(currentSec);
+                        return; 
+                    }
+                    markSectionComplete(currentSec);
+                }
+                currentIndex++;
+                renderStep();
+            } else {
+                if (appConfig.autoContinue) {
+                    markSectionComplete(currentSequence[currentIndex].section);
+                    attemptAutoContinue(currentSequence[currentIndex].section);
+                } else {
+                    finishSession(true);
+                }
             }
         }
 
-        window.setAutoMode = function() {
-            isAutoMode = true;
-            manualBtn.classList.remove('bg-yellow-600');
-            autoPlayBtn.classList.add('bg-indigo-700');
-            if (!isScrolling) {
-                handleNextStep();
-            }
-        }
-
-        window.skipPrayer = function() {
-            clearStepTimer(); 
-            const next = currentPrayerIndex + 1;
-            if (next > 11) { closeContemplationView(); return; }
-            
-            currentPrayerIndex = next; 
-            
-            const roseCont = document.getElementById('rose-container');
-            let cls = (next===0||next===11)?'red-bead':'white-bead';
-            if(!document.getElementById(`bead-${next}`)) {
-                roseCont.innerHTML += `<span class="bead ${cls}" id="bead-${next}"></span>`;
-            }
-            updateBeadHighlight();
-
+        function togglePlayPause() {
             if (isAutoMode) {
-                executePrayerStep(next);
-            } else {
-                let txt='', tit='';
-                if(next===0) { txt=getOurFatherText(); tit="The Our Father"; }
-                else if(next<=10) { txt=getHailMaryText(); tit=`Hail Mary (${next} of 10)`; }
-                else { txt=getGloryBeFatimaText(); tit="Glory Be & Fatima"; }
-                
-                document.getElementById('current-prayer-title').textContent = tit;
-                const content = document.getElementById('dynamic-prayer-content');
-                content.style.animation = 'none';
-                content.style.transform = `translateY(0px)`;
-                content.innerHTML = `<div class="pb-40">${txt}</div>`; 
-                isScrolling = false;
-            }
-        }
-
-
-        window.openContemplationView = async function(title, imageUrl, index, groupKey) {
-            
-            if (document.getElementById('settings-panel').classList.contains('active')) toggleSettingsPanel();
-            
-            resetContemplationState();
-            currentMysteryIndex = index;
-            currentMysteryGroupKey = groupKey;
-            
-            // MARK AS COMPLETED (LOCAL STORAGE)
-            const mysteryKey = `${groupKey}_${index + 1}`;
-            markAsCompleted(mysteryKey);
-            
-            document.getElementById('modal-mystery-title').textContent = title;
-            document.getElementById('modal-image').src = imageUrl;
-            document.getElementById('modal-image').alt = title;
-            
-            modalEl.classList.add('active');
-            document.getElementById('list-view').style.display = 'none';
-            
-            document.getElementById('dynamic-prayer-content').innerHTML = getInitialContemplationText(title);
-            
-            if (audio && audio.paused && !isMuted) audio.play().catch(e=>{});
-            requestWakeLock();
-
-            // Apply Default Mode Setting
-            const def = appConfig.defaultMode;
-            if (def === 'auto') {
-                isAutoMode = true;
-                autoPlayBtn.classList.add('bg-indigo-700');
-                manualBtn.classList.remove('bg-yellow-600');
-                scrollCompletionTimer = setTimeout(handleNextStep, 2000);
-            } else {
                 isAutoMode = false;
-                manualBtn.classList.add('bg-yellow-600');
-                autoPlayBtn.classList.remove('bg-indigo-700');
+                updatePlayButtonUI("Play");
+            } else {
+                isAutoMode = true;
+                updatePlayButtonUI("Pause");
+                if (!isScrolling) {
+                    const step = currentSequence[currentIndex];
+                    if (step.key === 'contemplation') {
+                        handleNextStep();
+                    } else {
+                        handleNextStep(); 
+                    }
+                }
             }
         }
-        
-        // MODIFIED: Added optional parameter isAutoCompletion
-        window.closeContemplationView = function(isAutoCompletion = false) { 
-            resetContemplationState();
-            releaseWakeLock();
-            modalEl.classList.remove('active');
-            document.getElementById('list-view').style.display = 'block';
+
+        function updatePlayButtonUI(label) {
+            const btn = document.getElementById('play-pause-btn');
+            btn.textContent = label;
+            if (label === "Pause") {
+                btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                btn.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
+            } else {
+                btn.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
+                btn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+            }
+        }
+
+        function userNextStep() {
+            clearTimer(); 
+            handleNextStep(); 
+        }
+
+        function finishCurrentSection() {
+            clearTimer();
+            const currentStep = currentSequence[currentIndex];
+            const currentSection = currentStep.section;
             
-            // Re-render the main display to show the updated grayscale status
-            updateMainDisplay(selectedDayIndex); 
+            markSectionComplete(currentSection);
 
-            // Auto-continue logic - Only continue if isAutoCompletion is true
-            if (appConfig.autoContinue && isAutoCompletion) {
-                const nextMysteryIndex = currentMysteryIndex + 1;
-                const currentMysteryGroup = allMysteries[currentMysteryGroupKey];
+            let nextSectionIndex = -1;
+            for(let i = currentIndex; i < currentSequence.length; i++) {
+                if (currentSequence[i].section !== currentSection) {
+                    nextSectionIndex = i;
+                    break;
+                }
+            }
 
-                if (nextMysteryIndex < currentMysteryGroup.length) {
-                    const nextMystery = currentMysteryGroup[nextMysteryIndex];
-                    
-                    // Delay to allow list view to display before next modal opens
-                    setTimeout(() => {
-                        window.openContemplationView(
-                            nextMystery.title, 
-                            nextMystery.imageUrl, 
-                            nextMysteryIndex, 
-                            currentMysteryGroupKey
-                        );
-                    }, 500); 
+            if (nextSectionIndex !== -1) {
+                currentIndex = nextSectionIndex;
+                renderStep();
+            } else {
+                if (appConfig.autoContinue) {
+                    attemptAutoContinue(currentSection);
+                } else {
+                    finishSession(true);
                 }
             }
         }
         
-        // --- AUDIO/WAKE/DAY LOGIC ---
-        window.toggleMute = function() {
-            if (!audio) return;
-            isMuted = !isMuted;
-            audio.muted = isMuted;
-            updateMuteButton(isMuted);
-            if (!isMuted && audio.paused) audio.play().catch(e=>{});
-        }
-        function updateMuteButton(m){
-             document.getElementById('mute-status').textContent = m?"Muted":"Unmuted";
-             document.getElementById('speaker-icon').innerHTML = m?'&#128263;':'&#128266;';
-        }
-        function initAudio(){ 
-            audio = document.getElementById('background-music'); 
-            if(!audio) return;
-            audio.volume=0.4; isMuted=false; audio.muted=false; updateMuteButton(false);
-            // Autoplay attempt (might be blocked by browser)
-            audio.play().catch(e=>{ console.log("Audio autoplay blocked. User interaction required."); });
-        }
-        
-        async function requestWakeLock() { if('wakeLock' in navigator) try{ wakeLockSentinel = await navigator.wakeLock.request('screen'); }catch(e){ console.log("Wake Lock Failed:", e); } }
-        function releaseWakeLock() { if(wakeLockSentinel) wakeLockSentinel.release().then(()=>{wakeLockSentinel=null;}).catch(()=>{}); }
-        document.addEventListener('visibilitychange', ()=>{ if(wakeLockSentinel!==null && document.visibilityState==='visible') requestWakeLock(); });
+        function attemptAutoContinue(completedSection) {
+            let nextType = '', nextIndex = -1;
+            const wasPlaying = isAutoMode;
 
-        window.selectDay = function(i) { selectedDayIndex=i; updateMainDisplay(i); populateCycleList(realCurrentDayIndex, selectedDayIndex); }
-        
-        // MODIFIED: loadCompletedStatus now uses Local Storage
-        async function updateMainDisplay(i) {
-             const name = dayNames[i]; 
-             const group = mysterySchedule[i].name;
-             const completedStatus = loadCompletedStatus(); // Uses Local Storage now
-
-             document.getElementById('current-day-text').textContent = (i===realCurrentDayIndex) 
-                ? `Today, ${name}, we contemplate the:` 
-                : `Viewing ${name}: (Actual: ${dayNames[realCurrentDayIndex]} *)`;
-             document.getElementById('mystery-group-name').textContent = group;
-             
-             document.getElementById('daily-mysteries-container').innerHTML = allMysteries[group].map((m,idx)=>createMysteryCard(m,idx, group, completedStatus)).join('');
-        }
-
-        function populateCycleList(real, sel) {
-            const list = document.getElementById('cycle-list'); list.innerHTML='';
-            for(let i=0;i<7;i++) {
-                const li = document.createElement('p');
-                li.className = (i===sel) ? "font-semibold text-indigo-100 flex justify-between items-center bg-indigo-600 p-2 rounded-md cursor-pointer" : "flex justify-between items-center p-2 text-gray-600 cursor-pointer bg-gray-50 hover:bg-indigo-100 rounded-md";
-                li.onclick = ()=>selectDay(i);
-                li.innerHTML = `<span class="font-medium">${dayNames[i]}${i===real?' *':''}</span><span>${mysterySchedule[i].name}</span>`;
-                list.appendChild(li);
+            if (completedSection === 'intro') {
+                nextType = 'mystery';
+                nextIndex = 0; 
+            } else if (completedSection.startsWith('mystery_')) {
+                const currentId = parseInt(completedSection.split('_')[1]);
+                if (currentId < 5) {
+                    nextType = 'mystery';
+                    nextIndex = currentId; 
+                } else {
+                    if (appConfig.rosaryStructure === 'full') {
+                        nextType = 'special';
+                        nextIndex = 'conclusion';
+                    }
+                }
+            } 
+            
+            if (nextType) {
+                // NO DELAY
+                startRosarySession(currentGroupKey, nextType, nextIndex, wasPlaying);
+            } else {
+                finishSession(true);
             }
         }
 
-        function createMysteryCard(mystery, index, groupKey, completedStatus) {
-            const title = mystery.title;
-            const imageUrl = mystery.imageUrl; 
-            const mysteryKey = `${groupKey}_${index + 1}`;
-            const isCompleted = completedStatus[mysteryKey];
-            const filterClass = isCompleted ? 'grayscale' : 'full-color';
-            
-            return `
-                <div id="mystery-${index}" 
-                     class="mystery-box bg-white rounded-lg overflow-hidden shadow-md"
-                     onclick="openContemplationView('${title.replace(/'/g, "\\'")}', '${imageUrl.replace(/'/g, "\\'")}', ${index}, '${groupKey}')">
-                    <div class="relative h-48 bg-gray-200 flex items-center justify-center overflow-hidden mystery-image-container">
-                        <img src="${imageUrl}" 
-                             alt="${title} contemplation image" 
-                             class="w-full h-full object-cover opacity-80 ${filterClass}"
-                             onerror="this.onerror=null; this.src='https://placehold.co/400x200/cccccc/000000?text=Image+Load+Error';"
-                        >
-                        
-                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900/70 to-transparent p-4 flex flex-col justify-end text-center">
-                            <span class="text-xs font-medium text-white opacity-80">Mystery ${index + 1}</span>
-                            <h4 class="text-xl font-bold text-white leading-snug">${title}</h4>
-                            ${isCompleted ? '<span class="text-sm font-semibold text-green-300">✓ Completed Today</span>' : ''}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        function initApp() {
-            loadSettings(); 
-            calculateBaseDurations();
-            applyTextSizeClass(); 
-            recalcDurations(); 
-            
-            // Removed all Firebase setup, now just start the UI.
-            updateMainDisplay(selectedDayIndex);
-            populateCycleList(realCurrentDayIndex, selectedDayIndex);
-            initAudio(); 
+        function markSectionComplete(section) {
+            if (section === 'intro' || section === 'conclusion') {
+                markAsCompleted(`${currentGroupKey}_${section}`);
+            } else if (section.startsWith('mystery_')) {
+                const id = section.split('_')[1];
+                markAsCompleted(`${currentGroupKey}_${id}`);
+            }
         }
 
-        document.addEventListener('DOMContentLoaded', initApp);
+        function finishSession(isComplete) {
+            if (isComplete && currentIndex < currentSequence.length) {
+                markSectionComplete(currentSequence[currentIndex].section);
+            }
+            clearTimer();
+            if (audio) { audio.pause(); audio.currentTime = 0; }
+            releaseWakeLock();
+            document.getElementById('contemplation-view').classList.remove('active');
+            document.getElementById('list-view').style.display = 'block';
+            updateMainDisplay(selectedDayIndex);
+        }
+
+        function clearTimer() {
+            if (stepTimer) clearTimeout(stepTimer);
+            stepTimer = null;
+            const content = document.getElementById('dynamic-prayer-content');
+            if(content) { content.style.animation = 'none'; content.style.transform = 'translateY(0)'; }
+            isScrolling = false;
+        }
+
+        function resetState() {
+            clearTimer();
+            document.getElementById('rose-container').innerHTML = '';
+            document.getElementById('rose-container').dataset.section = '';
+        }
+
+        function getCurrentDateKey() { return 'rosary_' + new Date().toISOString().split('T')[0]; }
+        function loadCompletedStatus() { return JSON.parse(localStorage.getItem(getCurrentDateKey()) || '{}'); }
+        function markAsCompleted(key) {
+            const data = loadCompletedStatus();
+            data[key] = true;
+            localStorage.setItem(getCurrentDateKey(), JSON.stringify(data));
+        }
+
+        function updateMainDisplay(dayIdx) {
+            const sched = mysterySchedule[dayIdx];
+            const groupKey = sched.name;
+            const status = loadCompletedStatus();
+            document.getElementById('current-day-text').textContent = (dayIdx===realCurrentDayIndex) ? `Today, ${dayNames[dayIdx]}` : `Viewing ${dayNames[dayIdx]}`;
+            document.getElementById('mystery-group-name').textContent = groupKey;
+            document.getElementById('mystery-list-title').textContent = (appConfig.rosaryStructure === 'full') ? "Full Rosary Sequence" : "Daily Mysteries";
+            
+            let html = '';
+            if (appConfig.rosaryStructure === 'full') {
+                html += createCard(SPECIAL.intro, 'special', groupKey, -1, status);
+            }
+            allMysteries[groupKey].forEach((m, idx) => {
+                html += createCard(m, 'mystery', groupKey, idx, status);
+            });
+            if (appConfig.rosaryStructure === 'full') {
+                html += createCard(SPECIAL.conclusion, 'special', groupKey, -1, status);
+            }
+            document.getElementById('daily-mysteries-container').innerHTML = html;
+        }
+
+        function createCard(data, type, groupKey, idx, status) {
+            const isSpecial = type === 'special';
+            const idKey = isSpecial ? `${groupKey}_${data.id}` : `${groupKey}_${data.id}`;
+            const isDone = idKey ? status[idKey] : false;
+            const filter = isDone ? 'grayscale' : 'full-color';
+            const label = isSpecial ? (data.id==='intro'?'I. Opening':'VII. Closing') : `Mystery ${data.id}`;
+            const indexParam = isSpecial ? `'${data.id}'` : idx;
+            
+            return `
+            <div onclick="startRosarySession('${groupKey}', '${type}', ${indexParam})" 
+                 class="mystery-box bg-white rounded-lg overflow-hidden shadow-md relative h-48">
+                <img src="${data.imageUrl}" class="w-full h-full object-cover ${filter}">
+                <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent p-4 flex flex-col justify-end text-center">
+                    <span class="text-xs font-medium text-white opacity-90">${label}</span>
+                    <h4 class="text-xl font-bold text-white">${data.title}</h4>
+                    ${isDone ? '<span class="text-xs text-green-300 font-bold mt-1">✓ Completed</span>' : ''}
+                </div>
+            </div>`;
+        }
+
+        function calculateDurations() {
+            for (let k in rosaryPrayers) {
+                if (k === 'contemplation') {
+                    DURATION[k] = 10000 / appConfig.pace;
+                } else {
+                    const text = rosaryPrayers[k].text;
+                    const words = text.split(/\s+/).length;
+                    DURATION[k] = Math.max(2000, (words * MS_PER_WORD) / appConfig.pace);
+                }
+            }
+        }
+        
+        function loadSettings() {
+            const s = JSON.parse(localStorage.getItem('rosarySettings') || '{}');
+            appConfig = { ...appConfig, ...s };
+            if(document.getElementById('structure-select')) document.getElementById('structure-select').value = appConfig.rosaryStructure;
+            if(document.getElementById('mode-select')) document.getElementById('mode-select').value = appConfig.defaultMode;
+            if(document.getElementById('speed-select')) document.getElementById('speed-select').value = appConfig.pace;
+            if(document.getElementById('size-select')) document.getElementById('size-select').value = appConfig.textSize;
+            if(document.getElementById('auto-continue-checkbox')) document.getElementById('auto-continue-checkbox').checked = appConfig.autoContinue;
+            if(document.getElementById('music-checkbox')) document.getElementById('music-checkbox').checked = appConfig.musicEnabled;
+        }
+
+        window.updateRosaryStructure = (v) => { appConfig.rosaryStructure = v; saveSet(); updateMainDisplay(selectedDayIndex); };
+        window.updateDefaultMode = (v) => { appConfig.defaultMode = v; saveSet(); };
+        window.updateSpeed = (v) => { appConfig.pace = parseFloat(v); calculateDurations(); saveSet(); };
+        window.updateTextSize = (v) => { appConfig.textSize = v; saveSet(); updateTextStyle(); }; 
+        window.updateAutoContinue = (v) => { appConfig.autoContinue = v; saveSet(); };
+        window.updateMusicEnabled = (isChecked) => { 
+            appConfig.musicEnabled = isChecked; 
+            saveSet(); 
+            if (isChecked) {
+                if(document.getElementById('contemplation-view').classList.contains('active')) {
+                    audio.play().catch(()=>{});
+                }
+            } else {
+                audio.pause();
+            }
+        };
+        function saveSet() { localStorage.setItem('rosarySettings', JSON.stringify(appConfig)); }
+
+        function updateTextStyle() {
+            if(appConfig.textSize === 'small') { baseTextClass='text-sm'; scrollTextClass='text-lg'; }
+            else if(appConfig.textSize === 'large') { baseTextClass='text-lg'; scrollTextClass='text-2xl'; }
+            else { baseTextClass='text-base'; scrollTextClass='text-xl'; }
+        }
+
+        window.toggleMute = () => { if(audio) { isMuted=!isMuted; audio.muted=isMuted; } };
+        async function requestWakeLock() { try { if('wakeLock' in navigator) activeWakeLock = await navigator.wakeLock.request('screen'); } catch(e){} }
+        function releaseWakeLock() { if(activeWakeLock) { activeWakeLock.release(); activeWakeLock=null; } }
+        
+        window.populateCycleList = (real, sel) => {
+            const list = document.getElementById('cycle-list'); list.innerHTML='';
+            dayNames.forEach((d, i) => {
+                const isActive = i===sel;
+                list.innerHTML += `<div onclick="selectedDayIndex=${i}; updateMainDisplay(${i}); populateCycleList(${real}, ${i})" 
+                class="flex justify-between p-2 rounded cursor-pointer ${isActive?'bg-indigo-600 text-white':'bg-gray-50 hover:bg-gray-100'}">
+                <span>${d}${i===real?' *':''}</span><span>${mysterySchedule[i].name}</span></div>`;
+            });
+        };
+        window.confirmReset = () => {
+            document.getElementById('custom-modal').classList.remove('hidden');
+            document.getElementById('modal-title').textContent = "Reset Progress";
+            document.getElementById('modal-message').textContent = "Clear all progress for today?";
+            document.getElementById('modal-confirm').onclick = () => {
+                localStorage.removeItem(getCurrentDateKey());
+                document.getElementById('custom-modal').classList.add('hidden');
+                updateMainDisplay(selectedDayIndex);
+            };
+            document.getElementById('modal-cancel').onclick = () => document.getElementById('custom-modal').classList.add('hidden');
+        };
+        window.toggleSettingsPanel = () => document.getElementById('settings-panel').classList.toggle('active');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            audio = document.getElementById('background-music');
+            audio.volume = 0.4;
+            loadSettings();
+            calculateDurations();
+            updateTextStyle();
+            updateMainDisplay(selectedDayIndex);
+        });
 
     </script>
 </body>

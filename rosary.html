@@ -36,59 +36,62 @@
         }
         .modal.active { opacity: 1; visibility: visible; }
         
-        /* IMAGE ZOOM CONTAINER */
-        /* This wrapper handles the scrolling when zoomed */
+        /* IMAGE CONTAINER (The box that holds the image) */
         .image-container-wrapper {
             width: 100%;
             background-color: white;
             border-radius: 0.75rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            overflow: auto; /* Enable scrolling for zoom */
             position: relative;
-            display: flex; /* Center image by default */
+            display: flex; 
             align-items: center;
-            justify-content: center;
-            flex-shrink: 1; /* Allow shrinking if needed */
+            justify-content: center; /* Center by default */
+            flex-shrink: 1;
             transition: all 0.3s ease;
             cursor: zoom-in;
-            /* Touch action for panning */
-            touch-action: pan-x pan-y;
+            overflow: hidden; /* Hide overflow when not zoomed */
         }
 
-        /* The Image itself */
+        /* ZOOMED STATE for Container */
+        .image-container-wrapper.zoomed {
+            cursor: zoom-out;
+            overflow: auto; /* Enable scrolling */
+            display: block; /* Switch to block to allow full scrolling */
+            /* touch-action: pan-x pan-y; allowed by default on block overflow */
+        }
+
+        /* THE IMAGE */
         .contemplation-image {
             max-width: 100%; 
             max-height: 100%; 
             object-fit: contain;
             transition: transform 0.3s ease;
+            margin: auto; /* Helps centering in block mode if not full width */
+            display: block;
         }
 
-        /* ZOOMED STATE */
-        .image-container-wrapper.zoomed {
-            display: block; /* Switch to block to allow full scroll flow */
-            cursor: zoom-out;
-        }
-        
+        /* ZOOMED STATE for Image */
         .image-container-wrapper.zoomed .contemplation-image {
             max-width: none; 
             max-height: none;
-            width: 200%; /* Force image to be larger than container */
+            width: 200%; /* Double size */
             height: auto;
+            margin: 0; /* Remove margin to allow scrolling to top-left */
         }
 
-        /* Dynamic Layout Sizing logic based on text visibility */
+        /* Dynamic Layout Height */
         .view-text-visible .image-container-wrapper { height: 50%; }
         .view-text-hidden .image-container-wrapper { height: 75%; }
         
         /* Beads */
         .bead {
-            display: inline-block; width: 16px; height: 16px; 
-            border-radius: 50%; margin: 2px; flex-shrink: 0;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.2); transition: all 0.2s ease;
+            display: inline-block; width: 18px; height: 18px; 
+            border-radius: 50%; margin: 3px; flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: all 0.2s ease;
         }
         .red-bead { background-color: #ef4444; }
         .white-bead { background-color: #ffffff; border: 1px solid #d1d5db; }
-        .bead.current { transform: scale(1.4); box-shadow: 0 0 0 3px #a78bfa; border-color: #a78bfa; z-index: 10; position: relative;}
+        .bead.current { transform: scale(1.3); box-shadow: 0 0 0 4px #a78bfa; border-color: #a78bfa; }
         
         /* Text Animation */
         @keyframes prayerScroll {
@@ -115,6 +118,10 @@
     <audio id="background-music" loop playsinline>
         <source src="instrumental-piano-christian-worship-of-jesus-301250.mp3" type="audio/mpeg">
     </audio>
+    <audio id="sfx-water" preload="auto" src="water-drop-3-84577.mp3"></audio>
+    <audio id="sfx-bell" preload="auto" src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Glocke.ogg"></audio>
+    <audio id="sfx-chime" preload="auto" src="WindChime-Short.mp3"></audio>
+    <audio id="sfx-page" preload="auto" src="page-flip1-178322.mp3"></audio>
 
     <div id="settings-panel" class="fixed inset-x-0 top-0 transform -translate-y-full transition-transform duration-300 z-50 bg-white shadow-xl p-6 rounded-b-xl max-w-lg mx-auto">
         <div class="flex justify-between items-center mb-6 border-b pb-4">
@@ -157,7 +164,15 @@
             </div>
             <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
                 <label class="font-medium text-gray-700">Background Music</label>
-                <input type="checkbox" id="music-checkbox" onchange="updateMusicEnabled(this.checked)" class="h-6 w-6 text-indigo-600 rounded cursor-pointer">
+                <select id="music-select" onchange="updateMusicVolume(this.value)" class="py-2 text-sm rounded-lg border-gray-300">
+                    <option value="off">Off</option>
+                    <option value="soft">Soft</option>
+                    <option value="loud">Loud</option>
+                </select>
+            </div>
+            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                <label class="font-medium text-gray-700">Sound Effects</label>
+                <input type="checkbox" id="sfx-checkbox" onchange="updateSfxEnabled(this.checked)" class="h-6 w-6 text-indigo-600 rounded cursor-pointer">
             </div>
             <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
                 <label class="font-medium text-gray-700">Auto Continue</label>
@@ -207,21 +222,19 @@
     
     <div id="contemplation-view" class="modal view-text-visible">
         
-        <div class="flex-shrink-0 bg-white shadow-md z-20 flex flex-col items-center">
-            <div class="w-full p-2 flex justify-end items-center relative h-12 border-b border-gray-100">
-                <h3 id="modal-top-title" class="absolute inset-x-12 text-center text-base sm:text-lg font-bold text-gray-800 truncate leading-tight"></h3>
-                <button onclick="finishSession(false)" class="p-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100 transition z-10">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-            </div>
-            
-            <div id="rose-container" class="w-full flex flex-wrap justify-center py-2 bg-gray-50 min-h-[40px] items-center border-b border-gray-200">
-                </div>
+        <div class="p-2 flex justify-end items-center bg-white shadow-md flex-shrink-0 relative h-12 z-20">
+            <h3 id="modal-top-title" class="absolute inset-x-8 text-center text-lg font-bold text-gray-800 truncate"></h3>
+            <button onclick="finishSession(false)" class="p-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100 transition z-10">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
         </div>
 
         <div class="flex-1 flex flex-col items-center justify-start p-2 overflow-y-hidden relative w-full max-w-xl mx-auto">
             
-            <div id="image-wrapper" class="image-container-wrapper p-1 mb-2 mt-2" onclick="toggleZoom()">
+            <div id="rose-container" class="flex flex-wrap justify-center w-full mb-1 py-1 min-h-[30px] flex-shrink-0 items-center">
+            </div>
+
+            <div id="image-wrapper" class="image-container-wrapper w-full bg-white rounded-xl shadow-xl p-1 mb-2 flex-shrink-1 relative" onclick="toggleZoom()">
                 <img id="modal-image" class="contemplation-image rounded-lg full-color" alt="Contemplation Image" 
                      onerror="this.onerror=null; this.src='https://placehold.co/800x400/cccccc/000000?text=Image+Load+Error';">
                 
@@ -234,7 +247,7 @@
                 <div id="prayer-title-bar" class="w-full p-2 mb-1 bg-indigo-100 rounded-lg shadow-inner flex justify-between items-center relative">
                     <div id="mystery-badge" class="w-8 h-8 rounded-full bg-indigo-800 text-white flex items-center justify-center font-bold text-sm shadow-md transition-opacity duration-300 opacity-0">1</div>
                     <h4 id="current-prayer-title" class="text-lg font-semibold text-indigo-800 text-center flex-grow mx-2 truncate">Contemplation</h4>
-                    <button onclick="toggleTextVisibility()" id="on-screen-toggle-btn" class="text-indigo-600 hover:text-indigo-900 p-1 w-8 flex justify-center" onclick="event.stopPropagation()">
+                    <button onclick="toggleTextVisibility()" id="on-screen-toggle-btn" class="text-indigo-600 hover:text-indigo-900 p-1 w-8 flex justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform duration-300" id="toggle-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
                     </button>
                 </div>
@@ -340,7 +353,8 @@
             defaultMode: 'manual', 
             autoContinue: false, 
             rosaryStructure: 'daily',
-            musicEnabled: false,
+            bgMusic: 'off',
+            sfxEnabled: false,
             showText: true 
         };
         
@@ -430,9 +444,11 @@
             if (currentSequence.length === 0) return; 
 
             document.getElementById('contemplation-view').classList.add('active');
-            document.getElementById('list-view-container').style.display = 'none'; // Hide main list
+            document.getElementById('list-view-container').style.display = 'none'; 
             
-            if (appConfig.musicEnabled && audio) {
+            if (appConfig.bgMusic !== 'off' && audio) {
+                let vol = (appConfig.bgMusic === 'soft') ? 0.1 : 0.4;
+                audio.volume = vol;
                 audio.currentTime = 0;
                 audio.play().catch(()=>{});
             }
@@ -460,13 +476,29 @@
             const prayer = rosaryPrayers[step.key];
             const isContemplation = step.key === 'contemplation';
 
+            if (appConfig.sfxEnabled) {
+                let sfxId = '';
+                if (step.key === 'contemplation') sfxId = 'sfx-page';
+                else if (step.key === 'hm') sfxId = 'sfx-water';
+                else if (step.key === 'of') sfxId = 'sfx-bell';
+                else if (step.key === 'gb' || step.key === 'gbf') sfxId = 'sfx-chime';
+                
+                if (sfxId) {
+                    const sound = document.getElementById(sfxId);
+                    if (sound) {
+                        sound.currentTime = 0;
+                        sound.volume = 0.6; 
+                        sound.play().catch(()=>{});
+                    }
+                }
+            }
+
             document.getElementById('scroll-instruction').classList.remove('opacity-100');
             document.getElementById('scroll-instruction').classList.add('opacity-0');
 
             document.getElementById('modal-top-title').textContent = step.flowTitle;
             document.getElementById('current-prayer-title').textContent = isContemplation ? "Contemplation" : step.flowTitle;
 
-            // Badge Update
             const badge = document.getElementById('mystery-badge');
             if (step.section.startsWith('mystery_')) {
                 badge.textContent = step.section.split('_')[1];
@@ -481,7 +513,10 @@
             imgEl.classList.add('full-color');
             
             // Reset Zoom
-            document.getElementById('image-wrapper').classList.remove('zoomed');
+            const wrapperDiv = document.getElementById('image-wrapper');
+            wrapperDiv.classList.remove('zoomed');
+            wrapperDiv.scrollTop = 0;
+            wrapperDiv.scrollLeft = 0;
 
             updateBeads(step);
 
@@ -521,7 +556,6 @@
             const textHeight = wrapper.offsetHeight;
             const containerHeight = document.getElementById('modal-text-area').offsetHeight;
             
-            // Apply Scroll Logic ALWAYS if text exceeds container
             if (textHeight > 0) {
                 contentEl.style.setProperty('--start-position', `${containerHeight}px`);
                 contentEl.style.setProperty('--end-position', `-${textHeight}px`);
@@ -565,9 +599,6 @@
         function toggleZoom() {
             const wrapper = document.getElementById('image-wrapper');
             wrapper.classList.toggle('zoomed');
-            
-            // Center if zooming in? Simple toggle allows user to scroll.
-            // Reset scroll position when un-zooming
             if(!wrapper.classList.contains('zoomed')) {
                 wrapper.scrollTop = 0;
                 wrapper.scrollLeft = 0;
@@ -765,7 +796,7 @@
             if (audio) { audio.pause(); audio.currentTime = 0; }
             releaseWakeLock();
             document.getElementById('contemplation-view').classList.remove('active');
-            document.getElementById('list-view-container').style.display = 'block'; // Show main list
+            document.getElementById('list-view-container').style.display = 'block'; 
             updateMainDisplay(selectedDayIndex);
         }
 
@@ -852,8 +883,9 @@
             if(document.getElementById('speed-select')) document.getElementById('speed-select').value = appConfig.pace;
             if(document.getElementById('size-select')) document.getElementById('size-select').value = appConfig.textSize;
             if(document.getElementById('auto-continue-checkbox')) document.getElementById('auto-continue-checkbox').checked = appConfig.autoContinue;
-            if(document.getElementById('music-checkbox')) document.getElementById('music-checkbox').checked = appConfig.musicEnabled;
-            // Load text toggle
+            // Handle new Music Select
+            if(document.getElementById('music-select')) document.getElementById('music-select').value = appConfig.bgMusic || 'off';
+            if(document.getElementById('sfx-checkbox')) document.getElementById('sfx-checkbox').checked = appConfig.sfxEnabled;
             if(document.getElementById('show-text-checkbox')) document.getElementById('show-text-checkbox').checked = (appConfig.showText !== false);
         }
 
@@ -862,17 +894,35 @@
         window.updateSpeed = (v) => { appConfig.pace = parseFloat(v); calculateDurations(); saveSet(); };
         window.updateTextSize = (v) => { appConfig.textSize = v; saveSet(); updateTextStyle(); }; 
         window.updateAutoContinue = (v) => { appConfig.autoContinue = v; saveSet(); };
-        window.updateMusicEnabled = (isChecked) => { 
-            appConfig.musicEnabled = isChecked; 
-            saveSet(); 
-            if (isChecked) {
-                if(document.getElementById('contemplation-view').classList.contains('active')) {
-                    audio.play().catch(()=>{});
+        
+        // Updated Music Volume Handler
+        window.updateMusicVolume = (val) => {
+            appConfig.bgMusic = val;
+            saveSet();
+            
+            let vol = 0;
+            if(val === 'soft') vol = 0.1;
+            if(val === 'loud') vol = 0.4;
+            
+            if (audio) {
+                audio.volume = vol;
+                if (val === 'off') {
+                    audio.pause();
+                } else {
+                    // Only play if session active
+                    if(document.getElementById('contemplation-view').classList.contains('active')) {
+                        audio.play().catch(()=>{});
+                    }
                 }
-            } else {
-                audio.pause();
             }
         };
+
+        // NEW SFX Handler
+        window.updateSfxEnabled = (isChecked) => {
+            appConfig.sfxEnabled = isChecked;
+            saveSet();
+        };
+        
         function saveSet() { localStorage.setItem('rosarySettings', JSON.stringify(appConfig)); }
 
         function updateTextStyle() {
@@ -909,8 +959,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             audio = document.getElementById('background-music');
-            audio.volume = 0.4;
-            loadSettings();
+            loadSettings(); // Will set initial volume
             calculateDurations();
             updateTextStyle();
             updateMainDisplay(selectedDayIndex);

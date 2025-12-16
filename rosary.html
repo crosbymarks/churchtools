@@ -47,7 +47,7 @@
             align-items: center;
             justify-content: center; 
             flex-shrink: 1;
-            transition: all 0.4s ease; /* Smooth flex resizing */
+            transition: all 0.4s ease;
             cursor: zoom-in;
             overflow: hidden; 
         }
@@ -76,7 +76,6 @@
         }
 
         /* DYNAMIC LAYOUT SIZING */
-        /* Note: We use flex-grow logic in JS/HTML mostly, but this sets max constraints */
         .view-text-visible .image-container-wrapper { height: 50%; }
         .view-text-hidden .image-container-wrapper { height: 75%; }
         
@@ -88,7 +87,6 @@
             will-change: height, opacity;
         }
 
-        /* Hiding Logic: Keep 1px height to preserve animation background processing */
         .view-text-hidden #modal-text-area {
             height: 1px !important; 
             opacity: 0;
@@ -117,7 +115,7 @@
         #dynamic-prayer-content {
             position: absolute; width: 100%; padding: 0 24px; top: 0; left: 0;
             transform: translateY(var(--start-position, 0)); 
-            will-change: transform; /* Hint to browser to keep compositing */
+            will-change: transform; 
         }
 
         #settings-panel.active { transform: translateY(0); }
@@ -141,28 +139,35 @@
 
     <div id="settings-panel" class="fixed inset-x-0 top-0 transform -translate-y-full transition-transform duration-300 z-50 bg-white shadow-xl p-6 rounded-b-xl max-w-lg mx-auto">
         <div class="flex justify-between items-center mb-6 border-b pb-4">
-            <h3 class="text-2xl font-bold text-indigo-700">App Settings</h3>
+            <h3 class="text-2xl font-bold text-indigo-700" id="lbl-settings-title">App Settings</h3>
             <button onclick="toggleSettingsPanel()" class="p-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
         </div>
         <div class="space-y-4">
             <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
-                <label class="font-medium text-gray-700">Rosary Structure</label>
+                <label class="font-medium text-gray-700" id="lbl-language">Language</label>
+                <select id="language-select" onchange="updateLanguage(this.value)" class="py-2 text-sm rounded-lg border-gray-300">
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                </select>
+            </div>
+            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                <label class="font-medium text-gray-700" id="lbl-structure">Rosary Structure</label>
                 <select id="structure-select" onchange="updateRosaryStructure(this.value)" class="py-2 text-sm rounded-lg border-gray-300">
-                    <option value="daily">Daily Mystery</option>
-                    <option value="full">Full Rosary</option>
+                    <option value="daily" id="opt-daily">Daily Mystery</option>
+                    <option value="full" id="opt-full">Full Rosary</option>
                 </select>
             </div>
             <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
-                <label class="font-medium text-gray-700">Default Mode</label>
+                <label class="font-medium text-gray-700" id="lbl-mode">Default Mode</label>
                 <select id="mode-select" onchange="updateDefaultMode(this.value)" class="py-2 text-sm rounded-lg border-gray-300">
-                    <option value="manual">Manual</option>
-                    <option value="auto">Auto Play</option>
+                    <option value="manual" id="opt-manual">Manual</option>
+                    <option value="auto" id="opt-auto">Auto Play</option>
                 </select>
             </div>
             <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
-                <label class="font-medium text-gray-700">Contemplation Pace</label>
+                <label class="font-medium text-gray-700" id="lbl-pace">Contemplation Pace</label>
                 <select id="speed-select" onchange="updateSpeed(this.value)" class="py-2 text-sm rounded-lg border-gray-300">
                     <option value="1">1x</option>
                     <option value="1.25">1.25x</option>
@@ -171,31 +176,31 @@
                 </select>
             </div>
             <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
-                <label class="font-medium text-gray-700">Text Size</label>
+                <label class="font-medium text-gray-700" id="lbl-textsize">Text Size</label>
                 <select id="size-select" onchange="updateTextSize(this.value)" class="py-2 text-sm rounded-lg border-gray-300">
-                    <option value="medium">Medium</option>
-                    <option value="small">Small</option>
-                    <option value="large">Large</option>
+                    <option value="medium" id="opt-med">Medium</option>
+                    <option value="small" id="opt-small">Small</option>
+                    <option value="large" id="opt-large">Large</option>
                 </select>
             </div>
             <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
-                <label class="font-medium text-gray-700">Background Music</label>
+                <label class="font-medium text-gray-700" id="lbl-music">Background Music</label>
                 <select id="music-select" onchange="updateMusicVolume(this.value)" class="py-2 text-sm rounded-lg border-gray-300">
-                    <option value="off">Off</option>
-                    <option value="soft">Soft</option>
-                    <option value="loud">Loud</option>
+                    <option value="off" id="opt-off">Off</option>
+                    <option value="soft" id="opt-soft">Soft</option>
+                    <option value="loud" id="opt-loud">Loud</option>
                 </select>
             </div>
             <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
-                <label class="font-medium text-gray-700">Sound Effects</label>
+                <label class="font-medium text-gray-700" id="lbl-sfx">Sound Effects</label>
                 <input type="checkbox" id="sfx-checkbox" onchange="updateSfxEnabled(this.checked)" class="h-6 w-6 text-indigo-600 rounded cursor-pointer">
             </div>
             <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
-                <label class="font-medium text-gray-700">Auto Continue</label>
+                <label class="font-medium text-gray-700" id="lbl-autocontinue">Auto Continue</label>
                 <input type="checkbox" id="auto-continue-checkbox" onchange="updateAutoContinue(this.checked)" class="h-6 w-6 text-indigo-600 rounded cursor-pointer">
             </div>
             <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
-                <label class="font-medium text-gray-700">Show Prayer Text</label>
+                <label class="font-medium text-gray-700" id="lbl-showtext">Show Prayer Text</label>
                 <input type="checkbox" id="show-text-checkbox" onchange="toggleTextVisibilityFromSettings(this.checked)" class="h-6 w-6 text-indigo-600 rounded cursor-pointer">
             </div>
         </div>
@@ -209,7 +214,7 @@
                 </button>
                 <div class="text-center flex-grow mx-4">
                     <h1 class="text-3xl font-bold text-gray-800 mb-1"><span class="text-indigo-600">Visio Divina</span> Rosary</h1>
-                    <p class="text-base text-gray-500">Contemplation through sacred images.</p>
+                    <p class="text-base text-gray-500" id="lbl-subtitle">Contemplation through sacred images.</p>
                 </div>
                 <button class="p-2 mt-2 invisible"><span class="text-2xl font-extrabold">&#9881;</span></button>
             </header>
@@ -227,9 +232,9 @@
             <div id="daily-mysteries-container" class="space-y-4"></div>
             
             <div class="mt-8 pt-4 border-t border-gray-200">
-                <button onclick="document.getElementById('cycle-list-wrapper').classList.toggle('hidden'); if(!document.getElementById('cycle-list-wrapper').classList.contains('hidden')) populateCycleList(realCurrentDayIndex, selectedDayIndex);" class="w-full text-sm text-indigo-600 hover:text-indigo-800 font-medium py-2">Show/Hide Full Weekly Cycle</button>
+                <button onclick="document.getElementById('cycle-list-wrapper').classList.toggle('hidden'); if(!document.getElementById('cycle-list-wrapper').classList.contains('hidden')) populateCycleList(realCurrentDayIndex, selectedDayIndex);" class="w-full text-sm text-indigo-600 hover:text-indigo-800 font-medium py-2" id="btn-showcycle">Show/Hide Full Weekly Cycle</button>
                 <div id="cycle-list-wrapper" class="hidden">
-                    <p class="text-sm font-semibold text-gray-600 mt-4 mb-2">Select a Day (Actual: *)</p>
+                    <p class="text-sm font-semibold text-gray-600 mt-4 mb-2" id="lbl-selectday">Select a Day (Actual: *)</p>
                     <div id="cycle-list" class="space-y-1 text-sm"></div>
                 </div>
             </div>
@@ -255,7 +260,7 @@
                      onerror="this.onerror=null; this.src='https://placehold.co/800x400/cccccc/000000?text=Image+Load+Error';">
                 
                 <div id="zoom-hint" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-500">
-                    <span class="bg-black/50 text-white text-xs px-2 py-1 rounded">Tap to Zoom</span>
+                    <span class="bg-black/50 text-white text-xs px-2 py-1 rounded" id="lbl-zoomhint">Tap to Zoom</span>
                 </div>
             </div>
             
@@ -271,7 +276,7 @@
                 <div id="modal-text-area" class="w-full bg-white rounded-xl shadow-lg p-4 h-28 relative transition-all duration-300 overflow-hidden mb-2">
                     <div id="dynamic-prayer-content" class="text-base text-gray-700 italic text-center"></div>
                     <div id="scroll-instruction" class="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-500 pointer-events-none">
-                        <span class="bg-white/90 px-3 py-1 rounded-full text-indigo-600 font-bold text-xs shadow-md border border-indigo-100 backdrop-blur-sm">Press Play or Next to continue</span>
+                        <span class="bg-white/90 px-3 py-1 rounded-full text-indigo-600 font-bold text-xs shadow-md border border-indigo-100 backdrop-blur-sm" id="lbl-instruction">Press Play or Next to continue</span>
                     </div>
                 </div>
             </div>
@@ -298,65 +303,174 @@
     </div>
 
     <script>
-        // --- DATA ---
-        const allMysteries = {
-            "Joyful Mysteries": [
-                { id: 1, title: "The Annunciation", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/0/0e/Fra_Angelico_-_The_Annunciation_-_WGA00555.jpg" },
-                { id: 2, title: "The Visitation", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/d/dc/La_Visitation_avec_Marie-Jacobie_et_Marie-Salom%C3%A9_-_Domenico_Ghirlandaio_-_Mus%C3%A9e_du_Louvre_Peintures_INV_297_%3B_MR_240.jpg" },
-                { id: 3, title: "The Nativity", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/6/64/Geertgen_tot_Sint_Jans%2C_The_Nativity_at_Night%2C_c_1490.jpg" },
-                { id: 4, title: "The Presentation in the Temple", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/f/f7/Rembrandt_-_Circumcision_-_WGA19111.jpg" },
-                { id: 5, title: "The Finding in the Temple", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/5/51/Cima_da_Conegliano_Christ_among_the_doctors.jpg" }
-            ],
-            "Sorrowful Mysteries": [
-                { id: 1, title: "The Agony in the Garden", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/1/10/Bellini%2CGiovanni_-_Agony_in_the_Garden_-_National_Gallery.jpg" },
-                { id: 2, title: "The Scourging at the Pillar", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/1/11/Piero_-_The_Flagellation.jpg" },
-                { id: 3, title: "The Crowning with Thorns", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/5/52/Caravaggio%2C_Crowning_of_Thorns.jpg" },
-                { id: 4, title: "The Carrying of the Cross", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/5/5d/Hieronymus_Bosch_-_Christ_Carrying_the_Cross_-_WGA2498.jpg" },
-                { id: 5, title: "The Crucifixion", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/d/d3/Lotto%2C_crocifissione_01.jpg" }
-            ],
-            "Glorious Mysteries": [
-                { id: 1, title: "The Resurrection", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/c/c2/Resurrection.JPG" },
-                { id: 2, title: "The Ascension", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/0/01/Jacopo_Tintoretto_-_The_Ascension_-_WGA22570.jpg" },
-                { id: 3, title: "The Descent of the Holy Spirit", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/5/5a/Titian_-_The_Descent_of_the_Holy_Ghost_-_WGA22768.jpg" },
-                { id: 4, title: "The Assumption of Mary", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/9/9e/Tizian_041.jpg" },
-                { id: 5, title: "The Coronation of Mary", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/b/b5/Diego_Vel%C3%A1zquez_-_Coronation_of_the_Virgin_-_Prado.jpg" }
-            ],
-            "Luminous Mysteries": [
-                { id: 1, title: "The Baptism of Jesus in the Jordan", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/5/5a/Piero_della_Francesca_-_Baptism_of_Christ_-_WGA17595.jpg" },
-                { id: 2, title: "The Wedding Feast at Cana", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/2/21/Paolo_Veronese%2C_The_Wedding_at_Cana.JPG" },
-                { id: 3, title: "The Proclamation of the Kingdom of God", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/9/96/Bloch-SermonOnTheMount.jpg" },
-                { id: 4, title: "The Transfiguration", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/5/51/Transfiguration_Raphael.jpg" },
-                { id: 5, title: "The Institution of the Eucharist", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/0/08/Leonardo_da_Vinci_%281452-1519%29_-_The_Last_Apper_%281495-1498%29.jpg" }
-            ]
+        // --- TRANSLATION DATA ---
+        const translations = {
+            en: {
+                ui: {
+                    settings: "App Settings",
+                    language: "Language",
+                    structure: "Rosary Structure",
+                    daily: "Daily Mystery",
+                    full: "Full Rosary",
+                    mode: "Default Mode",
+                    manual: "Manual",
+                    auto: "Auto Play",
+                    pace: "Contemplation Pace",
+                    textsize: "Text Size",
+                    small: "Small",
+                    medium: "Medium",
+                    large: "Large",
+                    bgmusic: "Background Music",
+                    off: "Off",
+                    soft: "Soft",
+                    loud: "Loud",
+                    sfx: "Sound Effects",
+                    autocontinue: "Auto Continue",
+                    showtext: "Show Prayer Text",
+                    subtitle: "Contemplation through sacred images.",
+                    reset: "Reset Day",
+                    cycle: "Show/Hide Full Weekly Cycle",
+                    selectday: "Select a Day (Actual: *)",
+                    play: "Play",
+                    pause: "Pause",
+                    next: "Next",
+                    finish: "Finish Mystery",
+                    finishRosary: "Finish Rosary",
+                    skipIntro: "Skip Intro",
+                    completed: "✓ Completed",
+                    zoomHint: "Tap to Zoom",
+                    instruction: "Press Play or Next to continue",
+                    today: "Today",
+                    viewing: "Viewing",
+                    modalResetTitle: "Reset Progress",
+                    modalResetMsg: "Clear all progress for today?",
+                    confirm: "Confirm",
+                    cancel: "Cancel",
+                    mysteryLabel: "Mystery",
+                    introLabel: "I. Opening",
+                    conclLabel: "VII. Closing",
+                    fullSeq: "Full Rosary Sequence",
+                    dailySeq: "Daily Mysteries"
+                },
+                days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+                mysteries: {
+                    joyful: "Joyful Mysteries",
+                    sorrowful: "Sorrowful Mysteries",
+                    glorious: "Glorious Mysteries",
+                    luminous: "Luminous Mysteries",
+                    titles: {
+                        joyful: ["The Annunciation", "The Visitation", "The Nativity", "The Presentation", "The Finding in the Temple"],
+                        sorrowful: ["The Agony in the Garden", "The Scourging at the Pillar", "The Crowning with Thorns", "The Carrying of the Cross", "The Crucifixion"],
+                        glorious: ["The Resurrection", "The Ascension", "The Descent of the Holy Spirit", "The Assumption", "The Coronation of Mary"],
+                        luminous: ["The Baptism of Jesus", "The Wedding at Cana", "The Proclamation of the Kingdom", "The Transfiguration", "The Institution of the Eucharist"],
+                        special: { intro: "Introduction", conclusion: "Conclusion" }
+                    }
+                },
+                prayers: {
+                    sotc: { title: "Sign of the Cross", text: "In the name of the Father, and of the Son, and of the Holy Spirit. Amen." },
+                    ac: { title: "The Apostles' Creed", text: "I believe in God, the Father Almighty, Creator of heaven and earth; and in Jesus Christ, His only Son, our Lord: Who was conceived by the Holy Spirit, born of the Virgin Mary, suffered under Pontius Pilate, was crucified, died, and was buried. He descended into hell; the third day He arose again from the dead. He ascended into heaven, sitteth at the right hand of God the Father Almighty; from thence He shall come to judge the living and the dead. I believe in the Holy Spirit, the holy Catholic Church, the communion of Saints, the forgiveness of sins, the resurrection of the body, and life everlasting. Amen." },
+                    of: { title: "The Our Father", text: "Our Father, Who art in heaven, Hallowed be Thy Name. Thy Kingdom come, Thy Will be done, on Earth as it is in Heaven. Give us this day our daily bread, and forgive us our trespasses, as we forgive those who trespass against us. And lead us not into temptation, but deliver us from evil. Amen." },
+                    hm: { title: "Hail Mary", text: "Hail Mary, full of grace, the Lord is with thee. Blessed art thou amongst women, and blessed is the fruit of thy womb, Jesus. Holy Mary, Mother of God, pray for us sinners, now and at the hour of our death. Amen." },
+                    gb: { title: "Glory Be", text: "Glory be to the Father, and to the Son, and to the Holy Spirit. As it was in the beginning, is now, and ever shall be, world without end. Amen." },
+                    gbf: { title: "Glory Be & Fatima", text: "Glory be to the Father, and to the Son, and to the Holy Spirit. As it was in the beginning, is now, and ever shall be, world without end. Amen. O my Jesus, forgive us our sins, save us from the fires of hell, lead all souls to Heaven, especially those in most need of Thy mercy." },
+                    hhq: { title: "Hail Holy Queen", text: "Hail, holy Queen, Mother of Mercy! Our life, our sweetness, and our hope! To thee do we cry, poor banished children of Eve; to thee do we send up our sighs, mourning and weeping in this valley of tears. Turn then, most gracious advocate, thine eyes of mercy toward us; and after this, our exile, show unto us the blessed fruit of thy womb, Jesus. O clement, O loving, O sweet Virgin Mary. Pray for us, O Holy Mother of God, that we may be made worthy of the promises of Christ. Amen." },
+                    ogws: { title: "O God, Whose", text: "O God, whose only begotten Son, by His life, death, and resurrection, has purchased for us the rewards of eternal life, grant, we beseech Thee, that meditating upon these mysteries of the most holy Rosary of the Blessed Virgin Mary, we may imitate what they contain and obtain what they promise, through the same Christ our Lord. Amen." },
+                    contemplation: { title: "Contemplation", text: "Gaze upon this image. What emotion does it evoke? What detail catches your attention? How does it connect you to the life of Christ or Mary?" }
+                }
+            },
+            es: {
+                ui: {
+                    settings: "Configuración",
+                    language: "Idioma",
+                    structure: "Estructura del Rosario",
+                    daily: "Misterio Diario",
+                    full: "Rosario Completo",
+                    mode: "Modo Predeterminado",
+                    manual: "Manual",
+                    auto: "Automático",
+                    pace: "Velocidad de Contemplación",
+                    textsize: "Tamaño del Texto",
+                    small: "Pequeño",
+                    medium: "Medio",
+                    large: "Grande",
+                    bgmusic: "Música de Fondo",
+                    off: "Apagado",
+                    soft: "Suave",
+                    loud: "Alto",
+                    sfx: "Efectos de Sonido",
+                    autocontinue: "Continuar Automáticamente",
+                    showtext: "Mostrar Texto",
+                    subtitle: "Contemplación a través de imágenes sagradas.",
+                    reset: "Reiniciar Día",
+                    cycle: "Mostrar/Ocultar Ciclo Semanal",
+                    selectday: "Seleccionar Día (Actual: *)",
+                    play: "Reproducir",
+                    pause: "Pausa",
+                    next: "Siguiente",
+                    finish: "Terminar Misterio",
+                    finishRosary: "Terminar Rosario",
+                    skipIntro: "Saltar Intro",
+                    completed: "✓ Completado",
+                    zoomHint: "Toca para Ampliar",
+                    instruction: "Presiona Reproducir o Siguiente para continuar",
+                    today: "Hoy",
+                    viewing: "Viendo",
+                    modalResetTitle: "Reiniciar Progreso",
+                    modalResetMsg: "¿Borrar todo el progreso de hoy?",
+                    confirm: "Confirmar",
+                    cancel: "Cancelar",
+                    mysteryLabel: "Misterio",
+                    introLabel: "I. Apertura",
+                    conclLabel: "VII. Cierre",
+                    fullSeq: "Secuencia Completa",
+                    dailySeq: "Misterios Diarios"
+                },
+                days: ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
+                mysteries: {
+                    joyful: "Misterios Gozosos",
+                    sorrowful: "Misterios Dolorosos",
+                    glorious: "Misterios Gloriosos",
+                    luminous: "Misterios Luminosos",
+                    titles: {
+                        joyful: ["La Encarnación", "La Visitación", "El Nacimiento", "La Presentación", "El Niño Perdido y Hallado"],
+                        sorrowful: ["La Oración en el Huerto", "La Flagelación", "La Coronación de Espinas", "Jesús con la Cruz a Cuestas", "La Crucifixión"],
+                        glorious: ["La Resurrección", "La Ascensión", "La Venida del Espíritu Santo", "La Asunción", "La Coronación de María"],
+                        luminous: ["El Bautismo de Jesús", "Las Bodas de Caná", "El Anuncio del Reino", "La Transfiguración", "La Institución de la Eucaristía"],
+                        special: { intro: "Introducción", conclusion: "Conclusión" }
+                    }
+                },
+                prayers: {
+                    sotc: { title: "La Señal de la Cruz", text: "En el nombre del Padre, y del Hijo, y del Espíritu Santo. Amén." },
+                    ac: { title: "El Credo", text: "Creo en Dios, Padre Todopoderoso, Creador del cielo y de la tierra. Creo en Jesucristo, su único Hijo, Nuestro Señor, que fue concebido por obra y gracia del Espíritu Santo, nació de Santa María Virgen, padeció bajo el poder de Poncio Pilato, fue crucificado, muerto y sepultado, descendió a los infiernos, al tercer día resucitó de entre los muertos, subió a los cielos y está sentado a la derecha de Dios, Padre todopoderoso. Desde allí ha de venir a juzgar a vivos y muertos. Creo en el Espíritu Santo, la santa Iglesia católica, la comunión de los santos, el perdón de los pecados, la resurrección de la carne y la vida eterna. Amén." },
+                    of: { title: "Padre Nuestro", text: "Padre nuestro, que estás en el cielo, santificado sea tu Nombre; venga a nosotros tu reino; hágase tu voluntad en la tierra como en el cielo. Danos hoy nuestro pan de cada día; perdona nuestras ofensas, como también nosotros perdonamos a los que nos ofenden; no nos dejes caer en la tentación, y líbranos del mal. Amén." },
+                    hm: { title: "Ave María", text: "Dios te salve, María, llena eres de gracia; el Señor es contigo. Bendita tú eres entre todas las mujeres, y bendito es el fruto de tu vientre, Jesús. Santa María, Madre de Dios, ruega por nosotros, pecadores, ahora y en la hora de nuestra muerte. Amén." },
+                    gb: { title: "Gloria", text: "Gloria al Padre, y al Hijo, y al Espíritu Santo. Como era en el principio, ahora y siempre, por los siglos de los siglos. Amén." },
+                    gbf: { title: "Gloria y Jaculatoria", text: "Gloria al Padre, y al Hijo, y al Espíritu Santo. Como era en el principio, ahora y siempre, por los siglos de los siglos. Amén. Oh Jesús mío, perdona nuestros pecados, líbranos del fuego del infierno, lleva al cielo a todas las almas, especialmente a las más necesitadas de tu misericordia." },
+                    hhq: { title: "La Salve", text: "Dios te salve, Reina y Madre de misericordia, vida, dulzura y esperanza nuestra; Dios te salve. A Ti llamamos los desterrados hijos de Eva; a Ti suspiramos, gimiendo y llorando, en este valle de lágrimas. Ea, pues, Señora, abogada nuestra, vuelve a nosotros esos tus ojos misericordiosos; y después de este destierro muéstranos a Jesús, fruto bendito de tu vientre. ¡Oh clementísima, oh piadosa, oh dulce Virgen María! Ruega por nosotros, Santa Madre de Dios, para que seamos dignos de alcanzar las promesas de Nuestro Señor Jesucristo. Amén." },
+                    ogws: { title: "Oración Final", text: "Oh Dios, cuyo Unigénito Hijo, con su vida, muerte y resurrección, nos ha comprado la recompensa de la vida eterna; concédenos, te rogamos, que meditando estos misterios del Santísimo Rosario de la Bienaventurada Virgen María, imitemos lo que contienen y alcancemos lo que prometen. Por el mismo Jesucristo nuestro Señor. Amén." },
+                    contemplation: { title: "Contemplación", text: "Contempla esta imagen. ¿Qué emoción te evoca? ¿Qué detalle llama tu atención? ¿Cómo te conecta con la vida de Cristo o María?" }
+                }
+            }
         };
 
-        const SPECIAL = {
-            'intro': { id: 'intro', title: "Introduction", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/4/4d/Rosary_2006-01-16.jpg" },
-            'conclusion': { id: 'conclusion', title: "Conclusion", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/4/4e/Antonio_de_Pereda_y_Salgado_-_The_Holy_Trinity_-_WGA17176.jpg" }
+        // --- CONSTANTS ---
+        const imageAssets = {
+            joyful: ["https://upload.wikimedia.org/wikipedia/commons/0/0e/Fra_Angelico_-_The_Annunciation_-_WGA00555.jpg", "https://upload.wikimedia.org/wikipedia/commons/d/dc/La_Visitation_avec_Marie-Jacobie_et_Marie-Salom%C3%A9_-_Domenico_Ghirlandaio_-_Mus%C3%A9e_du_Louvre_Peintures_INV_297_%3B_MR_240.jpg", "https://upload.wikimedia.org/wikipedia/commons/6/64/Geertgen_tot_Sint_Jans%2C_The_Nativity_at_Night%2C_c_1490.jpg", "https://upload.wikimedia.org/wikipedia/commons/f/f7/Rembrandt_-_Circumcision_-_WGA19111.jpg", "https://upload.wikimedia.org/wikipedia/commons/5/51/Cima_da_Conegliano_Christ_among_the_doctors.jpg"],
+            sorrowful: ["https://upload.wikimedia.org/wikipedia/commons/1/10/Bellini%2CGiovanni_-_Agony_in_the_Garden_-_National_Gallery.jpg", "https://upload.wikimedia.org/wikipedia/commons/1/11/Piero_-_The_Flagellation.jpg", "https://upload.wikimedia.org/wikipedia/commons/5/52/Caravaggio%2C_Crowning_of_Thorns.jpg", "https://upload.wikimedia.org/wikipedia/commons/5/5d/Hieronymus_Bosch_-_Christ_Carrying_the_Cross_-_WGA2498.jpg", "https://upload.wikimedia.org/wikipedia/commons/d/d3/Lotto%2C_crocifissione_01.jpg"],
+            glorious: ["https://upload.wikimedia.org/wikipedia/commons/c/c2/Resurrection.JPG", "https://upload.wikimedia.org/wikipedia/commons/0/01/Jacopo_Tintoretto_-_The_Ascension_-_WGA22570.jpg", "https://upload.wikimedia.org/wikipedia/commons/5/5a/Titian_-_The_Descent_of_the_Holy_Ghost_-_WGA22768.jpg", "https://upload.wikimedia.org/wikipedia/commons/9/9e/Tizian_041.jpg", "https://upload.wikimedia.org/wikipedia/commons/b/b5/Diego_Vel%C3%A1zquez_-_Coronation_of_the_Virgin_-_Prado.jpg"],
+            luminous: ["https://upload.wikimedia.org/wikipedia/commons/5/5a/Piero_della_Francesca_-_Baptism_of_Christ_-_WGA17595.jpg", "https://upload.wikimedia.org/wikipedia/commons/2/21/Paolo_Veronese%2C_The_Wedding_at_Cana.JPG", "https://upload.wikimedia.org/wikipedia/commons/9/96/Bloch-SermonOnTheMount.jpg", "https://upload.wikimedia.org/wikipedia/commons/5/51/Transfiguration_Raphael.jpg", "https://upload.wikimedia.org/wikipedia/commons/0/08/Leonardo_da_Vinci_%281452-1519%29_-_The_Last_Apper_%281495-1498%29.jpg"],
+            special: { intro: "https://upload.wikimedia.org/wikipedia/commons/4/4d/Rosary_2006-01-16.jpg", conclusion: "https://upload.wikimedia.org/wikipedia/commons/4/4e/Antonio_de_Pereda_y_Salgado_-_The_Holy_Trinity_-_WGA17176.jpg" }
         };
 
         const mysterySchedule = [
-            { name: "Glorious Mysteries" }, // Sun
-            { name: "Joyful Mysteries" },   // Mon
-            { name: "Sorrowful Mysteries" },// Tue
-            { name: "Glorious Mysteries" }, // Wed
-            { name: "Luminous Mysteries" }, // Thu
-            { name: "Sorrowful Mysteries" },// Fri
-            { name: "Joyful Mysteries" }    // Sat
+            { id: "glorious" }, // Sun
+            { id: "joyful" },   // Mon
+            { id: "sorrowful" },// Tue
+            { id: "glorious" }, // Wed
+            { id: "luminous" }, // Thu
+            { id: "sorrowful" },// Fri
+            { id: "joyful" }    // Sat
         ];
-        const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
-        const rosaryPrayers = {
-            'sotc': { title: "Sign of the Cross", text: "In the name of the Father, and of the Son, and of the Holy Spirit. Amen.", isBead: false, cls: 'red-bead' },
-            'ac': { title: "The Apostles' Creed", text: "I believe in God, the Father Almighty, Creator of heaven and earth; and in Jesus Christ, His only Son, our Lord: Who was conceived by the Holy Spirit, born of the Virgin Mary, suffered under Pontius Pilate, was crucified, died, and was buried. He descended into hell; the third day He arose again from the dead. He ascended into heaven, sitteth at the right hand of God the Father Almighty; from thence He shall come to judge the living and the dead. I believe in the Holy Spirit, the holy Catholic Church, the communion of Saints, the forgiveness of sins, the resurrection of the body, and life everlasting. Amen.", isBead: false, cls: 'red-bead' },
-            'of': { title: "The Our Father", text: "Our Father, Who art in heaven, Hallowed be Thy Name. Thy Kingdom come, Thy Will be done, on Earth as it is in Heaven. Give us this day our daily bread, and forgive us our trespasses, as we forgive those who trespass against us. And lead us not into temptation, but deliver us from evil. Amen.", isBead: true, cls: 'red-bead' },
-            'hm': { title: "Hail Mary", text: "Hail Mary, full of grace, the Lord is with thee. Blessed art thou amongst women, and blessed is the fruit of thy womb, Jesus. Holy Mary, Mother of God, pray for us sinners, now and at the hour of our death. Amen.", isBead: true, cls: 'white-bead' },
-            'gb': { title: "Glory Be", text: "Glory be to the Father, and to the Son, and to the Holy Spirit. As it was in the beginning, is now, and ever shall be, world without end. Amen.", isBead: true, cls: 'red-bead' },
-            'gbf': { title: "Glory Be & Fatima", text: "Glory be to the Father, and to the Son, and to the Holy Spirit. As it was in the beginning, is now, and ever shall be, world without end. Amen. O my Jesus, forgive us our sins, save us from the fires of hell, lead all souls to Heaven, especially those in most need of Thy mercy.", isBead: true, cls: 'red-bead' },
-            'hhq': { title: "Hail Holy Queen", text: "Hail, holy Queen, Mother of Mercy! Our life, our sweetness, and our hope! To thee do we cry, poor banished children of Eve; to thee do we send up our sighs, mourning and weeping in this valley of tears. Turn then, most gracious advocate, thine eyes of mercy toward us; and after this, our exile, show unto us the blessed fruit of thy womb, Jesus. O clement, O loving, O sweet Virgin Mary. Pray for us, O Holy Mother of God, that we may be made worthy of the promises of Christ. Amen.", isBead: false, cls: 'red-bead' },
-            'ogws': { title: "O God, Whose", text: "O God, whose only begotten Son, by His life, death, and resurrection, has purchased for us the rewards of eternal life, grant, we beseech Thee, that meditating upon these mysteries of the most holy Rosary of the Blessed Virgin Mary, we may imitate what they contain and obtain what they promise, through the same Christ our Lord. Amen.", isBead: false, cls: 'red-bead' },
-            'contemplation': { title: "Contemplation", text: "Gaze upon this image. What emotion does it evoke? What detail catches your attention? How does it connect you to the life of Christ or Mary?", isBead: false, cls: 'contemplation' }
-        };
 
         // --- STATE ---
         const today = new Date();
@@ -364,6 +478,7 @@
         let selectedDayIndex = realCurrentDayIndex; 
         
         let appConfig = {
+            language: 'en',
             pace: 1, 
             textSize: 'medium', 
             defaultMode: 'manual', 
@@ -385,18 +500,36 @@
         let currentGroupKey = ''; 
         const MS_PER_WORD = 350;
 
+        // --- TRANSLATION HELPERS ---
+        function getT(keyPath) {
+            // Traverse object path e.g. 'ui.settings'
+            const keys = keyPath.split('.');
+            let val = translations[appConfig.language];
+            for (let k of keys) {
+                if(val) val = val[k];
+            }
+            return val || keyPath;
+        }
+
+        function getPrayerData(key) {
+            return translations[appConfig.language].prayers[key];
+        }
+
         // --- GENERATOR ---
-        function generateSequence(mode, mysteryGroupKey, startMysteryIndex = -1) {
+        function generateSequence(mode, mysteryGroupId, startMysteryIndex = -1) {
             const sequence = [];
             let globalStepCounter = 0;
-            const mysteries = allMysteries[mysteryGroupKey];
+            // Get text titles and image urls
+            const titles = translations[appConfig.language].mysteries.titles[mysteryGroupId];
+            const images = imageAssets[mysteryGroupId];
 
             const addStep = (key, section, titleOverride, imgUrl, beadCount, beadIndex) => {
+                const pData = getPrayerData(key);
                 sequence.push({
                     index: globalStepCounter++,
                     key: key,
                     section: section,
-                    flowTitle: titleOverride || rosaryPrayers[key].title,
+                    flowTitle: titleOverride || pData.title,
                     imageUrl: imgUrl,
                     beadCount: beadCount,
                     beadIndex: beadIndex
@@ -404,37 +537,51 @@
             };
 
             if (mode === 'full' || startMysteryIndex === 'intro') {
+                const introTitle = translations[appConfig.language].mysteries.titles.special.intro;
+                const introImg = imageAssets.special.intro;
                 const introKeys = ['sotc', 'ac', 'of', 'hm', 'hm', 'hm', 'gb']; 
                 const beadCount = 5;
                 let beadIdx = 0;
-                addStep('contemplation', 'intro', SPECIAL.intro.title, SPECIAL.intro.imageUrl, beadCount, -1);
+                addStep('contemplation', 'intro', introTitle, introImg, beadCount, -1);
                 introKeys.forEach(k => {
-                    const isBead = rosaryPrayers[k].isBead;
-                    addStep(k, 'intro', null, SPECIAL.intro.imageUrl, beadCount, isBead ? beadIdx++ : -1);
+                    const isBead = (k==='hm' || k==='of' || k==='gb');
+                    addStep(k, 'intro', null, introImg, beadCount, isBead ? beadIdx++ : -1);
                 });
             }
 
-            mysteries.forEach((m, mIdx) => {
-                if (mode === 'daily' && mIdx !== startMysteryIndex) return;
-                const sectionId = `mystery_${mIdx+1}`;
+            // Loop 5 mysteries
+            for(let i=0; i<5; i++) {
+                if (mode === 'daily' && i !== startMysteryIndex) continue;
+                
+                const mTitle = titles[i];
+                const mImg = images[i];
+                const sectionId = `mystery_${i+1}`;
                 const decadeKeys = ['of', ...Array(10).fill('hm'), 'gbf'];
                 const beadCount = 12;
                 let beadIdx = 0;
-                addStep('contemplation', sectionId, `Mystery ${m.id}: ${m.title}`, m.imageUrl, beadCount, -1);
-                decadeKeys.forEach((k, i) => {
-                    const isBead = rosaryPrayers[k].isBead;
-                    let title = rosaryPrayers[k].title;
-                    if (k === 'hm') title = `Hail Mary (${i} of 10)`;
-                    addStep(k, sectionId, title, m.imageUrl, beadCount, isBead ? beadIdx++ : -1);
+                
+                const mysteryLabel = getT('ui.mysteryLabel');
+                addStep('contemplation', sectionId, `${mysteryLabel} ${i+1}: ${mTitle}`, mImg, beadCount, -1);
+                
+                decadeKeys.forEach((k, j) => {
+                    const isBead = (k==='hm' || k==='of' || k==='gbf');
+                    let title = null;
+                    if(k==='hm') {
+                        const prayerTitle = getPrayerData(k).title;
+                        title = `${prayerTitle} (${j} / 10)`;
+                    }
+                    addStep(k, sectionId, title, mImg, beadCount, isBead ? beadIdx++ : -1);
                 });
-            });
+            }
 
             if (mode === 'full' || startMysteryIndex === 'conclusion') {
+                const concTitle = translations[appConfig.language].mysteries.titles.special.conclusion;
+                const concImg = imageAssets.special.conclusion;
                 const closeKeys = ['hhq', 'ogws', 'sotc'];
                 const beadCount = 0;
-                addStep('contemplation', 'conclusion', SPECIAL.conclusion.title, SPECIAL.conclusion.imageUrl, beadCount, -1);
+                addStep('contemplation', 'conclusion', concTitle, concImg, beadCount, -1);
                 closeKeys.forEach(k => {
-                    addStep(k, 'conclusion', null, SPECIAL.conclusion.imageUrl, beadCount, -1);
+                    addStep(k, 'conclusion', null, concImg, beadCount, -1);
                 });
             }
             return sequence;
@@ -477,19 +624,14 @@
                 isAutoMode = (appConfig.defaultMode === 'auto');
             }
 
-            if (isAutoMode) {
-                updatePlayButtonUI("Pause"); 
-            } else {
-                updatePlayButtonUI("Play");
-            }
-
+            updatePlayButtonUI(isAutoMode ? getT('ui.pause') : getT('ui.play'));
             applyTextVisibility();
             renderStep();
         }
         
         function renderStep() {
             const step = currentSequence[currentIndex];
-            const prayer = rosaryPrayers[step.key];
+            const pData = getPrayerData(step.key);
             const isContemplation = step.key === 'contemplation';
 
             if (appConfig.sfxEnabled) {
@@ -513,7 +655,7 @@
             document.getElementById('scroll-instruction').classList.add('opacity-0');
 
             document.getElementById('modal-top-title').textContent = step.flowTitle;
-            document.getElementById('current-prayer-title').textContent = isContemplation ? "Contemplation" : step.flowTitle;
+            document.getElementById('current-prayer-title').textContent = isContemplation ? getT('prayers.contemplation.title') : step.flowTitle;
 
             const badge = document.getElementById('mystery-badge');
             if (step.section.startsWith('mystery_')) {
@@ -537,10 +679,11 @@
             updateBeads(step);
 
             const finishBtn = document.getElementById('finish-section-btn');
-            if (step.section === 'intro') finishBtn.textContent = "Skip Intro";
-            else if (step.section === 'conclusion') finishBtn.textContent = "Finish Rosary";
-            else finishBtn.textContent = "Finish Mystery";
+            if (step.section === 'intro') finishBtn.textContent = getT('ui.skipIntro');
+            else if (step.section === 'conclusion') finishBtn.textContent = getT('ui.finishRosary');
+            else finishBtn.textContent = getT('ui.finish');
 
+            // Text Rendering
             const contentEl = document.getElementById('dynamic-prayer-content');
             contentEl.innerHTML = '';
             contentEl.style.animation = 'none';
@@ -552,12 +695,12 @@
             if (isContemplation) {
                 textHtml = `
                     <p class="text-gray-700 italic ${baseTextClass}">
-                        Meditating on: <span class="font-bold text-indigo-800">${step.flowTitle}</span><br><br>
-                        ${prayer.text}
+                        ${step.flowTitle}<br><br>
+                        ${pData.text}
                     </p>`;
                 duration = DURATION.contemplation;
             } else {
-                textHtml = `<p class="${scrollTextClass} text-gray-900 font-bold text-center leading-relaxed">${prayer.text}</p>`;
+                textHtml = `<p class="${scrollTextClass} text-gray-900 font-bold text-center leading-relaxed">${pData.text}</p>`;
                 duration = DURATION[step.key];
             }
 
@@ -580,7 +723,6 @@
 
                 contentEl.addEventListener('animationend', () => {
                     isScrolling = false;
-                    // FIX: Check current mode before showing "Press Next"
                     if (!isAutoMode) {
                         document.getElementById('scroll-instruction').classList.remove('opacity-0');
                         document.getElementById('scroll-instruction').classList.add('opacity-100');
@@ -593,18 +735,23 @@
                 }
             }
 
-            // --- UNIFIED TIMER LOGIC (Fixes Pause Delay) ---
-            stepTimer = setTimeout(() => {
-                isScrolling = false;
-                // FIX: Check current state when timer finishes
+            if (isContemplation) {
+                stepTimer = setTimeout(() => {
+                    if (isAutoMode) {
+                        handleNextStep();
+                    } else {
+                        document.getElementById('scroll-instruction').classList.remove('opacity-0');
+                        document.getElementById('scroll-instruction').classList.add('opacity-100');
+                    }
+                }, duration);
+            } else {
                 if (isAutoMode) {
-                    handleNextStep();
-                } else {
-                    // Stop and show "Press Next"
-                    document.getElementById('scroll-instruction').classList.remove('opacity-0');
-                    document.getElementById('scroll-instruction').classList.add('opacity-100');
+                    stepTimer = setTimeout(() => {
+                        isScrolling = false;
+                        handleNextStep();
+                    }, duration);
                 }
-            }, duration);
+            }
         }
 
         // --- ZOOM LOGIC ---
@@ -639,12 +786,13 @@
             if (appConfig.showText) {
                 container.classList.remove('view-text-hidden');
                 container.classList.add('view-text-visible');
-                // FIX: Don't use display:none, rely on CSS class for height
+                textArea.style.display = 'block';
                 icon.style.transform = 'rotate(0deg)';
                 if(checkBox) checkBox.checked = true;
             } else {
                 container.classList.remove('view-text-visible');
                 container.classList.add('view-text-hidden');
+                textArea.style.display = 'none';
                 icon.style.transform = 'rotate(180deg)';
                 if(checkBox) checkBox.checked = false;
             }
@@ -702,17 +850,19 @@
         }
 
         function togglePlayPause() {
-            // FIX: Don't call handleNextStep here. Just toggle state.
-            // The timer in renderStep() will check the new state when it finishes.
             if (isAutoMode) {
                 isAutoMode = false;
-                updatePlayButtonUI("Play");
+                updatePlayButtonUI(getT('ui.play'));
             } else {
                 isAutoMode = true;
-                updatePlayButtonUI("Pause");
-                // Only if stopped (e.g. paused at end of prayer) do we manually advance
+                updatePlayButtonUI(getT('ui.pause'));
                 if (!isScrolling) {
-                    handleNextStep(); 
+                    const step = currentSequence[currentIndex];
+                    if (step.key === 'contemplation') {
+                        handleNextStep();
+                    } else {
+                        handleNextStep(); 
+                    }
                 }
             }
         }
@@ -720,7 +870,7 @@
         function updatePlayButtonUI(label) {
             const btn = document.getElementById('play-pause-btn');
             btn.textContent = label;
-            if (label === "Pause") {
+            if (isAutoMode) {
                 btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
                 btn.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
             } else {
@@ -738,9 +888,7 @@
             clearTimer();
             const currentStep = currentSequence[currentIndex];
             const currentSection = currentStep.section;
-            
             markSectionComplete(currentSection);
-
             let nextSectionIndex = -1;
             for(let i = currentIndex; i < currentSequence.length; i++) {
                 if (currentSequence[i].section !== currentSection) {
@@ -748,7 +896,6 @@
                     break;
                 }
             }
-
             if (nextSectionIndex !== -1) {
                 currentIndex = nextSectionIndex;
                 renderStep();
@@ -780,7 +927,6 @@
                     }
                 }
             } 
-            
             if (nextType) {
                 startRosarySession(currentGroupKey, nextType, nextIndex, wasPlaying);
             } else {
@@ -832,24 +978,81 @@
         }
 
         function updateMainDisplay(dayIdx) {
+            // Apply Translation
+            updateLabels();
+
             const sched = mysterySchedule[dayIdx];
-            const groupKey = sched.name;
+            const groupKey = sched.id;
             const status = loadCompletedStatus();
-            document.getElementById('current-day-text').textContent = (dayIdx===realCurrentDayIndex) ? `Today, ${dayNames[dayIdx]}` : `Viewing ${dayNames[dayIdx]}`;
-            document.getElementById('mystery-group-name').textContent = groupKey;
-            document.getElementById('mystery-list-title').textContent = (appConfig.rosaryStructure === 'full') ? "Full Rosary Sequence" : "Daily Mysteries";
+            
+            // Translated Texts
+            const dayName = translations[appConfig.language].days[dayIdx];
+            const groupName = translations[appConfig.language].mysteries[groupKey];
+            const todayLabel = getT('ui.today');
+            const viewingLabel = getT('ui.viewing');
+            
+            document.getElementById('current-day-text').textContent = (dayIdx===realCurrentDayIndex) ? `${todayLabel}, ${dayName}` : `${viewingLabel} ${dayName}`;
+            document.getElementById('mystery-group-name').textContent = groupName;
+            document.getElementById('mystery-list-title').textContent = (appConfig.rosaryStructure === 'full') ? getT('ui.fullSeq') : getT('ui.dailySeq');
             
             let html = '';
+            // Intro
             if (appConfig.rosaryStructure === 'full') {
-                html += createCard(SPECIAL.intro, 'special', groupKey, -1, status);
+                const introTitle = translations[appConfig.language].mysteries.titles.special.intro;
+                html += createCard({id:'intro', title:introTitle, imageUrl:imageAssets.special.intro}, 'special', groupKey, -1, status);
             }
-            allMysteries[groupKey].forEach((m, idx) => {
-                html += createCard(m, 'mystery', groupKey, idx, status);
-            });
+            // Mysteries
+            const mTitles = translations[appConfig.language].mysteries.titles[groupKey];
+            const mImgs = imageAssets[groupKey];
+            for(let i=0; i<5; i++) {
+                html += createCard({id: i+1, title: mTitles[i], imageUrl: mImgs[i]}, 'mystery', groupKey, i, status);
+            }
+            // Conclusion
             if (appConfig.rosaryStructure === 'full') {
-                html += createCard(SPECIAL.conclusion, 'special', groupKey, -1, status);
+                const concTitle = translations[appConfig.language].mysteries.titles.special.conclusion;
+                html += createCard({id:'conclusion', title:concTitle, imageUrl:imageAssets.special.conclusion}, 'special', groupKey, -1, status);
             }
             document.getElementById('daily-mysteries-container').innerHTML = html;
+        }
+
+        function updateLabels() {
+            // Static labels update
+            document.getElementById('lbl-settings-title').textContent = getT('ui.settings');
+            document.getElementById('lbl-language').textContent = getT('ui.language');
+            document.getElementById('lbl-structure').textContent = getT('ui.structure');
+            document.getElementById('lbl-mode').textContent = getT('ui.mode');
+            document.getElementById('lbl-pace').textContent = getT('ui.pace');
+            document.getElementById('lbl-textsize').textContent = getT('ui.textsize');
+            document.getElementById('lbl-music').textContent = getT('ui.bgmusic');
+            document.getElementById('lbl-sfx').textContent = getT('ui.sfx');
+            document.getElementById('lbl-autocontinue').textContent = getT('ui.autocontinue');
+            document.getElementById('lbl-showtext').textContent = getT('ui.showtext');
+            
+            document.getElementById('opt-daily').textContent = getT('ui.daily');
+            document.getElementById('opt-full').textContent = getT('ui.full');
+            document.getElementById('opt-manual').textContent = getT('ui.manual');
+            document.getElementById('opt-auto').textContent = getT('ui.auto');
+            document.getElementById('opt-med').textContent = getT('ui.medium');
+            document.getElementById('opt-small').textContent = getT('ui.small');
+            document.getElementById('opt-large').textContent = getT('ui.large');
+            document.getElementById('opt-off').textContent = getT('ui.off');
+            document.getElementById('opt-soft').textContent = getT('ui.soft');
+            document.getElementById('opt-loud').textContent = getT('ui.loud');
+
+            document.getElementById('lbl-subtitle').textContent = getT('ui.subtitle');
+            document.getElementById('reset-button').textContent = getT('ui.reset');
+            document.getElementById('btn-showcycle').textContent = getT('ui.cycle');
+            document.getElementById('lbl-selectday').textContent = getT('ui.selectday').replace('*', (realCurrentDayIndex===selectedDayIndex?'*':''));
+            document.getElementById('lbl-zoomhint').textContent = getT('ui.zoomHint');
+            document.getElementById('lbl-instruction').textContent = getT('ui.instruction');
+            document.getElementById('play-pause-btn').textContent = isAutoMode ? getT('ui.pause') : getT('ui.play');
+            document.getElementById('next-btn').textContent = getT('ui.next');
+            
+            // Buttons in modal update dynamically in renderStep but set base here
+            document.getElementById('modal-title').textContent = getT('ui.modalResetTitle');
+            document.getElementById('modal-message').textContent = getT('ui.modalResetMsg');
+            document.getElementById('modal-confirm').textContent = getT('ui.confirm');
+            document.getElementById('modal-cancel').textContent = getT('ui.cancel');
         }
 
         function createCard(data, type, groupKey, idx, status) {
@@ -857,7 +1060,12 @@
             const idKey = isSpecial ? `${groupKey}_${data.id}` : `${groupKey}_${data.id}`;
             const isDone = idKey ? status[idKey] : false;
             const filter = isDone ? 'grayscale' : 'full-color';
-            const label = isSpecial ? (data.id==='intro'?'I. Opening':'VII. Closing') : `Mystery ${data.id}`;
+            let label = "";
+            if(isSpecial) {
+                label = (data.id==='intro') ? getT('ui.introLabel') : getT('ui.conclLabel');
+            } else {
+                label = `${getT('ui.mysteryLabel')} ${data.id}`;
+            }
             const indexParam = isSpecial ? `'${data.id}'` : idx;
             
             return `
@@ -867,70 +1075,69 @@
                 <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent p-4 flex flex-col justify-end text-center">
                     <span class="text-xs font-medium text-white opacity-90">${label}</span>
                     <h4 class="text-xl font-bold text-white">${data.title}</h4>
-                    ${isDone ? '<span class="text-xs text-green-300 font-bold mt-1">✓ Completed</span>' : ''}
+                    ${isDone ? `<span class="text-xs text-green-300 font-bold mt-1">${getT('ui.completed')}</span>` : ''}
                 </div>
             </div>`;
         }
 
+        // --- CALCULATION ---
         function calculateDurations() {
-            for (let k in rosaryPrayers) {
+            // Need to calc based on current lang
+            // Just use a heuristic or re-run when language changes
+            // Simple heuristic: standard length
+            const p = translations[appConfig.language].prayers;
+            for (let k in p) {
                 if (k === 'contemplation') {
                     DURATION[k] = 10000 / appConfig.pace;
                 } else {
-                    const text = rosaryPrayers[k].text;
+                    const text = p[k].text;
                     const words = text.split(/\s+/).length;
                     DURATION[k] = Math.max(2000, (words * MS_PER_WORD) / appConfig.pace);
                 }
             }
         }
         
+        // --- LOAD SETTINGS ---
         function loadSettings() {
             const s = JSON.parse(localStorage.getItem('rosarySettings') || '{}');
             appConfig = { ...appConfig, ...s };
+            // Apply to UI
+            if(document.getElementById('language-select')) document.getElementById('language-select').value = appConfig.language;
             if(document.getElementById('structure-select')) document.getElementById('structure-select').value = appConfig.rosaryStructure;
             if(document.getElementById('mode-select')) document.getElementById('mode-select').value = appConfig.defaultMode;
             if(document.getElementById('speed-select')) document.getElementById('speed-select').value = appConfig.pace;
             if(document.getElementById('size-select')) document.getElementById('size-select').value = appConfig.textSize;
             if(document.getElementById('auto-continue-checkbox')) document.getElementById('auto-continue-checkbox').checked = appConfig.autoContinue;
-            // Handle new Music Select
             if(document.getElementById('music-select')) document.getElementById('music-select').value = appConfig.bgMusic || 'off';
             if(document.getElementById('sfx-checkbox')) document.getElementById('sfx-checkbox').checked = appConfig.sfxEnabled;
             if(document.getElementById('show-text-checkbox')) document.getElementById('show-text-checkbox').checked = (appConfig.showText !== false);
         }
 
+        // --- HANDLERS ---
+        window.updateLanguage = (v) => { appConfig.language = v; saveSet(); calculateDurations(); updateMainDisplay(selectedDayIndex); };
         window.updateRosaryStructure = (v) => { appConfig.rosaryStructure = v; saveSet(); updateMainDisplay(selectedDayIndex); };
         window.updateDefaultMode = (v) => { appConfig.defaultMode = v; saveSet(); };
         window.updateSpeed = (v) => { appConfig.pace = parseFloat(v); calculateDurations(); saveSet(); };
         window.updateTextSize = (v) => { appConfig.textSize = v; saveSet(); updateTextStyle(); }; 
         window.updateAutoContinue = (v) => { appConfig.autoContinue = v; saveSet(); };
-        
-        // Updated Music Volume Handler
         window.updateMusicVolume = (val) => {
             appConfig.bgMusic = val;
             saveSet();
-            
             let vol = 0;
             if(val === 'soft') vol = 0.1;
             if(val === 'loud') vol = 0.4;
-            
             if (audio) {
                 audio.volume = vol;
                 if (val === 'off') {
                     audio.pause();
                 } else {
-                    // Only play if session active
                     if(document.getElementById('contemplation-view').classList.contains('active')) {
                         audio.play().catch(()=>{});
                     }
                 }
             }
         };
-
-        // NEW SFX Handler
-        window.updateSfxEnabled = (isChecked) => {
-            appConfig.sfxEnabled = isChecked;
-            saveSet();
-        };
+        window.updateSfxEnabled = (isChecked) => { appConfig.sfxEnabled = isChecked; saveSet(); };
         
         function saveSet() { localStorage.setItem('rosarySettings', JSON.stringify(appConfig)); }
 
@@ -946,29 +1153,30 @@
         
         window.populateCycleList = (real, sel) => {
             const list = document.getElementById('cycle-list'); list.innerHTML='';
-            dayNames.forEach((d, i) => {
+            translations[appConfig.language].days.forEach((d, i) => {
                 const isActive = i===sel;
+                const mTitle = translations[appConfig.language].mysteries[mysterySchedule[i].id];
                 list.innerHTML += `<div onclick="selectedDayIndex=${i}; updateMainDisplay(${i}); populateCycleList(${real}, ${i})" 
                 class="flex justify-between p-2 rounded cursor-pointer ${isActive?'bg-indigo-600 text-white':'bg-gray-50 hover:bg-gray-100'}">
-                <span>${d}${i===real?' *':''}</span><span>${mysterySchedule[i].name}</span></div>`;
+                <span>${d}${i===real?' *':''}</span><span>${mTitle}</span></div>`;
             });
         };
         window.confirmReset = () => {
             document.getElementById('custom-modal').classList.remove('hidden');
-            document.getElementById('modal-title').textContent = "Reset Progress";
-            document.getElementById('modal-message').textContent = "Clear all progress for today?";
-            document.getElementById('modal-confirm').onclick = () => {
-                localStorage.removeItem(getCurrentDateKey());
-                document.getElementById('custom-modal').classList.add('hidden');
-                updateMainDisplay(selectedDayIndex);
-            };
-            document.getElementById('modal-cancel').onclick = () => document.getElementById('custom-modal').classList.add('hidden');
+            // Text updates in updateLabels
         };
+        document.getElementById('modal-confirm').onclick = () => {
+            localStorage.removeItem(getCurrentDateKey());
+            document.getElementById('custom-modal').classList.add('hidden');
+            updateMainDisplay(selectedDayIndex);
+        };
+        document.getElementById('modal-cancel').onclick = () => document.getElementById('custom-modal').classList.add('hidden');
+        
         window.toggleSettingsPanel = () => document.getElementById('settings-panel').classList.toggle('active');
 
         document.addEventListener('DOMContentLoaded', () => {
             audio = document.getElementById('background-music');
-            loadSettings(); // Will set initial volume
+            loadSettings(); 
             calculateDurations();
             updateTextStyle();
             updateMainDisplay(selectedDayIndex);

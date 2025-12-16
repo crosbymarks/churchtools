@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="version" content="2.2">
+    <meta name="version" content="2.5">
     <meta name="copyright" content="Crosby Marks 2025">
     <meta name="author" content="Crosby Marks">
     <title>Daily Rosary Mystery Tracker</title>
@@ -123,6 +123,17 @@
             will-change: transform; 
         }
 
+        /* Seamless Marquee Animation */
+        @keyframes marquee-infinite {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .scrolling-wrapper {
+            display: flex;
+            width: fit-content;
+            animation: marquee-infinite 15s linear infinite;
+        }
+
         #settings-panel.active { transform: translateY(0); }
         
         .control-btn {
@@ -141,79 +152,44 @@
         #list-view-container { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
         /* --- ORIENTATION LOCK OVERLAY --- */
-        #rotate-overlay {
-            display: none;
-        }
-        /* Only show on landscape AND small height (phones) */
+        #rotate-overlay { display: none; }
         @media screen and (orientation: landscape) and (max-height: 600px) {
             #rotate-overlay {
-                display: flex;
-                position: fixed;
-                inset: 0;
-                z-index: 9999;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                background-color: #312e81; /* Indigo 900 */
-                color: white;
-                text-align: center;
-                padding: 2rem;
+                display: flex; position: fixed; inset: 0; z-index: 9999;
+                flex-direction: column; align-items: center; justify-content: center;
+                background-color: #312e81; color: white; text-align: center; padding: 2rem;
             }
         }
 
         /* --- DARK MODE OVERRIDES --- */
-        body.dark-mode {
-            background-color: #111827; /* Gray 900 */
-            color: #f3f4f6; /* Gray 100 */
+        body.dark-mode { background-color: #111827; color: #f3f4f6; }
+        body.dark-mode .card, body.dark-mode .modal, body.dark-mode #settings-panel, body.dark-mode .bg-white {
+            background-color: #1f2937 !important; color: #f3f4f6;
         }
-        /* Update backgrounds for cards/modals/panels */
-        body.dark-mode .card, 
-        body.dark-mode .modal, 
-        body.dark-mode #settings-panel,
-        body.dark-mode .bg-white {
-            background-color: #1f2937 !important; /* Gray 800 */
-            color: #f3f4f6;
+        body.dark-mode .text-gray-800, body.dark-mode .text-gray-700, body.dark-mode .text-gray-600 {
+            color: #e5e7eb !important;
         }
-        /* Update text colors */
-        body.dark-mode .text-gray-800, 
-        body.dark-mode .text-gray-700, 
-        body.dark-mode .text-gray-600 {
-            color: #e5e7eb !important; /* Gray 200 */
+        body.dark-mode .text-gray-500, body.dark-mode .text-gray-400 {
+            color: #9ca3af !important;
         }
-        body.dark-mode .text-gray-500,
-        body.dark-mode .text-gray-400 {
-            color: #9ca3af !important; /* Gray 400 */
-        }
-        /* Update specific areas */
         body.dark-mode #settings-panel .bg-gray-50 {
-            background-color: #374151 !important; /* Gray 700 */
+            background-color: #374151 !important;
         }
-        body.dark-mode select, 
-        body.dark-mode input {
-            background-color: #374151;
-            color: white;
-            border-color: #4b5563;
+        body.dark-mode select, body.dark-mode input {
+            background-color: #374151; color: white; border-color: #4b5563;
         }
-        /* Headers and accents */
-        body.dark-mode .text-indigo-700,
-        body.dark-mode .text-indigo-800 {
-            color: #818cf8 !important; /* Indigo 400 */
+        body.dark-mode .text-indigo-700, body.dark-mode .text-indigo-800 {
+            color: #818cf8 !important;
         }
         body.dark-mode .bg-indigo-50 {
-            background-color: #312e81 !important; /* Indigo 900 */
-            border-color: #4338ca !important;
+            background-color: #312e81 !important; border-color: #4338ca !important;
         }
-        /* Fixed Footer/Header in Modal */
         body.dark-mode .bg-\[\#f7f3f1\] {
             background-color: #111827 !important;
         }
-        /* Instruction Pill */
         body.dark-mode #scroll-instruction span {
-            background-color: rgba(31, 41, 55, 0.95);
-            color: #818cf8;
-            border-color: #374151;
+            background-color: rgba(31, 41, 55, 0.95); color: #818cf8; border-color: #374151;
         }
-        /* Prayer Text Specifics */
         body.dark-mode .text-gray-900 {
             color: #f9fafb !important;
         }
@@ -346,15 +322,19 @@
                 </div>
             </div>
             
-            <p class="text-xs text-gray-400 text-center mt-8">v2.2 &copy; 2025 Crosby Marks</p>
+            <p class="text-xs text-gray-400 text-center mt-8">v2.5 &copy; 2025 Crosby Marks</p>
         </div>
     </div>
     
     <div id="contemplation-view" class="modal view-text-visible">
         
-        <div class="p-2 flex justify-end items-center bg-white shadow-md flex-shrink-0 relative h-12 z-20">
-            <h3 id="modal-top-title" class="absolute inset-x-8 text-center text-lg font-bold text-gray-800 truncate"></h3>
-            <button onclick="finishSession(false)" class="p-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100 transition z-10">
+        <div class="p-2 flex justify-between items-center bg-white shadow-md flex-shrink-0 relative h-12 z-20">
+            <div id="top-title-wrapper" class="absolute inset-x-12 top-1/2 transform -translate-y-1/2 overflow-hidden h-6 pointer-events-none">
+                <div id="marquee-container" class="flex justify-center items-center w-full h-full">
+                    </div>
+            </div>
+            <div class="w-10"></div>
+            <button onclick="finishSession(false)" class="p-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100 transition z-30 pointer-events-auto">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
         </div>
@@ -464,7 +444,6 @@
                     fullSeq: "Full Rosary Sequence",
                     dailySeq: "Daily Mysteries"
                 },
-                // ... [Same prayer/mystery data as before] ...
                 days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
                 mysteries: {
                     joyful: "Joyful Mysteries",
@@ -535,6 +514,7 @@
                     fullSeq: "Secuencia Completa",
                     dailySeq: "Misterios Diarios"
                 },
+                // ... [Same translated data] ...
                 days: ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
                 mysteries: {
                     joyful: "Misterios Gozosos",
@@ -826,7 +806,27 @@
             document.getElementById('scroll-instruction').classList.remove('opacity-100');
             document.getElementById('scroll-instruction').classList.add('opacity-0');
 
-            document.getElementById('modal-top-title').textContent = step.flowTitle;
+            const container = document.getElementById('marquee-container');
+            
+            // 1. Reset Content
+            container.innerHTML = `<h3 class="text-lg font-bold text-gray-800 whitespace-nowrap">${step.flowTitle}</h3>`;
+            const titleEl = container.firstElementChild;
+            container.classList.remove('scrolling-wrapper'); // Stop anim
+            
+            // 2. Check Overflow
+            const parentWidth = document.getElementById('top-title-wrapper').clientWidth;
+            const textWidth = titleEl.scrollWidth;
+
+            // 3. Apply Seamless Logic
+            if (textWidth > parentWidth) {
+                // Create Seamless Loop Structure
+                container.innerHTML = `
+                    <span class="text-lg font-bold text-gray-800 whitespace-nowrap mr-12">${step.flowTitle}</span>
+                    <span class="text-lg font-bold text-gray-800 whitespace-nowrap mr-12">${step.flowTitle}</span>
+                `;
+                container.classList.add('scrolling-wrapper');
+            }
+
             document.getElementById('current-prayer-title').textContent = isContemplation ? getT('prayers.contemplation.title') : step.flowTitle;
 
             const badge = document.getElementById('mystery-badge');
@@ -873,15 +873,15 @@
                 duration = DURATION[step.key] || 5000;
             }
 
-            const wrapper = document.createElement('div');
-            wrapper.innerHTML = textHtml.trim();
-            contentEl.appendChild(wrapper);
+            const wrapperEl = document.createElement('div');
+            wrapperEl.innerHTML = textHtml.trim();
+            contentEl.appendChild(wrapperEl);
             
             const spacer = document.createElement('div');
             spacer.style.height = document.getElementById('modal-text-area').offsetHeight + 'px';
             contentEl.appendChild(spacer);
 
-            const textHeight = wrapper.offsetHeight;
+            const textHeight = wrapperEl.offsetHeight;
             const containerHeight = document.getElementById('modal-text-area').offsetHeight;
             
             if (textHeight > 0) {

@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="version" content="2.2">
+    <meta name="copyright" content="Crosby Marks 2025">
+    <meta name="author" content="Crosby Marks">
     <title>Daily Rosary Mystery Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -137,6 +140,27 @@
         
         #list-view-container { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
+        /* --- ORIENTATION LOCK OVERLAY --- */
+        #rotate-overlay {
+            display: none;
+        }
+        /* Only show on landscape AND small height (phones) */
+        @media screen and (orientation: landscape) and (max-height: 600px) {
+            #rotate-overlay {
+                display: flex;
+                position: fixed;
+                inset: 0;
+                z-index: 9999;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                background-color: #312e81; /* Indigo 900 */
+                color: white;
+                text-align: center;
+                padding: 2rem;
+            }
+        }
+
         /* --- DARK MODE OVERRIDES --- */
         body.dark-mode {
             background-color: #111827; /* Gray 900 */
@@ -156,7 +180,8 @@
         body.dark-mode .text-gray-600 {
             color: #e5e7eb !important; /* Gray 200 */
         }
-        body.dark-mode .text-gray-500 {
+        body.dark-mode .text-gray-500,
+        body.dark-mode .text-gray-400 {
             color: #9ca3af !important; /* Gray 400 */
         }
         /* Update specific areas */
@@ -196,6 +221,14 @@
 </head>
 <body class="p-0 m-0">
 
+    <div id="rotate-overlay">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mb-4 animate-pulse">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+        </svg>
+        <h2 class="text-2xl font-bold">Please Rotate Your Device</h2>
+        <p class="mt-2 text-indigo-200">This application is designed for Portrait mode.</p>
+    </div>
+
     <audio id="background-music" loop playsinline>
         <source src="instrumental-piano-christian-worship-of-jesus-301250.mp3" type="audio/mpeg">
     </audio>
@@ -226,7 +259,6 @@
                     <option value="dark" id="opt-dark">Dark</option>
                 </select>
             </div>
-
             <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
                 <label class="font-medium text-gray-700" id="lbl-structure">Rosary Structure</label>
                 <select id="structure-select" onchange="updateRosaryStructure(this.value)" class="py-2 text-sm rounded-lg border-gray-300">
@@ -313,6 +345,8 @@
                     <div id="cycle-list" class="space-y-1 text-sm"></div>
                 </div>
             </div>
+            
+            <p class="text-xs text-gray-400 text-center mt-8">v2.2 &copy; 2025 Crosby Marks</p>
         </div>
     </div>
     
@@ -501,7 +535,6 @@
                     fullSeq: "Secuencia Completa",
                     dailySeq: "Misterios Diarios"
                 },
-                // ... [Same translated data] ...
                 days: ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
                 mysteries: {
                     joyful: "Misterios Gozosos",
@@ -948,10 +981,15 @@
             }
         }
 
+        // --- FIXED AUTO CONTINUE LOGIC ---
         function handleNextStep() {
             clearTimer();
+            
+            // Look ahead first
             if (currentIndex + 1 < currentSequence.length) {
+                // We are about to move to the NEXT item
                 currentIndex++; 
+                
                 const prevSec = currentSequence[currentIndex - 1].section;
                 const currSec = currentSequence[currentIndex].section;
                 
@@ -967,7 +1005,9 @@
                 
                 renderStep();
             } else {
+                // End of sequence (Daily or Full Mode end)
                 if (appConfig.autoContinue && appConfig.rosaryStructure === 'daily') {
+                    // Try to load next mystery if in Daily mode and AutoContinue is ON
                     attemptAutoContinue(currentSequence[currentIndex].section);
                 } else {
                     markSectionComplete(currentSequence[currentIndex].section);
@@ -1018,6 +1058,7 @@
             const currentSection = currentStep.section;
             markSectionComplete(currentSection);
             
+            // Check auto continue first - if OFF, exit immediately
             if (!appConfig.autoContinue) {
                 finishSession(true);
                 return;
@@ -1034,6 +1075,7 @@
                 currentIndex = nextSectionIndex;
                 renderStep();
             } else {
+                // End of this sequence
                 if (appConfig.rosaryStructure === 'daily') {
                     attemptAutoContinue(currentSection);
                 } else {

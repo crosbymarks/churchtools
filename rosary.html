@@ -119,10 +119,22 @@
         }
 
         #settings-panel.active { transform: translateY(0); }
+        /* Centered content in buttons for SVGs */
         .control-btn {
-            padding: 0.75rem 1rem; border-radius: 9999px; font-weight: 600;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: all 0.2s ease;
-            font-size: 0.95rem; white-space: nowrap;
+            height: 3rem; /* Fixed height for consistency */
+            width: 3.5rem; /* Fixed width for Play/Next */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px; 
+            font-weight: 600; 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+            transition: all 0.2s ease;
+        }
+        #finish-section-btn {
+            width: auto; /* Allow finish button to be wider if needed, but we used icon now so fixed is fine */
+            flex-grow: 0;
+            padding: 0 1.5rem;
         }
         #list-view-container { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
     </style>
@@ -283,10 +295,18 @@
         </div>
 
         <div class="flex-shrink-0 w-full bg-[#f7f3f1] z-30 p-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
-            <div class="flex justify-center flex-wrap gap-3 w-full max-w-xl mx-auto">
-                <button id="play-pause-btn" onclick="togglePlayPause()" class="control-btn bg-indigo-600 text-white hover:bg-indigo-700 w-24">Play</button>
-                <button id="next-btn" onclick="userNextStep()" class="control-btn bg-gray-500 text-white hover:bg-gray-600 w-24">Next</button>
-                <button id="finish-section-btn" onclick="finishCurrentSection()" class="control-btn bg-red-500 text-white hover:bg-red-600 flex-grow">Finish Mystery</button>
+            <div class="flex justify-center flex-wrap gap-4 w-full max-w-xl mx-auto items-center">
+                <button id="play-pause-btn" onclick="togglePlayPause()" class="control-btn bg-indigo-600 text-white hover:bg-indigo-700" title="Play/Pause">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-8 h-8"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                
+                <button id="next-btn" onclick="userNextStep()" class="control-btn bg-gray-500 text-white hover:bg-gray-600" title="Next Prayer">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-8 h-8"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
+                </button>
+                
+                <button id="finish-section-btn" onclick="finishCurrentSection()" class="control-btn bg-red-500 text-white hover:bg-red-600 flex-grow" title="Skip to End">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-8 h-8"><path d="M5 18l10-6-10-6v12zM19 6h2v12h-2z"/></svg>
+                </button>
             </div>
         </div>
     </div>
@@ -331,12 +351,6 @@
                     reset: "Reset Day",
                     cycle: "Show/Hide Full Weekly Cycle",
                     selectday: "Select a Day (Actual: *)",
-                    play: "Play",
-                    pause: "Pause",
-                    next: "Next",
-                    finish: "Finish Mystery",
-                    finishRosary: "Finish Rosary",
-                    skipIntro: "Skip Intro",
                     completed: "✓ Completed",
                     zoomHint: "Tap to Zoom",
                     instruction: "Press Play or Next to continue",
@@ -404,12 +418,6 @@
                     reset: "Reiniciar Día",
                     cycle: "Mostrar/Ocultar Ciclo Semanal",
                     selectday: "Seleccionar Día (Actual: *)",
-                    play: "Reproducir",
-                    pause: "Pausa",
-                    next: "Siguiente",
-                    finish: "Terminar Misterio",
-                    finishRosary: "Terminar Rosario",
-                    skipIntro: "Saltar Intro",
                     completed: "✓ Completado",
                     zoomHint: "Toca para Ampliar",
                     instruction: "Presiona Reproducir o Siguiente para continuar",
@@ -502,7 +510,6 @@
 
         // --- TRANSLATION HELPERS ---
         function getT(keyPath) {
-            // Traverse object path e.g. 'ui.settings'
             const keys = keyPath.split('.');
             let val = translations[appConfig.language];
             for (let k of keys) {
@@ -519,7 +526,6 @@
         function generateSequence(mode, mysteryGroupId, startMysteryIndex = -1) {
             const sequence = [];
             let globalStepCounter = 0;
-            // Get text titles and image urls
             const titles = translations[appConfig.language].mysteries.titles[mysteryGroupId];
             const images = imageAssets[mysteryGroupId];
 
@@ -549,7 +555,6 @@
                 });
             }
 
-            // Loop 5 mysteries
             for(let i=0; i<5; i++) {
                 if (mode === 'daily' && i !== startMysteryIndex) continue;
                 
@@ -624,7 +629,7 @@
                 isAutoMode = (appConfig.defaultMode === 'auto');
             }
 
-            updatePlayButtonUI(isAutoMode ? getT('ui.pause') : getT('ui.play'));
+            updatePlayButtonUI(isAutoMode ? "Pause" : "Play");
             applyTextVisibility();
             renderStep();
         }
@@ -678,12 +683,6 @@
 
             updateBeads(step);
 
-            const finishBtn = document.getElementById('finish-section-btn');
-            if (step.section === 'intro') finishBtn.textContent = getT('ui.skipIntro');
-            else if (step.section === 'conclusion') finishBtn.textContent = getT('ui.finishRosary');
-            else finishBtn.textContent = getT('ui.finish');
-
-            // Text Rendering
             const contentEl = document.getElementById('dynamic-prayer-content');
             contentEl.innerHTML = '';
             contentEl.style.animation = 'none';
@@ -735,26 +734,18 @@
                 }
             }
 
-            if (isContemplation) {
-                stepTimer = setTimeout(() => {
-                    if (isAutoMode) {
-                        handleNextStep();
-                    } else {
-                        document.getElementById('scroll-instruction').classList.remove('opacity-0');
-                        document.getElementById('scroll-instruction').classList.add('opacity-100');
-                    }
-                }, duration);
-            } else {
+            // UNIFIED TIMER CHECK
+            stepTimer = setTimeout(() => {
+                isScrolling = false;
                 if (isAutoMode) {
-                    stepTimer = setTimeout(() => {
-                        isScrolling = false;
-                        handleNextStep();
-                    }, duration);
+                    handleNextStep();
+                } else {
+                    document.getElementById('scroll-instruction').classList.remove('opacity-0');
+                    document.getElementById('scroll-instruction').classList.add('opacity-100');
                 }
-            }
+            }, duration);
         }
 
-        // --- ZOOM LOGIC ---
         function toggleZoom() {
             const wrapper = document.getElementById('image-wrapper');
             wrapper.classList.toggle('zoomed');
@@ -786,13 +777,11 @@
             if (appConfig.showText) {
                 container.classList.remove('view-text-hidden');
                 container.classList.add('view-text-visible');
-                textArea.style.display = 'block';
                 icon.style.transform = 'rotate(0deg)';
                 if(checkBox) checkBox.checked = true;
             } else {
                 container.classList.remove('view-text-visible');
                 container.classList.add('view-text-hidden');
-                textArea.style.display = 'none';
                 icon.style.transform = 'rotate(180deg)';
                 if(checkBox) checkBox.checked = false;
             }
@@ -852,10 +841,10 @@
         function togglePlayPause() {
             if (isAutoMode) {
                 isAutoMode = false;
-                updatePlayButtonUI(getT('ui.play'));
+                updatePlayButtonUI("Play");
             } else {
                 isAutoMode = true;
-                updatePlayButtonUI(getT('ui.pause'));
+                updatePlayButtonUI("Pause");
                 if (!isScrolling) {
                     const step = currentSequence[currentIndex];
                     if (step.key === 'contemplation') {
@@ -869,13 +858,15 @@
 
         function updatePlayButtonUI(label) {
             const btn = document.getElementById('play-pause-btn');
-            btn.textContent = label;
+            // Check based on state, not label string (which is now invisible/gone)
             if (isAutoMode) {
                 btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
                 btn.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-8 h-8"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
             } else {
                 btn.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
                 btn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-8 h-8"><path d="M8 5v14l11-7z"/></svg>`;
             }
         }
 
@@ -978,14 +969,12 @@
         }
 
         function updateMainDisplay(dayIdx) {
-            // Apply Translation
-            updateLabels();
-
+            updateLabels(); // Update text first
+            
             const sched = mysterySchedule[dayIdx];
             const groupKey = sched.id;
             const status = loadCompletedStatus();
             
-            // Translated Texts
             const dayName = translations[appConfig.language].days[dayIdx];
             const groupName = translations[appConfig.language].mysteries[groupKey];
             const todayLabel = getT('ui.today');
@@ -996,18 +985,15 @@
             document.getElementById('mystery-list-title').textContent = (appConfig.rosaryStructure === 'full') ? getT('ui.fullSeq') : getT('ui.dailySeq');
             
             let html = '';
-            // Intro
             if (appConfig.rosaryStructure === 'full') {
                 const introTitle = translations[appConfig.language].mysteries.titles.special.intro;
                 html += createCard({id:'intro', title:introTitle, imageUrl:imageAssets.special.intro}, 'special', groupKey, -1, status);
             }
-            // Mysteries
             const mTitles = translations[appConfig.language].mysteries.titles[groupKey];
             const mImgs = imageAssets[groupKey];
             for(let i=0; i<5; i++) {
                 html += createCard({id: i+1, title: mTitles[i], imageUrl: mImgs[i]}, 'mystery', groupKey, i, status);
             }
-            // Conclusion
             if (appConfig.rosaryStructure === 'full') {
                 const concTitle = translations[appConfig.language].mysteries.titles.special.conclusion;
                 html += createCard({id:'conclusion', title:concTitle, imageUrl:imageAssets.special.conclusion}, 'special', groupKey, -1, status);
@@ -1016,7 +1002,6 @@
         }
 
         function updateLabels() {
-            // Static labels update
             document.getElementById('lbl-settings-title').textContent = getT('ui.settings');
             document.getElementById('lbl-language').textContent = getT('ui.language');
             document.getElementById('lbl-structure').textContent = getT('ui.structure');
@@ -1045,10 +1030,8 @@
             document.getElementById('lbl-selectday').textContent = getT('ui.selectday').replace('*', (realCurrentDayIndex===selectedDayIndex?'*':''));
             document.getElementById('lbl-zoomhint').textContent = getT('ui.zoomHint');
             document.getElementById('lbl-instruction').textContent = getT('ui.instruction');
-            document.getElementById('play-pause-btn').textContent = isAutoMode ? getT('ui.pause') : getT('ui.play');
-            document.getElementById('next-btn').textContent = getT('ui.next');
             
-            // Buttons in modal update dynamically in renderStep but set base here
+            // Buttons in modal handled in renderStep
             document.getElementById('modal-title').textContent = getT('ui.modalResetTitle');
             document.getElementById('modal-message').textContent = getT('ui.modalResetMsg');
             document.getElementById('modal-confirm').textContent = getT('ui.confirm');
@@ -1080,11 +1063,7 @@
             </div>`;
         }
 
-        // --- CALCULATION ---
         function calculateDurations() {
-            // Need to calc based on current lang
-            // Just use a heuristic or re-run when language changes
-            // Simple heuristic: standard length
             const p = translations[appConfig.language].prayers;
             for (let k in p) {
                 if (k === 'contemplation') {
@@ -1097,22 +1076,6 @@
             }
         }
         
-        // --- LOAD SETTINGS ---
-        function loadSettings() {
-            const s = JSON.parse(localStorage.getItem('rosarySettings') || '{}');
-            appConfig = { ...appConfig, ...s };
-            // Apply to UI
-            if(document.getElementById('language-select')) document.getElementById('language-select').value = appConfig.language;
-            if(document.getElementById('structure-select')) document.getElementById('structure-select').value = appConfig.rosaryStructure;
-            if(document.getElementById('mode-select')) document.getElementById('mode-select').value = appConfig.defaultMode;
-            if(document.getElementById('speed-select')) document.getElementById('speed-select').value = appConfig.pace;
-            if(document.getElementById('size-select')) document.getElementById('size-select').value = appConfig.textSize;
-            if(document.getElementById('auto-continue-checkbox')) document.getElementById('auto-continue-checkbox').checked = appConfig.autoContinue;
-            if(document.getElementById('music-select')) document.getElementById('music-select').value = appConfig.bgMusic || 'off';
-            if(document.getElementById('sfx-checkbox')) document.getElementById('sfx-checkbox').checked = appConfig.sfxEnabled;
-            if(document.getElementById('show-text-checkbox')) document.getElementById('show-text-checkbox').checked = (appConfig.showText !== false);
-        }
-
         // --- HANDLERS ---
         window.updateLanguage = (v) => { appConfig.language = v; saveSet(); calculateDurations(); updateMainDisplay(selectedDayIndex); };
         window.updateRosaryStructure = (v) => { appConfig.rosaryStructure = v; saveSet(); updateMainDisplay(selectedDayIndex); };
@@ -1161,10 +1124,7 @@
                 <span>${d}${i===real?' *':''}</span><span>${mTitle}</span></div>`;
             });
         };
-        window.confirmReset = () => {
-            document.getElementById('custom-modal').classList.remove('hidden');
-            // Text updates in updateLabels
-        };
+        
         document.getElementById('modal-confirm').onclick = () => {
             localStorage.removeItem(getCurrentDateKey());
             document.getElementById('custom-modal').classList.add('hidden');

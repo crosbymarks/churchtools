@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="version" content="2.5">
+    <meta name="version" content="2.8">
     <meta name="copyright" content="Crosby Marks 2025">
     <meta name="author" content="Crosby Marks">
     <title>Daily Rosary Mystery Tracker</title>
@@ -123,7 +123,7 @@
             will-change: transform; 
         }
 
-        /* Seamless Marquee Animation */
+        /* Title Marquee Animation */
         @keyframes marquee-infinite {
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
@@ -192,6 +192,15 @@
         }
         body.dark-mode .text-gray-900 {
             color: #f9fafb !important;
+        }
+        
+        /* Cycle List Specifics to fix Light/Dark conflict */
+        body.dark-mode .cycle-item-unselected {
+            background-color: #374151 !important; /* Gray 700 */
+            color: #f3f4f6 !important;
+        }
+        body.dark-mode .cycle-item-unselected:hover {
+            background-color: #4b5563 !important; /* Gray 600 */
         }
     </style>
 </head>
@@ -315,14 +324,14 @@
             <div id="daily-mysteries-container" class="space-y-4"></div>
             
             <div class="mt-8 pt-4 border-t border-gray-200">
-                <button onclick="document.getElementById('cycle-list-wrapper').classList.toggle('hidden'); if(!document.getElementById('cycle-list-wrapper').classList.contains('hidden')) populateCycleList(realCurrentDayIndex, selectedDayIndex);" class="w-full text-sm text-indigo-600 hover:text-indigo-800 font-medium py-2" id="btn-showcycle">Show/Hide Full Weekly Cycle</button>
+                <button onclick="toggleCycleList()" class="w-full text-sm text-indigo-600 hover:text-indigo-800 font-medium py-2" id="btn-showcycle">Show/Hide Full Weekly Cycle</button>
                 <div id="cycle-list-wrapper" class="hidden">
                     <p class="text-sm font-semibold text-gray-600 mt-4 mb-2" id="lbl-selectday">Select a Day (Actual: *)</p>
                     <div id="cycle-list" class="space-y-1 text-sm"></div>
                 </div>
             </div>
             
-            <p class="text-xs text-gray-400 text-center mt-8">v2.5 &copy; 2025 Crosby Marks</p>
+            <p class="text-xs text-gray-400 text-center mt-8">v2.8 &copy; 2025 Crosby Marks</p>
         </div>
     </div>
     
@@ -705,6 +714,7 @@
             return sequence;
         }
 
+        // GLOBAL HANDLERS
         window.updateLanguage = (v) => { appConfig.language = v; saveSet(); calculateDurations(); updateMainDisplay(selectedDayIndex); };
         window.updateRosaryStructure = (v) => { appConfig.rosaryStructure = v; saveSet(); updateMainDisplay(selectedDayIndex); };
         window.updateDefaultMode = (v) => { appConfig.defaultMode = v; saveSet(); };
@@ -735,6 +745,48 @@
                 }
             }
         };
+
+        // UI HELPERS (Standard Functions)
+        function toggleCycleList() {
+            const wrapper = document.getElementById('cycle-list-wrapper');
+            wrapper.classList.toggle('hidden');
+            if(!wrapper.classList.contains('hidden')) {
+                populateCycleList(realCurrentDayIndex, selectedDayIndex);
+            }
+        }
+
+        function populateCycleList(real, sel) {
+            const list = document.getElementById('cycle-list'); 
+            list.innerHTML='';
+            translations[appConfig.language].days.forEach((d, i) => {
+                const isActive = i===sel;
+                const mTitle = translations[appConfig.language].mysteries[mysterySchedule[i].id];
+                
+                const item = document.createElement('div');
+                // Use custom class cycle-item-unselected for better dark/light control
+                let baseClass = isActive ? 'bg-indigo-600 text-white' : 'cycle-item-unselected bg-gray-50 text-gray-800 hover:bg-gray-100';
+                
+                item.className = `flex justify-between p-2 rounded cursor-pointer ${baseClass}`;
+                item.innerHTML = `<span>${d}${i===real?' *':''}</span><span>${mTitle}</span>`;
+                item.onclick = function() {
+                    selectedDayIndex = i;
+                    updateMainDisplay(i);
+                    populateCycleList(real, i); // Refresh list to show active state
+                };
+                list.appendChild(item);
+            });
+        }
+        
+        function confirmReset() {
+            document.getElementById('custom-modal').classList.remove('hidden');
+            // Re-bind click since updateLabels sets text only
+            document.getElementById('modal-confirm').onclick = () => {
+                localStorage.removeItem(getCurrentDateKey());
+                document.getElementById('custom-modal').classList.add('hidden');
+                updateMainDisplay(selectedDayIndex);
+            };
+            document.getElementById('modal-cancel').onclick = () => document.getElementById('custom-modal').classList.add('hidden');
+        }
 
         function startRosarySession(groupKey, type, index, preservePlayState = null) {
             resetState();
@@ -807,22 +859,17 @@
             document.getElementById('scroll-instruction').classList.add('opacity-0');
 
             const container = document.getElementById('marquee-container');
-            
-            // 1. Reset Content
-            container.innerHTML = `<h3 class="text-lg font-bold text-gray-800 whitespace-nowrap">${step.flowTitle}</h3>`;
+            container.innerHTML = `<h3 class="text-lg font-bold text-gray-800 dark:text-white whitespace-nowrap">${step.flowTitle}</h3>`;
             const titleEl = container.firstElementChild;
-            container.classList.remove('scrolling-wrapper'); // Stop anim
+            container.classList.remove('scrolling-wrapper'); 
             
-            // 2. Check Overflow
             const parentWidth = document.getElementById('top-title-wrapper').clientWidth;
             const textWidth = titleEl.scrollWidth;
 
-            // 3. Apply Seamless Logic
             if (textWidth > parentWidth) {
-                // Create Seamless Loop Structure
                 container.innerHTML = `
-                    <span class="text-lg font-bold text-gray-800 whitespace-nowrap mr-12">${step.flowTitle}</span>
-                    <span class="text-lg font-bold text-gray-800 whitespace-nowrap mr-12">${step.flowTitle}</span>
+                    <span class="text-lg font-bold text-gray-800 dark:text-white whitespace-nowrap mr-12">${step.flowTitle}</span>
+                    <span class="text-lg font-bold text-gray-800 dark:text-white whitespace-nowrap mr-12">${step.flowTitle}</span>
                 `;
                 container.classList.add('scrolling-wrapper');
             }

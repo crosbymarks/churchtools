@@ -193,14 +193,12 @@
         body.dark-mode .text-gray-900 {
             color: #f9fafb !important;
         }
-        
-        /* Cycle List Specifics to fix Light/Dark conflict */
+        /* Cycle List Specifics */
         body.dark-mode .cycle-item-unselected {
-            background-color: #374151 !important; /* Gray 700 */
-            color: #f3f4f6 !important;
+            background-color: #374151 !important; color: #f3f4f6 !important;
         }
         body.dark-mode .cycle-item-unselected:hover {
-            background-color: #4b5563 !important; /* Gray 600 */
+            background-color: #4b5563 !important;
         }
     </style>
 </head>
@@ -523,6 +521,7 @@
                     fullSeq: "Secuencia Completa",
                     dailySeq: "Misterios Diarios"
                 },
+                // ... [Same translated data] ...
                 days: ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
                 mysteries: {
                     joyful: "Misterios Gozosos",
@@ -591,6 +590,7 @@
         let DURATION = {};
         let currentGroupKey = ''; 
         const MS_PER_WORD = 350;
+        let currentTopTitle = ''; // Track top title for efficient updates
 
         function getT(keyPath) {
             const keys = keyPath.split('.');
@@ -650,13 +650,14 @@
             const titles = translations[appConfig.language].mysteries.titles[mysteryGroupId] || translations['en'].mysteries.titles[mysteryGroupId];
             const images = imageAssets[mysteryGroupId];
 
-            const addStep = (key, section, titleOverride, imgUrl, beadCount, beadIndex) => {
+            const addStep = (key, section, titleOverride, imgUrl, beadCount, beadIndex, sectionTitle) => {
                 const pData = getPrayerData(key);
                 sequence.push({
                     index: globalStepCounter++,
                     key: key,
                     section: section,
                     flowTitle: titleOverride || pData.title,
+                    sectionTitle: sectionTitle, // NEW: Constant title for the section
                     imageUrl: imgUrl,
                     beadCount: beadCount,
                     beadIndex: beadIndex
@@ -669,10 +670,14 @@
                 const introKeys = ['sotc', 'ac', 'of', 'hm', 'hm', 'hm', 'gb']; 
                 const beadCount = 5;
                 let beadIdx = 0;
-                addStep('contemplation', 'intro', introTitle, introImg, beadCount, -1);
+                
+                // Add Intro Contemplation
+                addStep('contemplation', 'intro', introTitle, introImg, beadCount, -1, introTitle);
+                
+                // Add Intro Prayers
                 introKeys.forEach(k => {
                     const isBead = PRAYER_META[k].isBead;
-                    addStep(k, 'intro', null, introImg, beadCount, isBead ? beadIdx++ : -1);
+                    addStep(k, 'intro', null, introImg, beadCount, isBead ? beadIdx++ : -1, introTitle);
                 });
             }
 
@@ -687,8 +692,12 @@
                 let beadIdx = 0;
                 
                 const mysteryLabel = getT('ui.mysteryLabel');
-                addStep('contemplation', sectionId, `${mysteryLabel} ${i+1}: ${mTitle}`, mImg, beadCount, -1);
+                const fullMysteryTitle = `${mysteryLabel} ${i+1}: ${mTitle}`; // The Section Title
                 
+                // Add Mystery Contemplation
+                addStep('contemplation', sectionId, fullMysteryTitle, mImg, beadCount, -1, fullMysteryTitle);
+                
+                // Add Mystery Prayers
                 decadeKeys.forEach((k, j) => {
                     const isBead = PRAYER_META[k].isBead;
                     let title = null;
@@ -696,7 +705,7 @@
                         const prayerTitle = getPrayerData(k).title;
                         title = `${prayerTitle} (${j} / 10)`;
                     }
-                    addStep(k, sectionId, title, mImg, beadCount, isBead ? beadIdx++ : -1);
+                    addStep(k, sectionId, title, mImg, beadCount, isBead ? beadIdx++ : -1, fullMysteryTitle);
                 });
             }
 
@@ -705,15 +714,18 @@
                 const concImg = imageAssets.special.conclusion;
                 const closeKeys = ['hhq', 'ogws', 'sotc'];
                 const beadCount = 0;
-                addStep('contemplation', 'conclusion', concTitle, concImg, beadCount, -1);
+                
+                // Add Conclusion Contemplation
+                addStep('contemplation', 'conclusion', concTitle, concImg, beadCount, -1, concTitle);
+                
+                // Add Conclusion Prayers
                 closeKeys.forEach(k => {
-                    addStep(k, 'conclusion', null, concImg, beadCount, -1);
+                    addStep(k, 'conclusion', null, concImg, beadCount, -1, concTitle);
                 });
             }
             return sequence;
         }
 
-        // GLOBAL HANDLERS
         window.updateLanguage = (v) => { appConfig.language = v; saveSet(); calculateDurations(); updateMainDisplay(selectedDayIndex); };
         window.updateRosaryStructure = (v) => { appConfig.rosaryStructure = v; saveSet(); updateMainDisplay(selectedDayIndex); };
         window.updateDefaultMode = (v) => { appConfig.defaultMode = v; saveSet(); };
@@ -744,15 +756,15 @@
                 }
             }
         };
-
-        // UI HELPERS (Standard Functions)
-        function toggleCycleList() {
+        
+        // GLOBAL FUNCTION FOR CYCLE LIST
+        window.toggleCycleList = () => {
             const wrapper = document.getElementById('cycle-list-wrapper');
             wrapper.classList.toggle('hidden');
             if(!wrapper.classList.contains('hidden')) {
                 populateCycleList(realCurrentDayIndex, selectedDayIndex);
             }
-        }
+        };
 
         function populateCycleList(real, sel) {
             const list = document.getElementById('cycle-list'); 
@@ -762,7 +774,6 @@
                 const mTitle = translations[appConfig.language].mysteries[mysterySchedule[i].id];
                 
                 const item = document.createElement('div');
-                // Use custom class cycle-item-unselected for better dark/light control
                 let baseClass = isActive ? 'bg-indigo-600 text-white' : 'cycle-item-unselected bg-gray-50 text-gray-800 hover:bg-gray-100';
                 
                 item.className = `flex justify-between p-2 rounded cursor-pointer ${baseClass}`;
@@ -770,7 +781,7 @@
                 item.onclick = function() {
                     selectedDayIndex = i;
                     updateMainDisplay(i);
-                    populateCycleList(real, i); // Refresh list to show active state
+                    populateCycleList(real, i); 
                 };
                 list.appendChild(item);
             });
@@ -778,7 +789,6 @@
         
         function confirmReset() {
             document.getElementById('custom-modal').classList.remove('hidden');
-            // Re-bind click since updateLabels sets text only
             document.getElementById('modal-confirm').onclick = () => {
                 localStorage.removeItem(getCurrentDateKey());
                 document.getElementById('custom-modal').classList.add('hidden');
@@ -790,8 +800,8 @@
         function startRosarySession(groupKey, type, index, preservePlayState = null) {
             resetState();
             currentGroupKey = groupKey; 
+            currentTopTitle = ''; // Reset top title tracker
             
-            // --- FIX: Respect settings for mode. Only force daily if 'special' in daily mode ---
             let mode = appConfig.rosaryStructure;
             if (type === 'special' && appConfig.rosaryStructure === 'daily') {
                 mode = 'daily'; 
@@ -799,18 +809,16 @@
 
             currentSequence = generateSequence(mode, groupKey, index);
             
-            // --- FIX: Jump to Conclusion if selected in Full Mode ---
             if (mode === 'full') {
                 if (type === 'mystery') {
                     const targetSection = `mystery_${index + 1}`;
                     const foundIndex = currentSequence.findIndex(step => step.section === targetSection);
                     currentIndex = foundIndex !== -1 ? foundIndex : 0;
                 } else if (type === 'special' && index === 'conclusion') {
-                     // Find start of conclusion
                      const foundIndex = currentSequence.findIndex(step => step.section === 'conclusion');
                      currentIndex = foundIndex !== -1 ? foundIndex : 0;
                 } else {
-                    currentIndex = 0; // Default (Intro)
+                    currentIndex = 0; 
                 }
             } else {
                 currentIndex = 0; 
@@ -866,22 +874,27 @@
             document.getElementById('scroll-instruction').classList.remove('opacity-100');
             document.getElementById('scroll-instruction').classList.add('opacity-0');
 
-            const container = document.getElementById('marquee-container');
-            container.innerHTML = `<h3 class="text-lg font-bold text-gray-800 dark:text-white whitespace-nowrap">${step.flowTitle}</h3>`;
-            const titleEl = container.firstElementChild;
-            container.classList.remove('scrolling-wrapper'); 
-            
-            const parentWidth = document.getElementById('top-title-wrapper').clientWidth;
-            const textWidth = titleEl.scrollWidth;
+            // --- TOP TITLE LOGIC (Section Title) ---
+            if (currentTopTitle !== step.sectionTitle) {
+                currentTopTitle = step.sectionTitle;
+                const container = document.getElementById('marquee-container');
+                container.innerHTML = `<h3 class="text-lg font-bold text-gray-800 dark:text-white whitespace-nowrap">${step.sectionTitle}</h3>`;
+                
+                container.classList.remove('scrolling-wrapper'); 
+                const titleEl = container.firstElementChild;
+                const parentWidth = document.getElementById('top-title-wrapper').clientWidth;
+                const textWidth = titleEl.scrollWidth;
 
-            if (textWidth > parentWidth) {
-                container.innerHTML = `
-                    <span class="text-lg font-bold text-gray-800 dark:text-white whitespace-nowrap mr-12">${step.flowTitle}</span>
-                    <span class="text-lg font-bold text-gray-800 dark:text-white whitespace-nowrap mr-12">${step.flowTitle}</span>
-                `;
-                container.classList.add('scrolling-wrapper');
+                if (textWidth > parentWidth) {
+                    container.innerHTML = `
+                        <span class="text-lg font-bold text-gray-800 dark:text-white whitespace-nowrap mr-12">${step.sectionTitle}</span>
+                        <span class="text-lg font-bold text-gray-800 dark:text-white whitespace-nowrap mr-12">${step.sectionTitle}</span>
+                    `;
+                    container.classList.add('scrolling-wrapper');
+                }
             }
 
+            // --- MIDDLE TITLE LOGIC (Prayer Title) ---
             document.getElementById('current-prayer-title').textContent = isContemplation ? getT('prayers.contemplation.title') : step.flowTitle;
 
             const badge = document.getElementById('mystery-badge');

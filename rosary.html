@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="version" content="2.9">
+    <meta name="version" content="3.0">
     <meta name="copyright" content="Crosby Marks 2025">
     <meta name="author" content="Crosby Marks">
     <title>Daily Rosary Mystery Tracker</title>
@@ -329,19 +329,22 @@
                 </div>
             </div>
             
-            <p class="text-xs text-gray-400 text-center mt-8">v2.9 &copy; 2025 Crosby Marks</p>
+            <p class="text-xs text-gray-400 text-center mt-8">v3.0 &copy; 2025 Crosby Marks</p>
         </div>
     </div>
     
     <div id="contemplation-view" class="modal view-text-visible">
         
-        <div class="p-2 flex justify-between items-center bg-white shadow-md flex-shrink-0 relative h-12 z-20">
-            <div id="top-title-wrapper" class="absolute inset-x-12 top-1/2 transform -translate-y-1/2 overflow-hidden h-6 pointer-events-none">
-                <div id="marquee-container" class="flex justify-center items-center w-full h-full">
-                    </div>
+        <div class="p-2 flex items-center justify-between bg-white shadow-md flex-shrink-0 relative h-12 z-20">
+            <div class="w-10 flex-shrink-0"></div>
+
+            <div id="top-title-wrapper" class="flex-grow mx-2 overflow-hidden h-full flex items-center justify-center relative">
+                <div id="marquee-container" class="w-full flex justify-center items-center">
+                    <h3 id="modal-top-title" class="text-lg font-bold text-gray-800 dark:text-white whitespace-nowrap"></h3>
+                </div>
             </div>
-            <div class="w-10"></div>
-            <button onclick="finishSession(false)" class="p-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100 transition z-30 pointer-events-auto">
+
+            <button onclick="finishSession(false)" class="w-10 p-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100 transition z-30 flex-shrink-0 flex justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
         </div>
@@ -451,6 +454,7 @@
                     fullSeq: "Full Rosary Sequence",
                     dailySeq: "Daily Mysteries"
                 },
+                // ... [Same prayer/mystery data as before] ...
                 days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
                 mysteries: {
                     joyful: "Joyful Mysteries",
@@ -726,6 +730,7 @@
             return sequence;
         }
 
+        // GLOBAL HANDLERS
         window.updateLanguage = (v) => { appConfig.language = v; saveSet(); calculateDurations(); updateMainDisplay(selectedDayIndex); };
         window.updateRosaryStructure = (v) => { appConfig.rosaryStructure = v; saveSet(); updateMainDisplay(selectedDayIndex); };
         window.updateDefaultMode = (v) => { appConfig.defaultMode = v; saveSet(); };
@@ -756,15 +761,15 @@
                 }
             }
         };
-        
-        // GLOBAL FUNCTION FOR CYCLE LIST
-        window.toggleCycleList = () => {
+
+        // UI HELPERS (Standard Functions)
+        function toggleCycleList() {
             const wrapper = document.getElementById('cycle-list-wrapper');
             wrapper.classList.toggle('hidden');
             if(!wrapper.classList.contains('hidden')) {
                 populateCycleList(realCurrentDayIndex, selectedDayIndex);
             }
-        };
+        }
 
         function populateCycleList(real, sel) {
             const list = document.getElementById('cycle-list'); 
@@ -1052,30 +1057,21 @@
         // --- FIXED AUTO CONTINUE LOGIC ---
         function handleNextStep() {
             clearTimer();
-            
-            // Look ahead first
             if (currentIndex + 1 < currentSequence.length) {
-                // We are about to move to the NEXT item
                 currentIndex++; 
-                
                 const prevSec = currentSequence[currentIndex - 1].section;
                 const currSec = currentSequence[currentIndex].section;
                 
                 if (prevSec !== currSec) {
                     markSectionComplete(prevSec);
-                    
-                    // IF AUTO CONTINUE IS OFF: EXIT IMMEDIATELY TO MENU
                     if (!appConfig.autoContinue) {
                         finishSession(true);
                         return; 
                     }
                 }
-                
                 renderStep();
             } else {
-                // End of sequence (Daily or Full Mode end)
                 if (appConfig.autoContinue && appConfig.rosaryStructure === 'daily') {
-                    // Try to load next mystery if in Daily mode and AutoContinue is ON
                     attemptAutoContinue(currentSequence[currentIndex].section);
                 } else {
                     markSectionComplete(currentSequence[currentIndex].section);
@@ -1126,7 +1122,6 @@
             const currentSection = currentStep.section;
             markSectionComplete(currentSection);
             
-            // Check auto continue first - if OFF, exit immediately
             if (!appConfig.autoContinue) {
                 finishSession(true);
                 return;
@@ -1143,7 +1138,6 @@
                 currentIndex = nextSectionIndex;
                 renderStep();
             } else {
-                // End of this sequence
                 if (appConfig.rosaryStructure === 'daily') {
                     attemptAutoContinue(currentSection);
                 } else {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="version" content="2.8">
+    <meta name="version" content="2.9">
     <meta name="copyright" content="Crosby Marks 2025">
     <meta name="author" content="Crosby Marks">
     <title>Daily Rosary Mystery Tracker</title>
@@ -331,7 +331,7 @@
                 </div>
             </div>
             
-            <p class="text-xs text-gray-400 text-center mt-8">v2.8 &copy; 2025 Crosby Marks</p>
+            <p class="text-xs text-gray-400 text-center mt-8">v2.9 &copy; 2025 Crosby Marks</p>
         </div>
     </div>
     
@@ -523,7 +523,6 @@
                     fullSeq: "Secuencia Completa",
                     dailySeq: "Misterios Diarios"
                 },
-                // ... [Same translated data] ...
                 days: ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
                 mysteries: {
                     joyful: "Misterios Gozosos",
@@ -800,10 +799,19 @@
 
             currentSequence = generateSequence(mode, groupKey, index);
             
-            if (mode === 'full' && type === 'mystery') {
-                const targetSection = `mystery_${index + 1}`;
-                const foundIndex = currentSequence.findIndex(step => step.section === targetSection);
-                currentIndex = foundIndex !== -1 ? foundIndex : 0;
+            // --- FIX: Jump to Conclusion if selected in Full Mode ---
+            if (mode === 'full') {
+                if (type === 'mystery') {
+                    const targetSection = `mystery_${index + 1}`;
+                    const foundIndex = currentSequence.findIndex(step => step.section === targetSection);
+                    currentIndex = foundIndex !== -1 ? foundIndex : 0;
+                } else if (type === 'special' && index === 'conclusion') {
+                     // Find start of conclusion
+                     const foundIndex = currentSequence.findIndex(step => step.section === 'conclusion');
+                     currentIndex = foundIndex !== -1 ? foundIndex : 0;
+                } else {
+                    currentIndex = 0; // Default (Intro)
+                }
             } else {
                 currentIndex = 0; 
             }

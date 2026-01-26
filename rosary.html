@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="version" content="3.0">
+    <meta name="version" content="4.1">
     <meta name="copyright" content="Crosby Marks 2025">
     <meta name="author" content="Crosby Marks">
     <title>Daily Rosary Mystery Tracker</title>
@@ -151,6 +151,11 @@
         
         #list-view-container { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
+        /* HEADER TITLE COLORS (Fixed for visibility) */
+        #marquee-container h3, #marquee-container span {
+            color: #312e81; /* Indigo 900 - Dark for Light Mode */
+        }
+
         /* --- ORIENTATION LOCK OVERLAY --- */
         #rotate-overlay { display: none; }
         @media screen and (orientation: landscape) and (max-height: 600px) {
@@ -199,6 +204,10 @@
         }
         body.dark-mode .cycle-item-unselected:hover {
             background-color: #4b5563 !important;
+        }
+        /* Fix Marquee Text in Dark Mode */
+        body.dark-mode #marquee-container h3, body.dark-mode #marquee-container span {
+            color: #f3f4f6 !important; /* White for Dark Mode */
         }
     </style>
 </head>
@@ -256,6 +265,11 @@
                     <option value="auto" id="opt-auto">Auto Play</option>
                 </select>
             </div>
+            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                <label class="font-medium text-gray-700" id="lbl-enabletts">Enable Voice Narration</label>
+                <input type="checkbox" id="tts-checkbox" onchange="updateTTS(this.checked)" class="h-6 w-6 text-indigo-600 rounded cursor-pointer">
+            </div>
+            
             <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
                 <label class="font-medium text-gray-700" id="lbl-pace">Contemplation Pace</label>
                 <select id="speed-select" onchange="updateSpeed(this.value)" class="py-2 text-sm rounded-lg border-gray-300">
@@ -329,22 +343,18 @@
                 </div>
             </div>
             
-            <p class="text-xs text-gray-400 text-center mt-8">v3.0 &copy; 2025 Crosby Marks</p>
+            <p class="text-xs text-gray-400 text-center mt-8">v4.1 &copy; 2025 Crosby Marks</p>
         </div>
     </div>
     
     <div id="contemplation-view" class="modal view-text-visible">
         
-        <div class="p-2 flex items-center justify-between bg-white shadow-md flex-shrink-0 relative h-12 z-20">
-            <div class="w-10 flex-shrink-0"></div>
-
-            <div id="top-title-wrapper" class="flex-grow mx-2 overflow-hidden h-full flex items-center justify-center relative">
-                <div id="marquee-container" class="w-full flex justify-center items-center">
-                    <h3 id="modal-top-title" class="text-lg font-bold text-gray-800 dark:text-white whitespace-nowrap"></h3>
-                </div>
+        <div class="p-2 flex justify-between items-center bg-white shadow-md flex-shrink-0 relative h-12 z-20">
+            <div id="top-title-wrapper" class="absolute inset-x-12 top-1/2 transform -translate-y-1/2 overflow-hidden h-6 pointer-events-none">
+                <div id="marquee-container" class="flex justify-center items-center w-full h-full"></div>
             </div>
-
-            <button onclick="finishSession(false)" class="w-10 p-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100 transition z-30 flex-shrink-0 flex justify-center">
+            <div class="w-10"></div>
+            <button onclick="finishSession(false)" class="p-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100 transition z-30 pointer-events-auto">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
         </div>
@@ -431,6 +441,7 @@
                     loud: "Loud",
                     sfx: "Sound Effects",
                     autocontinue: "Auto Continue",
+                    enabletts: "Enable Voice Narration",
                     showtext: "Show Prayer Text",
                     theme: "Appearance",
                     light: "Light",
@@ -502,6 +513,7 @@
                     loud: "Alto",
                     sfx: "Efectos de Sonido",
                     autocontinue: "Continuar Automáticamente",
+                    enabletts: "Activar Narración de Voz",
                     showtext: "Mostrar Texto",
                     theme: "Apariencia",
                     light: "Claro",
@@ -567,10 +579,10 @@
         };
 
         const imageAssets = {
-            joyful: ["images/joyful/Fra_Angelico_-_The_Annunciation_-_WGA00555.jpg", "images/joyful/1024px-La_Visitation_avec_Marie-Jacobie_et_Marie-Salome_-_Domenico_Ghirlandaio_-_Musee_du_Louvre_Peintures_INV_297_MR_240_-_avec_cadre.jpg", "images/joyful/1024px-Geertgen_tot_Sint_Jans,_The_Nativity_at_Night,_c_1490FXD.jpg", "images/joyful/Rembrandt_-_Circumcision_-_WGA19111.jpg", "images/joyful/Cima_da_Conegliano_Christ_among_the_doctors.jpg"],
+            joyful: ["https://upload.wikimedia.org/wikipedia/commons/0/0e/Fra_Angelico_-_The_Annunciation_-_WGA00555.jpg", "https://upload.wikimedia.org/wikipedia/commons/d/dc/La_Visitation_avec_Marie-Jacobie_et_Marie-Salom%C3%A9_-_Domenico_Ghirlandaio_-_Mus%C3%A9e_du_Louvre_Peintures_INV_297_%3B_MR_240.jpg", "https://upload.wikimedia.org/wikipedia/commons/6/64/Geertgen_tot_Sint_Jans%2C_The_Nativity_at_Night%2C_c_1490.jpg", "https://upload.wikimedia.org/wikipedia/commons/f/f7/Rembrandt_-_Circumcision_-_WGA19111.jpg", "https://upload.wikimedia.org/wikipedia/commons/5/51/Cima_da_Conegliano_Christ_among_the_doctors.jpg"],
             sorrowful: ["https://upload.wikimedia.org/wikipedia/commons/1/10/Bellini%2CGiovanni_-_Agony_in_the_Garden_-_National_Gallery.jpg", "https://upload.wikimedia.org/wikipedia/commons/1/11/Piero_-_The_Flagellation.jpg", "https://upload.wikimedia.org/wikipedia/commons/5/52/Caravaggio%2C_Crowning_of_Thorns.jpg", "https://upload.wikimedia.org/wikipedia/commons/5/5d/Hieronymus_Bosch_-_Christ_Carrying_the_Cross_-_WGA2498.jpg", "https://upload.wikimedia.org/wikipedia/commons/d/d3/Lotto%2C_crocifissione_01.jpg"],
             glorious: ["https://upload.wikimedia.org/wikipedia/commons/c/c2/Resurrection.JPG", "https://upload.wikimedia.org/wikipedia/commons/0/01/Jacopo_Tintoretto_-_The_Ascension_-_WGA22570.jpg", "https://upload.wikimedia.org/wikipedia/commons/5/5a/Titian_-_The_Descent_of_the_Holy_Ghost_-_WGA22768.jpg", "https://upload.wikimedia.org/wikipedia/commons/9/9e/Tizian_041.jpg", "https://upload.wikimedia.org/wikipedia/commons/b/b5/Diego_Vel%C3%A1zquez_-_Coronation_of_the_Virgin_-_Prado.jpg"],
-            luminous: ["https://upload.wikimedia.org/wikipedia/commons/5/5a/Piero_della_Francesca_-_Baptism_of_Christ_-_WGA17595.jpg", "https://upload.wikimedia.org/wikipedia/commons/2/21/Paolo_Veronese%2C_The_Wedding_at_Cana.JPG", "https://upload.wikimedia.org/wikipedia/commons/9/96/Bloch-SermonOnTheMount.jpg", "https://upload.wikimedia.org/wikipedia/commons/5/51/Transfiguration_Raphael.jpg", "https://upload.wikimedia.org/wikipedia/commons/0/08/Leonardo_da_Vinci_%281452-1519%29_-_The_Last_Apper_%281495-1498%29.jpg"],
+            luminous: ["https://upload.wikimedia.org/wikipedia/commons/5/5a/Piero_della_Francesca_-_Baptism_of_Christ_-_WGA17595.jpg", "https://upload.wikimedia.org/wikipedia/commons/2/21/Paolo_Veronese%2C_The_Wedding_at_Cana.JPG", "https://upload.wikimedia.org/wikipedia/commons/9/9e/Tizian_041.jpg", "https://upload.wikimedia.org/wikipedia/commons/5/51/Transfiguration_Raphael.jpg", "https://upload.wikimedia.org/wikipedia/commons/0/08/Leonardo_da_Vinci_%281452-1519%29_-_The_Last_Apper_%281495-1498%29.jpg"],
             special: { intro: "https://upload.wikimedia.org/wikipedia/commons/4/4d/Rosary_2006-01-16.jpg", conclusion: "https://upload.wikimedia.org/wikipedia/commons/4/4e/Antonio_de_Pereda_y_Salgado_-_The_Holy_Trinity_-_WGA17176.jpg" }
         };
 
@@ -582,7 +594,7 @@
         const realCurrentDayIndex = today.getDay(); 
         let selectedDayIndex = realCurrentDayIndex; 
         
-        let appConfig = { language: 'en', pace: 1, textSize: 'medium', defaultMode: 'manual', autoContinue: false, rosaryStructure: 'daily', bgMusic: 'off', sfxEnabled: false, showText: true, darkMode: 'light' };
+        let appConfig = { language: 'en', pace: 1, textSize: 'medium', defaultMode: 'manual', autoContinue: false, rosaryStructure: 'daily', bgMusic: 'off', sfxEnabled: false, showText: true, darkMode: 'light', enableTTS: false };
         
         let currentSequence = [];
         let currentIndex = 0;
@@ -594,7 +606,22 @@
         let DURATION = {};
         let currentGroupKey = ''; 
         const MS_PER_WORD = 350;
-        let currentTopTitle = ''; // Track top title for efficient updates
+        let currentTopTitle = '';
+        let synth = window.speechSynthesis;
+        let currentUtterance = null;
+        let wasMusicPlaying = false;
+        let originalMusicVol = 0;
+        let voices = [];
+        // Pinch Zoom Vars
+        let initialPinchDistance = 0;
+        let currentZoomLevel = 100; // percent
+
+        // Init Voices
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = function() {
+                voices = synth.getVoices();
+            };
+        }
 
         function getT(keyPath) {
             const keys = keyPath.split('.');
@@ -624,6 +651,7 @@
             if(document.getElementById('show-text-checkbox')) document.getElementById('show-text-checkbox').checked = (appConfig.showText !== false);
             if(document.getElementById('language-select')) document.getElementById('language-select').value = appConfig.language;
             if(document.getElementById('theme-select')) document.getElementById('theme-select').value = appConfig.darkMode || 'light';
+            if(document.getElementById('tts-checkbox')) document.getElementById('tts-checkbox').checked = appConfig.enableTTS;
             
             updateTheme(appConfig.darkMode || 'light');
         }
@@ -675,10 +703,8 @@
                 const beadCount = 5;
                 let beadIdx = 0;
                 
-                // Add Intro Contemplation
                 addStep('contemplation', 'intro', introTitle, introImg, beadCount, -1, introTitle);
                 
-                // Add Intro Prayers
                 introKeys.forEach(k => {
                     const isBead = PRAYER_META[k].isBead;
                     addStep(k, 'intro', null, introImg, beadCount, isBead ? beadIdx++ : -1, introTitle);
@@ -698,10 +724,8 @@
                 const mysteryLabel = getT('ui.mysteryLabel');
                 const fullMysteryTitle = `${mysteryLabel} ${i+1}: ${mTitle}`; // The Section Title
                 
-                // Add Mystery Contemplation
                 addStep('contemplation', sectionId, fullMysteryTitle, mImg, beadCount, -1, fullMysteryTitle);
                 
-                // Add Mystery Prayers
                 decadeKeys.forEach((k, j) => {
                     const isBead = PRAYER_META[k].isBead;
                     let title = null;
@@ -719,10 +743,8 @@
                 const closeKeys = ['hhq', 'ogws', 'sotc'];
                 const beadCount = 0;
                 
-                // Add Conclusion Contemplation
                 addStep('contemplation', 'conclusion', concTitle, concImg, beadCount, -1, concTitle);
                 
-                // Add Conclusion Prayers
                 closeKeys.forEach(k => {
                     addStep(k, 'conclusion', null, concImg, beadCount, -1, concTitle);
                 });
@@ -744,6 +766,10 @@
             if (val === 'dark') document.body.classList.add('dark-mode');
             else document.body.classList.remove('dark-mode');
         };
+        window.updateTTS = (isChecked) => {
+            appConfig.enableTTS = isChecked;
+            saveSet();
+        };
         window.updateMusicVolume = (val) => {
             appConfig.bgMusic = val;
             saveSet();
@@ -761,15 +787,14 @@
                 }
             }
         };
-
-        // UI HELPERS (Standard Functions)
-        function toggleCycleList() {
+        
+        window.toggleCycleList = () => {
             const wrapper = document.getElementById('cycle-list-wrapper');
             wrapper.classList.toggle('hidden');
             if(!wrapper.classList.contains('hidden')) {
                 populateCycleList(realCurrentDayIndex, selectedDayIndex);
             }
-        }
+        };
 
         function populateCycleList(real, sel) {
             const list = document.getElementById('cycle-list'); 
@@ -802,10 +827,72 @@
             document.getElementById('modal-cancel').onclick = () => document.getElementById('custom-modal').classList.add('hidden');
         }
 
+        // --- TTS HELPER FUNCTIONS ---
+        function stopSpeaking() {
+            if (synth.speaking) {
+                synth.cancel();
+            }
+            if(currentUtterance) {
+                currentUtterance.onend = null;
+                currentUtterance.onerror = null;
+                currentUtterance = null;
+            }
+            if (wasMusicPlaying && audio) {
+                try { audio.volume = originalMusicVol; } catch(e){}
+                wasMusicPlaying = false;
+            }
+        }
+
+        function speakText(text, onComplete) {
+            window.speechSynthesis.cancel();
+            if (wasMusicPlaying && audio) {
+                try { audio.volume = originalMusicVol; } catch(e){}
+                wasMusicPlaying = false;
+            }
+            if (!text) {
+                if (onComplete) onComplete();
+                return;
+            }
+
+            const cleanText = text.replace(/<[^>]*>?/gm, '');
+            currentUtterance = new SpeechSynthesisUtterance(cleanText);
+            currentUtterance.lang = appConfig.language === 'es' ? 'es-ES' : 'en-US';
+            currentUtterance.rate = 1.0; 
+            currentUtterance.pitch = 1.0;
+            currentUtterance.volume = 1.0;
+
+            currentUtterance.onend = function() {
+                if (wasMusicPlaying && audio) {
+                    try { audio.volume = originalMusicVol; } catch(e){}
+                    wasMusicPlaying = false;
+                }
+                if (onComplete) onComplete();
+            };
+
+            currentUtterance.onerror = function(e) {
+                 if (wasMusicPlaying && audio) {
+                    try { audio.volume = originalMusicVol; } catch(e){}
+                    wasMusicPlaying = false;
+                }
+                if (onComplete) onComplete();
+            };
+
+            window.speechSynthesis.speak(currentUtterance);
+            
+            try {
+                if (audio && !audio.paused && audio.volume > 0) {
+                    wasMusicPlaying = true;
+                    originalMusicVol = audio.volume;
+                    audio.volume = 0.1; 
+                }
+            } catch(e) { console.log("Audio ducking failed, ignoring."); }
+        }
+
         function startRosarySession(groupKey, type, index, preservePlayState = null) {
+            document.getElementById('settings-panel').classList.remove('active');
             resetState();
             currentGroupKey = groupKey; 
-            currentTopTitle = ''; // Reset top title tracker
+            currentTopTitle = ''; 
             
             let mode = appConfig.rosaryStructure;
             if (type === 'special' && appConfig.rosaryStructure === 'daily') {
@@ -851,10 +938,17 @@
 
             updatePlayButtonUI(); 
             applyTextVisibility();
+            
+            if (appConfig.enableTTS) {
+               window.speechSynthesis.cancel();
+            }
+
             renderStep();
         }
         
         function renderStep() {
+            stopSpeaking();
+            
             const step = currentSequence[currentIndex];
             const pData = getPrayerData(step.key);
             const isContemplation = step.key === 'contemplation';
@@ -879,7 +973,6 @@
             document.getElementById('scroll-instruction').classList.remove('opacity-100');
             document.getElementById('scroll-instruction').classList.add('opacity-0');
 
-            // --- TOP TITLE LOGIC (Section Title) ---
             if (currentTopTitle !== step.sectionTitle) {
                 currentTopTitle = step.sectionTitle;
                 const container = document.getElementById('marquee-container');
@@ -899,7 +992,6 @@
                 }
             }
 
-            // --- MIDDLE TITLE LOGIC (Prayer Title) ---
             document.getElementById('current-prayer-title').textContent = isContemplation ? getT('prayers.contemplation.title') : step.flowTitle;
 
             const badge = document.getElementById('mystery-badge');
@@ -921,6 +1013,8 @@
                 wrapperDiv.classList.remove('zoomed');
                 wrapperDiv.scrollTop = 0;
                 wrapperDiv.scrollLeft = 0;
+                currentZoomLevel = 100; // Reset pinch
+                imgEl.style.width = '200%'; // Reset default zoomed width
             }
 
             updateBeads(step);
@@ -957,6 +1051,7 @@
             const textHeight = wrapperEl.offsetHeight;
             const containerHeight = document.getElementById('modal-text-area').offsetHeight;
             
+            // Start Visual Animation
             if (textHeight > 0) {
                 contentEl.style.setProperty('--start-position', `${containerHeight}px`);
                 contentEl.style.setProperty('--end-position', `-${textHeight}px`);
@@ -965,27 +1060,50 @@
 
                 contentEl.addEventListener('animationend', () => {
                     isScrolling = false;
-                    if (!isAutoMode) {
+                    // FIX: Visual instruction logic
+                    if (!isAutoMode && !appConfig.enableTTS) {
                         document.getElementById('scroll-instruction').classList.remove('opacity-0');
                         document.getElementById('scroll-instruction').classList.add('opacity-100');
                     }
                 }, { once: true });
             } else {
-                if (!isAutoMode) {
+                if (!isAutoMode && !appConfig.enableTTS) {
                     document.getElementById('scroll-instruction').classList.remove('opacity-0');
                     document.getElementById('scroll-instruction').classList.add('opacity-100');
                 }
             }
 
-            stepTimer = setTimeout(() => {
-                isScrolling = false;
-                if (isAutoMode) {
-                    handleNextStep();
-                } else {
-                    document.getElementById('scroll-instruction').classList.remove('opacity-0');
-                    document.getElementById('scroll-instruction').classList.add('opacity-100');
+            // --- TTS vs TIMER LOGIC ---
+            if (appConfig.enableTTS) {
+                // ALWAYS SPEAK if enabled, regardless of auto/manual
+                let textToSpeak = safeText;
+                if (step.key === 'contemplation') {
+                    textToSpeak = `${step.sectionTitle}. ${safeText}`;
                 }
-            }, duration);
+
+                speakText(textToSpeak, () => {
+                    // Voice finished. 
+                    isScrolling = false;
+                    if (isAutoMode) {
+                        handleNextStep();
+                    } else {
+                        // Manual Mode: Voice done, NOW show "Next" prompt
+                        document.getElementById('scroll-instruction').classList.remove('opacity-0');
+                        document.getElementById('scroll-instruction').classList.add('opacity-100');
+                    }
+                });
+            } else {
+                // Timer Logic (TTS OFF)
+                stepTimer = setTimeout(() => {
+                    isScrolling = false;
+                    if (isAutoMode) {
+                        handleNextStep();
+                    } else {
+                        document.getElementById('scroll-instruction').classList.remove('opacity-0');
+                        document.getElementById('scroll-instruction').classList.add('opacity-100');
+                    }
+                }, duration);
+            }
         }
 
         function toggleZoom() {
@@ -994,8 +1112,75 @@
             if(!wrapper.classList.contains('zoomed')) {
                 wrapper.scrollTop = 0;
                 wrapper.scrollLeft = 0;
+                currentZoomLevel = 100;
+                document.getElementById('modal-image').style.width = '100%';
+            } else {
+                currentZoomLevel = 200; // Default zoom
+                document.getElementById('modal-image').style.width = '200%';
             }
         }
+
+        // --- PINCH TO ZOOM HANDLERS ---
+        const imageWrapper = document.getElementById('image-wrapper');
+        const modalImage = document.getElementById('modal-image');
+        
+        imageWrapper.addEventListener('touchstart', function(e) {
+            if (e.touches.length === 2 && imageWrapper.classList.contains('zoomed')) {
+                initialPinchDistance = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+            }
+        });
+
+        imageWrapper.addEventListener('touchmove', function(e) {
+            if (e.touches.length === 2 && imageWrapper.classList.contains('zoomed')) {
+                const dist = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+                
+                if (initialPinchDistance > 0) {
+                    const diff = dist - initialPinchDistance;
+                    // Sensitivity factor
+                    const newZoom = currentZoomLevel + (diff * 0.5);
+                    
+                    // Clamp between 100% and 500%
+                    currentZoomLevel = Math.min(Math.max(newZoom, 100), 500);
+                    
+                    modalImage.style.width = `${currentZoomLevel}%`;
+                    initialPinchDistance = dist; // Update for continuous movement
+                }
+                e.preventDefault(); // Prevent page scroll while pinching
+            }
+        });
+
+        // --- PRESS AND HOLD HANDLERS (v4.0 Revert to Pause/Resume) ---
+        const textArea = document.getElementById('modal-text-area');
+        
+        function pauseAction() {
+            if (appConfig.enableTTS) {
+                synth.pause();
+            }
+            const content = document.getElementById('dynamic-prayer-content');
+            if(content) content.style.animationPlayState = 'paused';
+        }
+        
+        function resumeAction() {
+            if (appConfig.enableTTS) {
+                synth.resume();
+            }
+            const content = document.getElementById('dynamic-prayer-content');
+            if(content) content.style.animationPlayState = 'running';
+        }
+
+        // Attach events
+        textArea.addEventListener('mousedown', pauseAction);
+        textArea.addEventListener('touchstart', pauseAction, {passive: true});
+        
+        textArea.addEventListener('mouseup', resumeAction);
+        textArea.addEventListener('touchend', resumeAction);
+        textArea.addEventListener('mouseleave', resumeAction);
 
         function toggleTextVisibility() {
             appConfig.showText = !appConfig.showText;
@@ -1054,7 +1239,6 @@
             }
         }
 
-        // --- FIXED AUTO CONTINUE LOGIC ---
         function handleNextStep() {
             clearTimer();
             if (currentIndex + 1 < currentSequence.length) {
@@ -1083,17 +1267,13 @@
         function togglePlayPause() {
             if (isAutoMode) {
                 isAutoMode = false;
+                stopSpeaking(); 
                 updatePlayButtonUI();
             } else {
                 isAutoMode = true;
                 updatePlayButtonUI();
                 if (!isScrolling) {
-                    const step = currentSequence[currentIndex];
-                    if (step.key === 'contemplation') {
-                        handleNextStep();
-                    } else {
-                        handleNextStep(); 
-                    }
+                    renderStep(); 
                 }
             }
         }
@@ -1112,12 +1292,14 @@
         }
 
         function userNextStep() {
-            clearTimer(); 
+            clearTimer();
+            stopSpeaking();
             handleNextStep(); 
         }
 
         function finishCurrentSection() {
             clearTimer();
+            stopSpeaking();
             const currentStep = currentSequence[currentIndex];
             const currentSection = currentStep.section;
             markSectionComplete(currentSection);
@@ -1186,6 +1368,7 @@
                 markSectionComplete(currentSequence[currentIndex].section);
             }
             clearTimer();
+            stopSpeaking(); 
             if (audio) { audio.pause(); audio.currentTime = 0; }
             releaseWakeLock();
             document.getElementById('contemplation-view').classList.remove('active');
@@ -1262,6 +1445,7 @@
                 document.getElementById('lbl-music').textContent = getT('ui.bgmusic');
                 document.getElementById('lbl-sfx').textContent = getT('ui.sfx');
                 document.getElementById('lbl-autocontinue').textContent = getT('ui.autocontinue');
+                document.getElementById('lbl-enabletts').textContent = getT('ui.enabletts');
                 document.getElementById('lbl-showtext').textContent = getT('ui.showtext');
                 document.getElementById('lbl-theme').textContent = getT('ui.theme');
                 

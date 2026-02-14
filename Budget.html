@@ -180,7 +180,12 @@
             position: fixed; bottom: 20px; right: 20px; background: #263238; color: white;
             padding: 12px 24px; border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             z-index: 1000; font-size: 1.1rem; font-weight: bold; display: flex; gap: 10px;
-            align-items: center; transition: border-color 0.3s; border: 2px solid transparent;
+            align-items: center; border: 2px solid transparent;
+            transition: border-color 0.3s, opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 1; transform: translateY(0);
+        }
+        .floating-balance.hidden {
+            opacity: 0; transform: translateY(20px); pointer-events: none;
         }
         .floating-balance.positive { border-color: #81C784; }
         .floating-balance.negative { border-color: #E57373; }
@@ -278,6 +283,10 @@
             </div>
             <div class="controls">
                 <label class="chk-label">
+                    <input type="checkbox" id="float-toggle-chk" onchange="handleFloatToggle()" checked>
+                    <span id="t-float-toggle">Mostrar Flotante</span>
+                </label>
+                <label class="chk-label">
                     <input type="checkbox" id="save-data-chk" onchange="handleSaveToggle()">
                     <span id="t-save">Guardar Sesión</span>
                 </label>
@@ -333,7 +342,7 @@
         <div id="list-exp"></div>
     </div>
 
-    <div class="results-bar">
+    <div class="results-bar" id="main-results-bar">
         <div class="result-item">
             <div class="res-label" id="t-sug-ind">Ingreso Neto Disp. (Sugerido)</div>
             <div class="res-value" id="res-sug-ind">$0.00</div>
@@ -352,6 +361,8 @@
     const STORAGE_KEY = 'budgetPlannerStewardshipData';
     let lang = 'es';
     let lockMode = 'percent'; 
+    let isFloatEnabled = true;
+    let isBottomVisible = false;
 
     const schema = [
         { id: 'tithe', min: 10, max: 10, type: 'must', icon: '🙏' },
@@ -383,6 +394,7 @@
             sec1: "1. Obligaciones Prioritarias (Primeros Frutos)", sec2: "2. Gastos de Vida & Familia",
             sugInd: "Ingreso Neto Disp. (Sugerido)", bal: "Tu Balance Final", avg: "Prom",
             ph_amt: "Monto", btnUpd: "Actualizar", saveChk: "Guardar Sesión",
+            floatToggle: "Mostrar Flotante",
             overTitle: "Gire su Dispositivo", overText: "Para una mejor experiencia, use esta herramienta en modo horizontal.", overBtn: "Continuar de todos modos",
             floatBal: "Balance:"
         },
@@ -397,6 +409,7 @@
             sec1: "1. Priority Obligations (First Fruits)", sec2: "2. Living & Family Expenses",
             sugInd: "Suggested NDI", bal: "Your Final Balance", avg: "Avg",
             ph_amt: "Amount", btnUpd: "Update", saveChk: "Save Session",
+            floatToggle: "Show Float Bar",
             overTitle: "Rotate Device", overText: "For the best experience, please use this tool in landscape mode.", overBtn: "Continue Anyway",
             floatBal: "Balance:"
         }
@@ -435,9 +448,41 @@
             (item.type === 'must' ? mustDiv : expDiv).appendChild(row);
         });
         
+        setupIntersectionObserver();
         loadFromLocal();
         updateText();
         calculateAll();
+        updateFloatingBarVisibility();
+    }
+
+    // --- Floating Bar Logic ---
+    function setupIntersectionObserver() {
+        const resultsBar = document.getElementById('main-results-bar');
+        if ('IntersectionObserver' in window && resultsBar) {
+            const observer = new IntersectionObserver((entries) => {
+                isBottomVisible = entries[0].isIntersecting;
+                updateFloatingBarVisibility();
+            }, { threshold: 0.1 }); // triggers when 10% of results bar is visible
+            observer.observe(resultsBar);
+        }
+    }
+
+    function handleFloatToggle() {
+        isFloatEnabled = document.getElementById('float-toggle-chk').checked;
+        updateFloatingBarVisibility();
+        saveToLocal();
+    }
+
+    function updateFloatingBarVisibility() {
+        const floatBar = document.getElementById('float-bar');
+        if (!floatBar) return;
+
+        // Hide if toggle is off OR if the bottom static balance is visible
+        if (isFloatEnabled && !isBottomVisible) {
+            floatBar.classList.remove('hidden');
+        } else {
+            floatBar.classList.add('hidden');
+        }
     }
 
     // --- Local Storage Functions ---
@@ -456,6 +501,7 @@
             iba: document.getElementById('iba').value,
             lockMode: lockMode,
             lang: lang,
+            floatEnabled: isFloatEnabled,
             inputs: {}
         };
 
@@ -479,6 +525,12 @@
                 
                 if(data.lang) lang = data.lang;
                 if(data.iba) document.getElementById('iba').value = data.iba;
+                
+                if (data.floatEnabled !== undefined) {
+                    isFloatEnabled = data.floatEnabled;
+                    document.getElementById('float-toggle-chk').checked = isFloatEnabled;
+                }
+
                 if(data.lockMode) {
                     lockMode = data.lockMode;
                     document.getElementById('adj-toggle').setAttribute('data-mode', lockMode);
@@ -600,11 +652,11 @@
                 
                 floatVal.className = "float-val positive";
                 floatVal.innerText = positiveStr;
-                floatBar.className = "floating-balance positive";
+                floatBar.className = "floating-balance positive " + (floatBar.classList.contains('hidden') ? 'hidden' : '');
             } else {
                 balEl.className = "res-value negative";
                 floatVal.className = "float-val negative";
-                floatBar.className = "floating-balance negative";
+                floatBar.className = "floating-balance negative " + (floatBar.classList.contains('hidden') ? 'hidden' : '');
             }
         }
 
@@ -642,6 +694,7 @@
         document.getElementById('btn-lang').innerText = lang === 'es' ? 'English' : 'Español';
         document.getElementById('btn-update-txt').innerText = t.btnUpd;
         document.getElementById('t-save').innerText = t.saveChk;
+        document.getElementById('t-float-toggle').innerText = t.floatToggle;
         
         // Overlay and Floating Bar
         document.getElementById('t-over-title').innerText = t.overTitle;

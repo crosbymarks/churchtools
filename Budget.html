@@ -3,531 +3,696 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="html-title">Calculadora de Presupuesto Familiar</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Administración - Unidos en la Imagen de Dios</title>
     <style>
-        /* Setting 'Inter' as the main font */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        :root {
+            --primary: #5D4037;
+            --primary-light: #D7CCC8;
+            --accent: #FFB74D;
+            --bg-body: #F5F5F5;
+            --bg-card: #FFFFFF;
+            --text-main: #3E2723;
+            --text-light: #757575;
+            --success: #66BB6A;
+            --danger: #EF5350;
+            --toggle-inactive: #E0E0E0;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f7f9fc;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
         }
-        .budget-category-row {
-            transition: background-color 0.2s;
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            overflow: hidden;
         }
-        .budget-category-row:hover {
-            background-color: #f0f4f8;
+
+        /* --- Header --- */
+        header {
+            background: linear-gradient(135deg, #5D4037 0%, #3E2723 100%);
+            color: white;
+            padding: 25px 30px;
         }
-        /* Style for the adjustment inputs */
-        .input-style {
-            padding: 0.5rem;
-            border-radius: 0.375rem; /* rounded-md */
-            border: 1px solid #d1d5db; /* border-gray-300 */
-            width: 100%;
-            text-align: right;
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        /* Custom scrollbar style for better aesthetics */
-        ::-webkit-scrollbar {
-            width: 8px;
+
+        h1 { margin: 0; font-weight: 300; font-size: 1.8rem; letter-spacing: 0.5px; }
+        .subtitle { opacity: 0.8; font-size: 0.9rem; margin-top: 5px; font-style: italic; }
+
+        .controls { display: flex; gap: 15px; align-items: center; }
+
+        .btn-action {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #9ca3af;
-            border-radius: 10px;
+        .btn-action:hover { background: rgba(255,255,255,0.3); }
+
+        /* --- Income Panel --- */
+        .income-panel {
+            background: #FFF8E1;
+            padding: 25px 30px;
+            border-bottom: 1px solid #FFE0B2;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 20px;
         }
-        /* Home Icon SVG Style */
-        .home-icon-svg {
-            width: 28px;
-            height: 28px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
+
+        .income-left { display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap; }
+
+        .input-group label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            font-size: 1.6rem;
+            padding: 8px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            width: 180px;
+            text-align: center;
+            color: var(--primary);
+            font-weight: bold;
+            transition: border-color 0.2s;
+        }
+        .input-group input:focus { outline: none; border-color: var(--accent); }
+
+        /* Update Button */
+        .btn-update {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            height: 50px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.1s, background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-update:hover { background-color: #4e342e; transform: translateY(-2px); }
+        .btn-update:active { transform: translateY(0); }
+
+        /* Lock Toggle */
+        .lock-wrapper {
+            background: white;
+            padding: 5px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .toggle-switch {
+            display: flex;
+            background: var(--toggle-inactive);
+            border-radius: 6px;
+            position: relative;
+            cursor: pointer;
+            width: 140px;
+            height: 36px;
+        }
+        .toggle-option {
+            flex: 1;
+            text-align: center;
+            line-height: 36px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            z-index: 2;
+            color: #757575;
+            transition: color 0.3s;
+        }
+        .toggle-slider {
+            position: absolute;
+            top: 2px; bottom: 2px; left: 2px;
+            width: calc(50% - 2px);
+            background: white;
+            border-radius: 4px;
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            z-index: 1;
+        }
+        .toggle-switch[data-mode="percent"] .toggle-slider { transform: translateX(0); }
+        .toggle-switch[data-mode="percent"] .opt-perc { color: var(--primary); }
+        .toggle-switch[data-mode="value"] .toggle-slider { transform: translateX(100%); }
+        .toggle-switch[data-mode="value"] .opt-val { color: var(--primary); }
+
+        .calc-display { text-align: right; }
+        .calc-val { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
+
+        /* --- Grid --- */
+        .budget-grid { padding: 20px; }
+
+        .section-title {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 5px;
+            margin: 30px 0 15px 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title svg { width: 20px; height: 20px; fill: var(--primary); }
+
+        .row {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 2fr;
+            gap: 15px;
+            align-items: center;
+            padding: 12px 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .row:hover { background: #fafafa; }
+        .row.header-row {
+            font-weight: bold;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            border-bottom: 2px solid #ddd;
+            background: white !important;
+        }
+
+        .col-label { display: flex; flex-direction: column; }
+        .label-main { font-weight: 500; display: flex; align-items: center; gap: 8px; }
+        .label-sub { font-size: 0.8rem; color: var(--text-light); }
+        .label-avg { color: var(--accent); font-weight: 600; }
+
+        .col-sug {
+            background: #F1F8E9;
+            border-radius: 6px;
+            padding: 8px;
+            text-align: center;
+            color: #33691E;
+            font-weight: 500;
+            border: 1px solid #DCEDC8;
+        }
+
+        .col-user { display: flex; justify-content: flex-end; gap: 10px; }
+        .inp-money { width: 110px; text-align: right; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; }
+        .inp-perc { width: 55px; text-align: center; padding: 6px; border: 1px solid #ccc; border-radius: 4px; background: #f9f9f9; font-size: 0.9rem; }
+        
+        /* Highlight active input based on mode */
+        .toggle-switch[data-mode="percent"] ~ .budget-grid .inp-perc { border-color: var(--accent); background: #fff; font-weight: bold; }
+        .toggle-switch[data-mode="value"] ~ .budget-grid .inp-money { border-color: var(--accent); background: #fff; font-weight: bold; }
+
+        /* --- Results --- */
+        .results-bar {
+            background: #263238;
+            color: white;
+            padding: 20px 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        .result-item { text-align: center; }
+        .res-label { font-size: 0.8rem; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
+        .res-value { font-size: 2rem; font-weight: 300; }
+        .res-value.positive { color: #81C784; }
+        .res-value.negative { color: #E57373; }
+
+        .progress-container { background: #37474F; height: 8px; width: 100%; margin-top: 10px; border-radius: 4px; overflow: hidden; grid-column: span 2; }
+        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.5s ease; }
+
+
+        /* ----------------------------------------------------
+           PRINT STYLES - Condensed Single Page
+           ---------------------------------------------------- */
+        @media print {
+            @page { margin: 0.5cm; size: portrait; }
+            
+            body { 
+                background: white; 
+                padding: 0; 
+                -webkit-print-color-adjust: exact; 
+                font-size: 10pt;
+            }
+
+            .container { 
+                box-shadow: none; 
+                max-width: 100%; 
+                width: 100%; 
+                margin: 0; 
+                border-radius: 0;
+            }
+
+            /* Hide Controls/Buttons */
+            .controls, .btn-update, .lock-wrapper, .progress-container { 
+                display: none !important; 
+            }
+
+            /* Compact Header */
+            header { 
+                padding: 10px 0; 
+                border-bottom: 2px solid #000; 
+                background: none !important; 
+                color: #000 !important; 
+                margin-bottom: 10px;
+            }
+            .header-top { justify-content: center; text-align: center; }
+            h1 { font-size: 1.4rem; color: #000; }
+            .subtitle { color: #444; font-size: 0.8rem; }
+
+            /* Compact Income Panel */
+            .income-panel { 
+                background: none !important; 
+                border: 1px solid #999; 
+                padding: 5px 15px; 
+                margin-bottom: 10px; 
+                justify-content: space-around;
+                align-items: center;
+            }
+            .income-left { gap: 40px; }
+            .input-group label { color: #000; margin-bottom: 2px; }
+            .input-group input { 
+                border: none; 
+                border-bottom: 1px solid #000; 
+                background: none; 
+                font-size: 1.2rem; 
+                color: #000; 
+                padding: 0;
+                width: 120px;
+                text-align: left;
+            }
+            .calc-val { font-size: 1.2rem; color: #000; }
+
+            /* Grid Layout - Compact Rows */
+            .budget-grid { padding: 0; }
+            
+            .section-title { 
+                margin: 10px 0 5px 0; 
+                font-size: 0.9rem; 
+                border-bottom: 1px solid #000; 
+                color: #000;
+                padding-bottom: 2px;
+            }
+            .section-title svg { display: none; } /* Hide icons to save space */
+            
+            .row { 
+                padding: 3px 0; /* Tight rows */
+                border-bottom: 1px solid #ccc; 
+                grid-template-columns: 2fr 1fr 1fr;
+                gap: 5px;
+                page-break-inside: avoid;
+            }
+            .row.header-row { 
+                background: #eee !important; 
+                color: #000; 
+                border-bottom: 1px solid #000; 
+                font-size: 0.7rem;
+            }
+
+            .label-main span:first-child { display: none; } /* Hide emoji icons */
+            .label-main { font-size: 0.85rem; }
+            .label-sub { font-size: 0.7rem; }
+            .label-avg { color: #333; font-weight: normal; }
+
+            .col-sug { 
+                background: none; 
+                border: none; 
+                padding: 0; 
+                color: #000; 
+                font-size: 0.85rem; 
+                text-align: right; 
+                padding-right: 20px;
+            }
+
+            .col-user { gap: 5px; }
+            .inp-money, .inp-perc {
+                border: none;
+                background: none;
+                padding: 0;
+                font-size: 0.85rem;
+                color: #000;
+                font-weight: bold;
+                height: auto;
+            }
+            .inp-money { width: 80px; text-align: right; }
+            .inp-perc { width: 40px; text-align: right; font-size: 0.75rem; color: #555; }
+            
+            /* Results Footer */
+            .results-bar {
+                background: none !important;
+                color: #000 !important;
+                border-top: 2px solid #000;
+                padding: 10px 0;
+                margin-top: 10px;
+                grid-template-columns: 1fr 1fr;
+            }
+            .res-label { color: #000; }
+            .res-value { font-size: 1.4rem; color: #000 !important; }
+
+            /* Force Scaling to fit one page */
+            html { zoom: 85%; }
         }
     </style>
 </head>
-<body class="p-4 md:p-8 min-h-screen">
+<body>
 
-    <div id="app" class="max-w-4xl mx-auto bg-white shadow-xl rounded-xl p-6 md:p-10">
-
-        <!-- Header with Home Button in the upper left, above the Title -->
-        <header class="mb-8 pb-4 border-b border-gray-200">
-            
-            <!-- Home Icon Link (Upper Left) -->
-            <div class="flex justify-start mb-4">
-                <a href="./" class="text-gray-600 hover:text-blue-600 transition duration-150 p-2 rounded-full hover:bg-gray-100" aria-label="Go to home page">
-                    <svg class="home-icon-svg" viewBox="0 0 24 24">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                    </svg>
-                </a>
-            </div>
-            
-            <!-- Title and Subtitle -->
+<div class="container">
+    <header>
+        <div class="header-top">
             <div>
-                <h1 id="header-title" class="text-3xl md:text-4xl font-extrabold text-blue-800 mb-2">Administración del Presupuesto Familiar</h1>
-                <p id="header-subtitle" class="text-gray-600 text-lg">Planifica, ajusta y administra tus Ingresos Netos Disponibles (IND).</p>
+                <h1 id="t-title">Administración del Hogar</h1>
+                <div class="subtitle" id="t-subtitle">Planificación basada en "Unidos en la Imagen de Dios"</div>
             </div>
-        </header>
-
-
-        <!-- Income Input Section -->
-        <section class="bg-blue-50 p-6 rounded-lg shadow-inner mb-8">
-            <h2 id="section-1-title" class="text-xl font-semibold text-blue-700 mb-4">1. Ingresos Netos Disponibles (IND)</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="md:col-span-2">
-                    <label for="income-amount" id="income-label" class="block text-sm font-medium text-gray-700 mb-1">Monto de Ingreso Neto:</label>
-                    <input type="number" id="income-amount" value="5000" min="0" class="input-style border-blue-300 focus:border-blue-500 focus:ring-blue-500" placeholder="Ej. 5000">
-                </div>
-                <div>
-                    <label for="income-frequency" id="frequency-label" class="block text-sm font-medium text-gray-700 mb-1">Frecuencia:</label>
-                    <select id="income-frequency" class="input-style border-blue-300 focus:border-blue-500 focus:ring-blue-500">
-                        <!-- Options populated/translated by JS -->
-                    </select>
-                </div>
+            <div class="controls">
+                <button class="btn-action" onclick="window.print()">🖨 Print</button>
+                <button class="btn-action" onclick="toggleLang()" id="btn-lang">EN / ES</button>
             </div>
-            <p id="monthly-income-display" class="mt-4 text-lg font-bold text-blue-800 text-center md:text-left"></p>
-        </section>
+        </div>
+    </header>
 
-        <!-- Budget Table and Breakdown -->
-        <section class="mb-8">
-            <h2 id="section-2-title" class="text-xl font-semibold text-blue-700 mb-4">2. Distribución del Presupuesto</h2>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th scope="col" id="th-category" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">Categoría</th>
-                            <th scope="col" id="th-suggested" class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Sugerido (%)</th>
-                            <th scope="col" id="th-actual" class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Actual (%)</th>
-                            <th scope="col" id="th-amount" class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">Monto ($)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="budget-table-body" class="bg-white divide-y divide-gray-200">
-                        <!-- Budget rows will be injected here by JavaScript -->
-                    </tbody>
-                    <tfoot>
-                        <tr id="total-assigned-row" class="bg-gray-100 font-bold text-gray-800 transition-colors">
-                            <td id="td-total-assigned" class="px-3 py-3 text-left text-sm">TOTAL ASIGNADO</td>
-                            <td class="px-3 py-3 text-center text-sm" id="total-percent"></td>
-                            <td class="px-3 py-3 text-center text-sm"></td>
-                            <td class="px-3 py-3 text-right text-sm" id="total-amount"></td>
-                        </tr>
-                        <tr id="remaining-balance-row" class="bg-blue-100 font-bold text-blue-800 transition-colors">
-                            <td id="td-remaining-balance" class="px-3 py-3 text-left text-sm">BALANCE RESTANTE (IND - GASTOS)</td>
-                            <td colspan="2" class="px-3 py-3 text-center text-sm"></td>
-                            <td class="px-3 py-3 text-right text-sm" id="remaining-balance"></td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </section>
-
-        <!-- Visual Chart Summary -->
-        <section>
-            <h2 id="section-3-title" class="text-xl font-semibold text-blue-700 mb-4">3. Vista General de la Distribución</h2>
-            <div id="chart-container" class="w-full h-8 flex rounded-full overflow-hidden bg-gray-200 shadow-md">
-                <!-- Chart segments will be injected here -->
+    <div class="income-panel">
+        <div class="income-left">
+            <div class="input-group">
+                <label id="lbl-iba">Ingresos Brutos Anuales</label>
+                <input type="number" id="iba" value="60000">
             </div>
             
-            <p id="alert-message" class="mt-4 text-red-600 font-bold hidden text-center p-3 border border-red-300 rounded-lg bg-red-50">
-                ¡Advertencia! El total de sus gastos excede el 100% de sus Ingresos Netos Disponibles (IND). Por favor, ajuste las categorías.
-            </p>
-        </section>
+            <button class="btn-update" onclick="applyIncomeChange()">
+                <span>🔄</span> <span id="btn-update-txt">Actualizar / Update</span>
+            </button>
 
-        <!-- Language Switch -->
-        <div class="mt-10 pt-6 border-t border-gray-300 flex justify-center items-center">
-            <div class="inline-flex rounded-full bg-gray-200 p-1">
-                <button id="lang-es" data-lang="es" class="px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200">
-                    Español
-                </button>
-                <button id="lang-en" data-lang="en" class="px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200">
-                    English
-                </button>
+            <div class="lock-wrapper">
+                <div class="toggle-switch" id="adj-toggle" data-mode="percent" onclick="toggleMode()">
+                    <div class="toggle-slider"></div>
+                    <div class="toggle-option opt-perc">Lock %</div>
+                    <div class="toggle-option opt-val">Lock $</div>
+                </div>
             </div>
+        </div>
+
+        <div class="calc-display">
+            <label style="font-size:0.8rem; color:#777; display:block; margin-bottom:5px;" id="lbl-ibm">Ingreso Mensual (IBA/12)</label>
+            <div class="calc-val" id="ibm-val">$5,000.00</div>
         </div>
     </div>
 
-    <script>
-        // --- DATA SETUP ---
-        const budgetCategories = [
-            // name_es and name_en added for translation
-            { id: 'diezmo', name_es: 'Dar (Diezmo/Caridad)', name_en: 'Giving (Tithes/Charity)', defaultPercent: 10, color: 'bg-green-600', percent: 10, amount: 0 },
-            { id: 'ahorro', name_es: 'Ahorro (Emergencia/Retiro)', name_en: 'Savings (Emergency/Retirement)', defaultPercent: 15, color: 'bg-indigo-600', percent: 15, amount: 0 },
-            { id: 'vivienda', name_es: 'Vivienda (Alquiler/Hipoteca)', name_en: 'Housing (Rent/Mortgage)', defaultPercent: 25, color: 'bg-blue-600', percent: 25, amount: 0 },
-            { id: 'alimentos', name_es: 'Alimentos y Hogar', name_en: 'Food and Household', defaultPercent: 10, color: 'bg-yellow-600', percent: 10, amount: 0 },
-            { id: 'transporte', name_es: 'Transporte', name_en: 'Transportation', defaultPercent: 5, color: 'bg-purple-600', percent: 5, amount: 0 },
-            { id: 'deudas', name_es: 'Deudas (No Hipotecarias)', name_en: 'Debt (Non-Mortgage)', defaultPercent: 15, color: 'bg-red-600', percent: 15, amount: 0 },
-            { id: 'salud', name_es: 'Salud y Cuidado Personal', name_en: 'Health and Personal Care', defaultPercent: 5, color: 'bg-pink-600', percent: 5, amount: 0 },
-            { id: 'educacion', name_es: 'Educación/Hijos', name_en: 'Education/Children', defaultPercent: 5, color: 'bg-teal-600', percent: 5, amount: 0 },
-            { id: 'otros', name_es: 'Entretenimiento/Misceláneos', name_en: 'Entertainment/Miscellaneous', defaultPercent: 10, color: 'bg-gray-600', percent: 10, amount: 0 },
-        ];
+    <div class="budget-grid">
+        <div class="row header-row">
+            <div id="h-cat">Categoría & Rango</div>
+            <div style="text-align:center;" id="h-sug">Sugerido</div>
+            <div style="text-align:right; padding-right:10px;" id="h-act">Tu Plan</div>
+        </div>
+
+        <div class="section-title">
+            <svg viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 3.5l8.5 14.5h-17L12 5.5zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z"/></svg>
+            <span id="t-sec1">1. Obligaciones Prioritarias (Primeros Frutos)</span>
+        </div>
+        <div id="list-must"></div>
+
+        <div class="section-title">
+            <svg viewBox="0 0 24 24"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm5 15h-2v-6H9v6H7v-7.81l5-4.5 5 4.5V18z"/></svg>
+            <span id="t-sec2">2. Gastos de Vida & Familia</span>
+        </div>
+        <div id="list-exp"></div>
+    </div>
+
+    <div class="results-bar">
+        <div class="result-item">
+            <div class="res-label" id="t-sug-ind">Ingreso Neto Disp. (Sugerido)</div>
+            <div class="res-value" id="res-sug-ind">$0.00</div>
+        </div>
+        <div class="result-item">
+            <div class="res-label" id="t-balance">Tu Balance Final</div>
+            <div class="res-value" id="res-balance">$0.00</div>
+        </div>
+        <div class="progress-container">
+            <div class="progress-fill" id="progress-bar"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- Data Definition ---
+    const schema = [
+        { id: 'tithe', min: 10, max: 10, type: 'must', icon: '🙏' },
+        { id: 'pretax', min: 3, max: 25, type: 'must', icon: '🐷' },
+        { id: 'tax', min: 8, max: 38.5, type: 'must', icon: '🏛️' },
+        { id: 'housing', min: 18, max: 28, type: 'exp', icon: '🏠' },
+        { id: 'food', min: 7, max: 11, type: 'exp', icon: '🛒' },
+        { id: 'auto', min: 9, max: 12, type: 'exp', icon: '🚗' },
+        { id: 'ins', min: 3, max: 6, type: 'exp', icon: '🛡️' },
+        { id: 'cloth', min: 1, max: 4, type: 'exp', icon: '👕' },
+        { id: 'med', min: 1, max: 3, type: 'exp', icon: '⚕️' },
+        { id: 'debt', min: 0, max: 5, type: 'exp', icon: '💳' },
+        { id: 'fun', min: 1, max: 4, type: 'exp', icon: '🎟️' },
+        { id: 'save', min: 3, max: 7, type: 'exp', icon: '💰' },
+        { id: 'misc', min: 2, max: 6, type: 'exp', icon: '📦' },
+        { id: 'kids', min: 2, max: 7, type: 'exp', icon: '🧸' },
+        { id: 'edu', min: 2, max: 6, type: 'exp', icon: '🎓' }
+    ];
+
+    const text = {
+        es: {
+            tithe: "Diezmo (D)", pretax: "Ahorros Antes de Impuestos", tax: "Impuestos (I)",
+            housing: "Vivienda", food: "Alimentos", auto: "Transporte/Auto", ins: "Seguros Personales",
+            cloth: "Ropa", med: "Médicos/Dentistas", debt: "Pago de Deudas", fun: "Citas y Salidas",
+            save: "Ahorros (Emergencia)", misc: "Misceláneas", kids: "Escuela/Guardería", edu: "Ahorro Universitario",
+            title: "Administración del Hogar", subtitle: 'Planificación basada en "Unidos en la Imagen de Dios"',
+            iba: "Ingresos Brutos Anuales", ibm: "Ingreso Mensual (IBA/12)",
+            h_cat: "Categoría & Rango", h_sug: "Sugerido", h_act: "Tu Plan",
+            sec1: "1. Obligaciones Prioritarias (Primeros Frutos)", sec2: "2. Gastos de Vida & Familia",
+            sugInd: "Ingreso Neto Disp. (Sugerido)", bal: "Tu Balance Final", avg: "Prom",
+            ph_amt: "Monto", btnUpd: "Actualizar"
+        },
+        en: {
+            tithe: "Tithe", pretax: "Pre-tax Savings", tax: "Taxes",
+            housing: "Housing", food: "Food", auto: "Transport", ins: "Personal Insurance",
+            cloth: "Clothing", med: "Medical/Dental", debt: "Debt Repayment", fun: "Dates & Outings",
+            save: "Savings (Emergency)", misc: "Miscellaneous", kids: "School/Daycare", edu: "College Savings",
+            title: "Household Stewardship", subtitle: 'Planning based on "United in the Image of God"',
+            iba: "Annual Gross Income", ibm: "Monthly Income (AGI/12)",
+            h_cat: "Category & Range", h_sug: "Suggested", h_act: "Your Plan",
+            sec1: "1. Priority Obligations (First Fruits)", sec2: "2. Living & Family Expenses",
+            sugInd: "Suggested NDI", bal: "Your Final Balance", avg: "Avg",
+            ph_amt: "Amount", btnUpd: "Update"
+        }
+    };
+
+    let lang = 'es';
+    let lockMode = 'percent'; 
+
+    function init() {
+        const mustDiv = document.getElementById('list-must');
+        const expDiv = document.getElementById('list-exp');
         
-        const translations = {
-            'es': {
-                htmlTitle: 'Calculadora de Presupuesto Familiar',
-                header: 'Administración del Presupuesto Familiar',
-                headerSubtitle: 'Planifica, ajusta y administra tus Ingresos Netos Disponibles (IND).',
-                section1Title: '1. Ingresos Netos Disponibles (IND)',
-                incomeLabel: 'Monto de Ingreso Neto:',
-                frequencyLabel: 'Frecuencia:',
-                frequencyMonthly: 'Mensual',
-                frequencyWeekly: 'Semanal',
-                frequencyAnnually: 'Anual',
-                monthlyIncomeDisplay: (ind) => `Tu IND Mensual es: ${ind}`,
-                section2Title: '2. Distribución del Presupuesto',
-                tableHeaderCategory: 'Categoría',
-                tableHeaderSuggested: 'Sugerido (%)',
-                tableHeaderActual: 'Actual (%)',
-                tableHeaderAmount: 'Monto ($)',
-                totalAssigned: 'TOTAL ASIGNADO',
-                remainingBalance: 'BALANCE RESTANTE (IND - GASTOS)',
-                section3Title: '3. Vista General de la Distribución',
-                alertMessage: '¡Advertencia! El total de sus gastos excede el 100% de sus Ingresos Netos Disponibles (IND). Por favor, ajuste las categorías.',
-                category: (cat) => cat.name_es,
-            },
-            'en': {
-                htmlTitle: 'Family Budget Calculator',
-                header: 'Family Budget Administration',
-                headerSubtitle: 'Plan, adjust, and manage your Net Disposable Income (NDI).',
-                section1Title: '1. Net Disposable Income (NDI)',
-                incomeLabel: 'Net Income Amount:',
-                frequencyLabel: 'Frequency:',
-                frequencyMonthly: 'Monthly',
-                frequencyWeekly: 'Weekly',
-                frequencyAnnually: 'Annually',
-                monthlyIncomeDisplay: (ind) => `Your Monthly NDI is: ${ind}`,
-                section2Title: '2. Budget Distribution',
-                tableHeaderCategory: 'Category',
-                tableHeaderSuggested: 'Suggested (%)',
-                tableHeaderActual: 'Actual (%)',
-                tableHeaderAmount: 'Amount ($)',
-                totalAssigned: 'TOTAL ASSIGNED',
-                remainingBalance: 'REMAINING BALANCE (NDI - EXPENSES)',
-                section3Title: '3. Distribution Overview',
-                alertMessage: 'Warning! Your total expenses exceed 100% of your Net Disposable Income (NDI). Please adjust the categories.',
-                category: (cat) => cat.name_en,
+        if (!mustDiv || !expDiv) return;
+
+        mustDiv.innerHTML = ''; 
+        expDiv.innerHTML = '';
+
+        schema.forEach(item => {
+            const avg = (item.min + item.max) / 2;
+            const row = document.createElement('div');
+            row.className = 'row';
+            
+            let rangeDisplay = item.min + '%';
+            if (item.min !== item.max) {
+                 rangeDisplay = `${item.min}-${item.max}% <span class="label-avg" id="avg-${item.id}">(Prom: ${avg}%)</span>`;
             }
-        };
 
-        // --- DOM REFERENCES ---
-        const htmlTitle = document.getElementById('html-title');
-        const incomeAmountInput = document.getElementById('income-amount');
-        const incomeFrequencySelect = document.getElementById('income-frequency');
-        const monthlyIncomeDisplay = document.getElementById('monthly-income-display');
-        const budgetTableBody = document.getElementById('budget-table-body');
-        const totalPercentElement = document.getElementById('total-percent');
-        const totalAmountElement = document.getElementById('total-amount');
-        const totalAssignedRow = document.getElementById('total-assigned-row');
-        const remainingBalanceElement = document.getElementById('remaining-balance');
-        const remainingBalanceRow = document.getElementById('remaining-balance-row');
-        const chartContainer = document.getElementById('chart-container');
-        const alertMessage = document.getElementById('alert-message');
-        const esButton = document.getElementById('lang-es');
-        const enButton = document.getElementById('lang-en');
+            row.innerHTML = `
+                <div class="col-label">
+                    <div class="label-main">
+                        <span>${item.icon}</span>
+                        <span id="txt-${item.id}">...</span>
+                    </div>
+                    <div class="label-sub">
+                        ${rangeDisplay}
+                    </div>
+                </div>
+                <div class="col-sug">
+                    <span id="sug-${item.id}">$0</span>
+                </div>
+                <div class="col-user">
+                    <input type="number" class="inp-money" id="val-${item.id}" placeholder="0.00" onchange="userChangedVal('${item.id}')">
+                    <input type="number" class="inp-perc" id="perc-${item.id}" placeholder="%" onchange="userChangedPerc('${item.id}')">
+                </div>
+            `;
+            (item.type === 'must' ? mustDiv : expDiv).appendChild(row);
+        });
+        
+        updateText();
+        calculateAll();
+    }
 
-        // --- STATE ---
-        let monthlyIND = 0; // Ingresos Netos Disponibles Mensuales
-        let currentLang = 'es';
+    function toggleMode() {
+        lockMode = lockMode === 'percent' ? 'value' : 'percent';
+        const toggle = document.getElementById('adj-toggle');
+        toggle.setAttribute('data-mode', lockMode);
+    }
 
-        // --- UTILITIES ---
-        const formatter = new Intl.NumberFormat('es-US', {
-            style: 'currency',
-            currency: 'USD',
+    function applyIncomeChange() {
+        const ibaInput = document.getElementById('iba');
+        const iba = parseFloat(ibaInput.value) || 0;
+        const ibm = iba / 12;
+
+        schema.forEach(item => {
+            const valInput = document.getElementById(`val-${item.id}`);
+            const percInput = document.getElementById(`perc-${item.id}`);
+            
+            if (!valInput || !percInput) return;
+
+            if (lockMode === 'percent') {
+                const currentPerc = parseFloat(percInput.value) || 0;
+                const newVal = (currentPerc / 100) * ibm;
+                if (currentPerc > 0) {
+                    valInput.value = newVal.toFixed(2);
+                }
+            } else {
+                const currentVal = parseFloat(valInput.value) || 0;
+                if (ibm > 0 && currentVal > 0) {
+                    const newPerc = (currentVal / ibm) * 100;
+                    percInput.value = newPerc.toFixed(2);
+                }
+            }
+        });
+        calculateAll();
+    }
+
+    function userChangedVal(id) {
+        const iba = parseFloat(document.getElementById('iba').value) || 0;
+        const val = parseFloat(document.getElementById(`val-${id}`).value) || 0;
+        if(iba > 0) {
+            document.getElementById(`perc-${id}`).value = ((val / (iba/12)) * 100).toFixed(2);
+        }
+        calculateAll();
+    }
+
+    function userChangedPerc(id) {
+        const iba = parseFloat(document.getElementById('iba').value) || 0;
+        const perc = parseFloat(document.getElementById(`perc-${id}`).value) || 0;
+        document.getElementById(`val-${id}`).value = ((perc / 100) * (iba/12)).toFixed(2);
+        calculateAll();
+    }
+
+    function calculateAll() {
+        const iba = parseFloat(document.getElementById('iba').value) || 0;
+        const ibm = iba / 12;
+        
+        const ibmDisplay = document.getElementById('ibm-val');
+        if(ibmDisplay) ibmDisplay.innerText = ibm.toLocaleString('en-US', {style:'currency', currency:'USD'});
+
+        let sugInd = ibm;
+        let userInd = ibm;
+        let userExp = 0;
+        let userTotalSpent = 0;
+
+        schema.forEach(item => {
+            const avg = (item.min + item.max) / 2;
+            const sugAmount = (avg / 100) * ibm;
+            const sugEl = document.getElementById(`sug-${item.id}`);
+            if(sugEl) sugEl.innerText = sugAmount.toLocaleString('en-US', {style:'currency', currency:'USD', maximumFractionDigits:0});
+
+            const inputEl = document.getElementById(`val-${item.id}`);
+            const userAmount = inputEl ? (parseFloat(inputEl.value) || 0) : 0;
+            
+            userTotalSpent += userAmount;
+
+            if (item.type === 'must') {
+                sugInd -= sugAmount;
+                userInd -= userAmount;
+            } else {
+                userExp += userAmount;
+            }
         });
 
-        // --- CORE LOGIC ---
-
-        function calculateMonthlyIND() {
-            const amount = parseFloat(incomeAmountInput.value) || 0;
-            const frequency = incomeFrequencySelect.value;
-            let annualIncome = 0;
-
-            // 1. Convert to Annual Income
-            switch (frequency) {
-                case 'weekly':
-                    annualIncome = amount * 52; 
-                    break;
-                case 'monthly':
-                    annualIncome = amount * 12;
-                    break;
-                case 'annually':
-                    annualIncome = amount;
-                    break;
-            }
-
-            // 2. Convert to Monthly Net Income (IND)
-            return annualIncome / 12;
-        }
-
-        function calculateBudgetBreakdown() {
-            monthlyIND = calculateMonthlyIND();
-            let totalAmountAssigned = 0;
-            let totalPercentAssigned = 0;
-
-            budgetCategories.forEach(category => {
-                // When income changes, recalculate amounts based on existing percentages
-                category.amount = (monthlyIND * category.percent) / 100;
-                
-                totalAmountAssigned += category.amount;
-                totalPercentAssigned += category.percent;
-            });
-
-            // Update state and UI
-            updateUI(totalAmountAssigned, totalPercentAssigned);
-        }
-
-        function handleCategoryUpdate(id, source, value) {
-            
-            const category = budgetCategories.find(c => c.id === id);
-            const newValue = parseFloat(value) || 0;
-            
-            if (!category || monthlyIND === 0) return;
-
-            if (source === 'percent') {
-                category.percent = Math.max(0, newValue);
-                category.amount = (monthlyIND * category.percent) / 100;
-            } else if (source === 'amount') {
-                category.amount = Math.max(0, newValue);
-                category.percent = (monthlyIND > 0) ? (category.amount / monthlyIND) * 100 : 0;
-            }
-
-            // Recalculate all totals
-            let totalAssigned = 0;
-            let totalPercentAssigned = 0;
-
-            budgetCategories.forEach(c => {
-                totalAssigned += c.amount;
-                totalPercentAssigned += c.percent;
-            });
-
-            // Re-render UI
-            updateUI(totalAssigned, totalPercentAssigned);
-            renderBudgetTable();
-        }
-
-        function updateUI(totalAmountAssigned, totalPercentAssigned) {
-            const remainingBalance = monthlyIND - totalAmountAssigned;
-            const overBudget = totalPercentAssigned > 100.001; 
-            const t = translations[currentLang];
-
-            // 1. Update Monthly IND Display
-            monthlyIncomeDisplay.textContent = t.monthlyIncomeDisplay(formatter.format(monthlyIND));
-
-            // 2. Update Totals
-            totalPercentElement.textContent = `${totalPercentAssigned.toFixed(2)}%`;
-            totalAmountElement.textContent = formatter.format(totalAmountAssigned);
-
-            // Conditional styling for TOTAL ROW
-            if (overBudget) {
-                totalAssignedRow.classList.add('bg-red-200', 'text-red-800');
-                totalAssignedRow.classList.remove('bg-gray-100', 'text-gray-800');
-                alertMessage.classList.remove('hidden'); 
-            } else {
-                totalAssignedRow.classList.remove('bg-red-200', 'text-red-800');
-                totalAssignedRow.classList.add('bg-gray-100', 'text-gray-800');
-                alertMessage.classList.add('hidden');
-            }
-
-
-            // 3. Update Remaining Balance (Conditional Styling)
-            remainingBalanceElement.textContent = formatter.format(remainingBalance);
-            
-            if (remainingBalance < -0.01) { 
-                remainingBalanceElement.classList.remove('text-blue-800');
-                remainingBalanceElement.classList.add('text-red-600');
-                remainingBalanceRow.classList.remove('bg-blue-100');
-                remainingBalanceRow.classList.add('bg-red-50');
-            } else { 
-                remainingBalanceElement.classList.remove('text-red-600');
-                remainingBalanceElement.classList.add('text-blue-800'); 
-                remainingBalanceRow.classList.remove('bg-red-50');
-                remainingBalanceRow.classList.add('bg-blue-100');
-            }
-
-            // 4. Update Chart
-            renderChart();
-        }
-
-        function renderBudgetTable() {
-            budgetTableBody.innerHTML = ''; // Clear table
-            const t = translations[currentLang];
-            
-            budgetCategories.forEach(category => {
-                const row = document.createElement('tr');
-                row.classList.add('budget-category-row');
-                
-                const displayPercent = isNaN(category.percent) ? 0.00 : category.percent;
-                const displayAmount = isNaN(category.amount) ? 0.00 : category.amount;
-                
-                // Get the translated category name
-                const categoryName = t.category(category);
-
-                row.innerHTML = `
-                    <td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                        <span class="inline-block w-3 h-3 rounded-full ${category.color} mr-2 align-middle"></span>
-                        ${categoryName}
-                    </td>
-                    <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500 text-center">${category.defaultPercent}%</td>
-                    <td class="px-3 py-3 whitespace-nowrap text-sm">
-                        <input type="number" id="${category.id}-percent" value="${displayPercent.toFixed(2)}" min="0" max="1000" step="0.01"
-                               class="input-style text-center w-full max-w-[80px] mx-auto"
-                               data-category-id="${category.id}" data-type="percent">
-                    </td>
-                    <td class="px-3 py-3 whitespace-nowrap text-sm">
-                        <div class="relative flex items-center">
-                             <span class="absolute left-2 text-gray-500 text-xs">$</span>
-                             <input type="number" id="${category.id}-amount" value="${displayAmount.toFixed(2)}" min="0" step="0.01"
-                                class="input-style pl-5"
-                                data-category-id="${category.id}" data-type="amount">
-                        </div>
-                    </td>
-                `;
-                budgetTableBody.appendChild(row);
-            });
-
-            // Attach listeners to new inputs
-            document.querySelectorAll('#budget-table-body input').forEach(input => {
-                input.addEventListener('change', (e) => {
-                    const id = e.target.dataset.categoryId;
-                    const type = e.target.dataset.type;
-                    handleCategoryUpdate(id, type, e.target.value);
-                });
-            });
-        }
-
-        function renderChart() {
-            chartContainer.innerHTML = ''; // Clear chart
-            const t = translations[currentLang];
-            
-            let currentTotalPercent = 0;
-            budgetCategories.forEach(category => {
-                currentTotalPercent += category.percent;
-            });
-
-            const proportionalBase = Math.max(currentTotalPercent, 100);
-
-            // Render categories
-            budgetCategories.forEach(category => {
-                if (category.percent > 0) {
-                    const widthPercent = (category.percent / proportionalBase) * 100;
-                    
-                    const segment = document.createElement('div');
-                    segment.style.width = `${widthPercent.toFixed(2)}%`;
-                    segment.classList.add(category.color, 'h-full', 'transition-all', 'duration-300');
-                    
-                    const categoryName = t.category(category);
-                    segment.title = `${categoryName}: ${category.percent.toFixed(2)}% (${formatter.format(category.amount)})`;
-                    chartContainer.appendChild(segment);
-                }
-            });
-
-            // Add remaining balance segment (ONLY if the total assigned is < 100%)
-            const remainingPercent = 100 - currentTotalPercent;
-            if (remainingPercent > 0) {
-                 const remainingSegment = document.createElement('div');
-                 remainingSegment.style.width = `${remainingPercent.toFixed(2)}%`;
-                 remainingSegment.classList.add('bg-gray-300', 'h-full', 'transition-all', 'duration-300');
-                 
-                 const remainingBalanceText = t.remainingBalance.split('(')[0].trim();
-                 remainingSegment.title = `${remainingBalanceText}: ${remainingPercent.toFixed(2)}%`;
-
-                 chartContainer.appendChild(remainingSegment);
-                 
-            }
-        }
+        const resSugInd = document.getElementById('res-sug-ind');
+        if(resSugInd) resSugInd.innerText = sugInd.toLocaleString('en-US', {style:'currency', currency:'USD'});
         
-        // --- LANGUAGE LOGIC ---
-        function setLanguage(lang) {
-            currentLang = lang;
-            document.documentElement.lang = lang;
-            const t = translations[lang];
-
-            // 1. Update general elements
-            htmlTitle.textContent = t.htmlTitle;
-            document.getElementById('header-title').textContent = t.header;
-            document.getElementById('header-subtitle').textContent = t.headerSubtitle;
-            document.getElementById('section-1-title').textContent = t.section1Title;
-            document.getElementById('income-label').textContent = t.incomeLabel;
-            document.getElementById('frequency-label').textContent = t.frequencyLabel;
-            document.getElementById('section-2-title').textContent = t.section2Title;
-            document.getElementById('th-category').textContent = t.tableHeaderCategory;
-            document.getElementById('th-suggested').textContent = t.tableHeaderSuggested;
-            document.getElementById('th-actual').textContent = t.tableHeaderActual;
-            document.getElementById('th-amount').textContent = t.tableHeaderAmount;
-            document.getElementById('td-total-assigned').textContent = t.totalAssigned;
-            document.getElementById('td-remaining-balance').textContent = t.remainingBalance;
-            document.getElementById('section-3-title').textContent = t.section3Title;
-            document.getElementById('alert-message').textContent = t.alertMessage;
-
-            // 2. Update frequency options
-            incomeFrequencySelect.innerHTML = `
-                <option value="monthly">${t.frequencyMonthly}</option>
-                <option value="weekly">${t.frequencyWeekly}</option>
-                <option value="annually">${t.frequencyAnnually}</option>
-            `;
-            // Re-select the previous value after updating options
-            incomeFrequencySelect.value = incomeFrequencySelect.dataset.current || 'monthly';
-
-            // 3. Update table rows (requires re-rendering)
-            renderBudgetTable();
-            // Re-calculate and update totals/messages
-            calculateBudgetBreakdown();
-
-            // 4. Update button styles
-            esButton.classList.remove('bg-blue-600', 'text-white');
-            enButton.classList.remove('bg-blue-600', 'text-white');
-            esButton.classList.add('text-gray-700', 'hover:bg-gray-300');
-            enButton.classList.add('text-gray-700', 'hover:bg-gray-300');
-
-            if (lang === 'es') {
-                esButton.classList.add('bg-blue-600', 'text-white');
-                esButton.classList.remove('text-gray-700', 'hover:bg-gray-300');
+        const finalBalance = userInd - userExp;
+        const balEl = document.getElementById('res-balance');
+        if(balEl) {
+            balEl.innerText = finalBalance.toLocaleString('en-US', {style:'currency', currency:'USD'});
+            if(finalBalance >= 0) {
+                balEl.className = "res-value positive";
+                balEl.innerText = "+" + balEl.innerText.replace('+', '').replace('-', '');
             } else {
-                enButton.classList.add('bg-blue-600', 'text-white');
-                enButton.classList.remove('text-gray-700', 'hover:bg-gray-300');
+                balEl.className = "res-value negative";
             }
-
-            // Save preference
-            localStorage.setItem('budgetLanguagePreference', lang);
         }
 
-        // --- INITIALIZATION AND EVENT LISTENERS ---
-        function init() {
-            // Load language preference
-            const storedLang = localStorage.getItem('budgetLanguagePreference') || 'es';
-            setLanguage(storedLang);
+        const percentSpent = ibm > 0 ? (userTotalSpent / ibm) * 100 : 0;
+        const bar = document.getElementById('progress-bar');
+        if(bar) {
+            bar.style.width = Math.min(percentSpent, 100) + "%";
+            if (percentSpent > 100) {
+                bar.style.backgroundColor = "#EF5350"; 
+            } else if (percentSpent > 90) {
+                bar.style.backgroundColor = "#FFA726"; 
+            } else {
+                bar.style.backgroundColor = "#66BB6A"; 
+            }
+        }
+    }
 
-            // Store current frequency selection
-            incomeFrequencySelect.dataset.current = incomeFrequencySelect.value;
+    function toggleLang() {
+        lang = lang === 'es' ? 'en' : 'es';
+        updateText();
+        calculateAll();
+    }
+
+    function updateText() {
+        const t = text[lang];
+        document.getElementById('t-title').innerText = t.title;
+        document.getElementById('t-subtitle').innerText = t.subtitle;
+        document.getElementById('lbl-iba').innerText = t.iba;
+        document.getElementById('lbl-ibm').innerText = t.ibm;
+        document.getElementById('h-cat').innerText = t.h_cat;
+        document.getElementById('h-sug').innerText = t.h_sug;
+        document.getElementById('h-act').innerText = t.h_act;
+        document.getElementById('t-sec1').innerText = t.sec1;
+        document.getElementById('t-sec2').innerText = t.sec2;
+        document.getElementById('t-sug-ind').innerText = t.sugInd;
+        document.getElementById('t-balance').innerText = t.bal;
+        document.getElementById('btn-lang').innerText = lang === 'es' ? 'English' : 'Español';
+        document.getElementById('btn-update-txt').innerText = t.btnUpd;
+
+        schema.forEach(item => {
+            const txtEl = document.getElementById(`txt-${item.id}`);
+            if(txtEl) txtEl.innerText = t[item.id];
             
-            // Apply default percentages to the initial state
-            calculateBudgetBreakdown();
-            renderBudgetTable();
+            const valEl = document.getElementById(`val-${item.id}`);
+            if(valEl) valEl.placeholder = t.ph_amt;
 
-            // Event listeners for Income inputs
-            incomeAmountInput.addEventListener('input', () => {
-                // Recalculate based on default percentages when income changes
-                budgetCategories.forEach(c => c.percent = c.defaultPercent);
-                calculateBudgetBreakdown();
-                renderBudgetTable();
-            });
+            if(item.min !== item.max) {
+                 const avgEl = document.getElementById(`avg-${item.id}`);
+                 const avg = (item.min + item.max) / 2;
+                 if(avgEl) avgEl.innerText = `(${t.avg}: ${avg}%)`;
+            }
+        });
+    }
 
-            incomeFrequencySelect.addEventListener('change', (e) => {
-                incomeFrequencySelect.dataset.current = e.target.value;
-                // Recalculate based on default percentages when frequency changes
-                budgetCategories.forEach(c => c.percent = c.defaultPercent);
-                calculateBudgetBreakdown();
-                renderBudgetTable();
-            });
-
-            // Event listeners for language switch
-            esButton.addEventListener('click', () => setLanguage('es'));
-            enButton.addEventListener('click', () => setLanguage('en'));
-        }
-
-        // Run initialization on page load
-        window.onload = init;
-    </script>
+    window.onload = init;
+</script>
 </body>
 </html>

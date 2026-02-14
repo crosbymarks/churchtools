@@ -25,6 +25,7 @@
             margin: 0;
             padding: 20px;
             line-height: 1.5;
+            padding-bottom: 80px; /* Space for floating bar */
         }
 
         .container {
@@ -40,19 +41,29 @@
         header {
             background: linear-gradient(135deg, #5D4037 0%, #3E2723 100%);
             color: white;
-            padding: 25px 30px;
+            padding: 20px 30px;
         }
 
         .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         h1 { margin: 0; font-weight: 300; font-size: 1.8rem; letter-spacing: 0.5px; }
         .subtitle { opacity: 0.8; font-size: 0.9rem; margin-top: 5px; font-style: italic; }
 
-        .controls { display: flex; gap: 15px; align-items: center; }
+        .controls { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+
+        .chk-label {
+            display: flex; align-items: center; gap: 6px; font-size: 0.85rem; cursor: pointer;
+            background: rgba(0,0,0,0.2); padding: 6px 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2);
+            transition: background 0.2s;
+        }
+        .chk-label:hover { background: rgba(0,0,0,0.4); }
+        .chk-label input { cursor: pointer; }
 
         .btn-action {
             background: rgba(255,255,255,0.2);
@@ -81,83 +92,41 @@
         .income-left { display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap; }
 
         .input-group label {
-            display: block;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-light);
-            margin-bottom: 8px;
-            font-weight: bold;
+            display: block; font-size: 0.75rem; text-transform: uppercase;
+            letter-spacing: 1px; color: var(--text-light); margin-bottom: 8px; font-weight: bold;
         }
 
         .input-group input {
-            font-size: 1.6rem;
-            padding: 8px 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            width: 180px;
-            text-align: center;
-            color: var(--primary);
-            font-weight: bold;
-            transition: border-color 0.2s;
+            font-size: 1.6rem; padding: 8px 15px; border: 2px solid #ddd;
+            border-radius: 8px; width: 150px; text-align: center;
+            color: var(--primary); font-weight: bold; transition: border-color 0.2s;
         }
         .input-group input:focus { outline: none; border-color: var(--accent); }
 
         /* Update Button */
         .btn-update {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 0 20px;
-            height: 50px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.1s, background 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            background-color: var(--primary); color: white; border: none; padding: 0 15px;
+            height: 50px; border-radius: 8px; font-weight: bold; font-size: 0.95rem;
+            cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.1s, background 0.2s; display: flex; align-items: center; gap: 8px;
         }
         .btn-update:hover { background-color: #4e342e; transform: translateY(-2px); }
         .btn-update:active { transform: translateY(0); }
 
         /* Lock Toggle */
-        .lock-wrapper {
-            background: white;
-            padding: 5px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-        }
+        .lock-wrapper { background: white; padding: 5px; border-radius: 8px; border: 1px solid #ddd; }
         .toggle-switch {
-            display: flex;
-            background: var(--toggle-inactive);
-            border-radius: 6px;
-            position: relative;
-            cursor: pointer;
-            width: 140px;
-            height: 36px;
+            display: flex; background: var(--toggle-inactive); border-radius: 6px;
+            position: relative; cursor: pointer; width: 140px; height: 36px;
         }
         .toggle-option {
-            flex: 1;
-            text-align: center;
-            line-height: 36px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            z-index: 2;
-            color: #757575;
-            transition: color 0.3s;
+            flex: 1; text-align: center; line-height: 36px; font-size: 0.8rem;
+            font-weight: 700; z-index: 2; color: #757575; transition: color 0.3s;
         }
         .toggle-slider {
-            position: absolute;
-            top: 2px; bottom: 2px; left: 2px;
-            width: calc(50% - 2px);
-            background: white;
-            border-radius: 4px;
-            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-            z-index: 1;
+            position: absolute; top: 2px; bottom: 2px; left: 2px; width: calc(50% - 2px);
+            background: white; border-radius: 4px; transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15); z-index: 1;
         }
         .toggle-switch[data-mode="percent"] .toggle-slider { transform: translateX(0); }
         .toggle-switch[data-mode="percent"] .opt-perc { color: var(--primary); }
@@ -171,67 +140,32 @@
         .budget-grid { padding: 20px; }
 
         .section-title {
-            color: var(--primary);
-            border-bottom: 2px solid var(--primary-light);
-            padding-bottom: 5px;
-            margin: 30px 0 15px 0;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            color: var(--primary); border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 5px; margin: 30px 0 15px 0; font-weight: 600; display: flex; align-items: center; gap: 10px;
         }
         .section-title svg { width: 20px; height: 20px; fill: var(--primary); }
 
-        .row {
-            display: grid;
-            grid-template-columns: 2fr 1.5fr 2fr;
-            gap: 15px;
-            align-items: center;
-            padding: 12px 10px;
-            border-bottom: 1px solid #eee;
-        }
+        .row { display: grid; grid-template-columns: 2fr 1.5fr 2fr; gap: 15px; align-items: center; padding: 12px 10px; border-bottom: 1px solid #eee; }
         .row:hover { background: #fafafa; }
-        .row.header-row {
-            font-weight: bold;
-            color: var(--text-light);
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            border-bottom: 2px solid #ddd;
-            background: white !important;
-        }
+        .row.header-row { font-weight: bold; color: var(--text-light); font-size: 0.85rem; text-transform: uppercase; border-bottom: 2px solid #ddd; background: white !important; }
 
         .col-label { display: flex; flex-direction: column; }
         .label-main { font-weight: 500; display: flex; align-items: center; gap: 8px; }
         .label-sub { font-size: 0.8rem; color: var(--text-light); }
         .label-avg { color: var(--accent); font-weight: 600; }
 
-        .col-sug {
-            background: #F1F8E9;
-            border-radius: 6px;
-            padding: 8px;
-            text-align: center;
-            color: #33691E;
-            font-weight: 500;
-            border: 1px solid #DCEDC8;
-        }
+        .col-sug { background: #F1F8E9; border-radius: 6px; padding: 8px; text-align: center; color: #33691E; font-weight: 500; border: 1px solid #DCEDC8; }
 
         .col-user { display: flex; justify-content: flex-end; gap: 10px; }
-        .inp-money { width: 110px; text-align: right; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; }
+        .inp-money { width: 100px; text-align: right; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; }
         .inp-perc { width: 55px; text-align: center; padding: 6px; border: 1px solid #ccc; border-radius: 4px; background: #f9f9f9; font-size: 0.9rem; }
         
         /* Highlight active input based on mode */
         .toggle-switch[data-mode="percent"] ~ .budget-grid .inp-perc { border-color: var(--accent); background: #fff; font-weight: bold; }
         .toggle-switch[data-mode="value"] ~ .budget-grid .inp-money { border-color: var(--accent); background: #fff; font-weight: bold; }
 
-        /* --- Results --- */
-        .results-bar {
-            background: #263238;
-            color: white;
-            padding: 20px 40px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
+        /* --- Results Panel --- */
+        .results-bar { background: #263238; color: white; padding: 20px 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         .result-item { text-align: center; }
         .res-label { font-size: 0.8rem; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
         .res-value { font-size: 2rem; font-weight: 300; }
@@ -241,140 +175,99 @@
         .progress-container { background: #37474F; height: 8px; width: 100%; margin-top: 10px; border-radius: 4px; overflow: hidden; grid-column: span 2; }
         .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.5s ease; }
 
+        /* --- Floating Balance --- */
+        .floating-balance {
+            position: fixed; bottom: 20px; right: 20px; background: #263238; color: white;
+            padding: 12px 24px; border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 1000; font-size: 1.1rem; font-weight: bold; display: flex; gap: 10px;
+            align-items: center; transition: border-color 0.3s; border: 2px solid transparent;
+        }
+        .floating-balance.positive { border-color: #81C784; }
+        .floating-balance.negative { border-color: #E57373; }
+        .float-val { font-size: 1.3rem; }
+        .float-val.positive { color: #81C784; }
+        .float-val.negative { color: #E57373; }
 
-        /* ----------------------------------------------------
-           PRINT STYLES - Condensed Single Page
-           ---------------------------------------------------- */
+        /* --- Orientation Overlay --- */
+        #landscape-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(38, 50, 56, 0.95);
+            color: white; z-index: 9999; flex-direction: column; justify-content: center;
+            align-items: center; text-align: center; padding: 30px; box-sizing: border-box;
+            backdrop-filter: blur(5px);
+        }
+        .overlay-icon { font-size: 4rem; margin-bottom: 20px; animation: rotatePhone 2s infinite ease-in-out; }
+        .overlay-btn { margin-top: 30px; padding: 12px 24px; background: var(--accent); color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; }
+        
+        @keyframes rotatePhone {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(-90deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        /* Show overlay ONLY on portrait mobile devices */
+        @media screen and (max-width: 768px) and (orientation: portrait) {
+            #landscape-overlay { display: flex; }
+        }
+
+        /* Responsive Tweaks */
+        @media screen and (max-width: 768px) {
+            .row { grid-template-columns: 1fr; gap: 10px; padding: 15px 10px; }
+            .col-sug { text-align: left; padding: 5px; background: none; border: none; color: #555; font-size: 0.9rem; }
+            .col-sug::before { content: "Sugerido: "; font-weight: bold; }
+            .col-user { justify-content: flex-start; }
+            .floating-balance { bottom: 10px; left: 10px; right: 10px; justify-content: space-between; border-radius: 12px; }
+        }
+
+        /* --- Print Styles --- */
         @media print {
             @page { margin: 0.5cm; size: portrait; }
+            body { background: white; padding: 0; -webkit-print-color-adjust: exact; font-size: 10pt; }
+            .container { box-shadow: none; max-width: 100%; width: 100%; margin: 0; border-radius: 0; }
             
-            body { 
-                background: white; 
-                padding: 0; 
-                -webkit-print-color-adjust: exact; 
-                font-size: 10pt;
-            }
+            /* Hide non-printable elements */
+            .controls, .btn-update, .lock-wrapper, .progress-container, .floating-balance, #landscape-overlay { display: none !important; }
 
-            .container { 
-                box-shadow: none; 
-                max-width: 100%; 
-                width: 100%; 
-                margin: 0; 
-                border-radius: 0;
-            }
-
-            /* Hide Controls/Buttons */
-            .controls, .btn-update, .lock-wrapper, .progress-container { 
-                display: none !important; 
-            }
-
-            /* Compact Header */
-            header { 
-                padding: 10px 0; 
-                border-bottom: 2px solid #000; 
-                background: none !important; 
-                color: #000 !important; 
-                margin-bottom: 10px;
-            }
+            header { padding: 10px 0; border-bottom: 2px solid #000; background: none !important; color: #000 !important; margin-bottom: 10px; }
             .header-top { justify-content: center; text-align: center; }
             h1 { font-size: 1.4rem; color: #000; }
             .subtitle { color: #444; font-size: 0.8rem; }
 
-            /* Compact Income Panel */
-            .income-panel { 
-                background: none !important; 
-                border: 1px solid #999; 
-                padding: 5px 15px; 
-                margin-bottom: 10px; 
-                justify-content: space-around;
-                align-items: center;
-            }
-            .income-left { gap: 40px; }
+            .income-panel { background: none !important; border: 1px solid #999; padding: 5px 15px; margin-bottom: 10px; justify-content: space-around; align-items: center; }
             .input-group label { color: #000; margin-bottom: 2px; }
-            .input-group input { 
-                border: none; 
-                border-bottom: 1px solid #000; 
-                background: none; 
-                font-size: 1.2rem; 
-                color: #000; 
-                padding: 0;
-                width: 120px;
-                text-align: left;
-            }
-            .calc-val { font-size: 1.2rem; color: #000; }
-
-            /* Grid Layout - Compact Rows */
+            .input-group input { border: none; border-bottom: 1px solid #000; background: none; font-size: 1.2rem; color: #000; padding: 0; width: 120px; text-align: left; }
+            
             .budget-grid { padding: 0; }
+            .section-title { margin: 10px 0 5px 0; font-size: 0.9rem; border-bottom: 1px solid #000; color: #000; padding-bottom: 2px; }
+            .section-title svg { display: none; }
             
-            .section-title { 
-                margin: 10px 0 5px 0; 
-                font-size: 0.9rem; 
-                border-bottom: 1px solid #000; 
-                color: #000;
-                padding-bottom: 2px;
-            }
-            .section-title svg { display: none; } /* Hide icons to save space */
-            
-            .row { 
-                padding: 3px 0; /* Tight rows */
-                border-bottom: 1px solid #ccc; 
-                grid-template-columns: 2fr 1fr 1fr;
-                gap: 5px;
-                page-break-inside: avoid;
-            }
-            .row.header-row { 
-                background: #eee !important; 
-                color: #000; 
-                border-bottom: 1px solid #000; 
-                font-size: 0.7rem;
-            }
+            .row { padding: 3px 0; border-bottom: 1px solid #ccc; grid-template-columns: 2fr 1fr 1fr; gap: 5px; page-break-inside: avoid; }
+            .row.header-row { background: #eee !important; color: #000; border-bottom: 1px solid #000; font-size: 0.7rem; }
 
-            .label-main span:first-child { display: none; } /* Hide emoji icons */
-            .label-main { font-size: 0.85rem; }
-            .label-sub { font-size: 0.7rem; }
-            .label-avg { color: #333; font-weight: normal; }
-
-            .col-sug { 
-                background: none; 
-                border: none; 
-                padding: 0; 
-                color: #000; 
-                font-size: 0.85rem; 
-                text-align: right; 
-                padding-right: 20px;
-            }
-
-            .col-user { gap: 5px; }
-            .inp-money, .inp-perc {
-                border: none;
-                background: none;
-                padding: 0;
-                font-size: 0.85rem;
-                color: #000;
-                font-weight: bold;
-                height: auto;
-            }
+            .label-main span:first-child { display: none; }
+            .col-sug { background: none; border: none; padding: 0; color: #000; font-size: 0.85rem; text-align: right; padding-right: 20px; }
+            .inp-money, .inp-perc { border: none; background: none; padding: 0; font-size: 0.85rem; color: #000; font-weight: bold; height: auto; }
             .inp-money { width: 80px; text-align: right; }
             .inp-perc { width: 40px; text-align: right; font-size: 0.75rem; color: #555; }
             
-            /* Results Footer */
-            .results-bar {
-                background: none !important;
-                color: #000 !important;
-                border-top: 2px solid #000;
-                padding: 10px 0;
-                margin-top: 10px;
-                grid-template-columns: 1fr 1fr;
-            }
-            .res-label { color: #000; }
+            .results-bar { background: none !important; color: #000 !important; border-top: 2px solid #000; padding: 10px 0; margin-top: 10px; grid-template-columns: 1fr 1fr; }
             .res-value { font-size: 1.4rem; color: #000 !important; }
-
-            /* Force Scaling to fit one page */
             html { zoom: 85%; }
         }
     </style>
 </head>
 <body>
+
+<div id="landscape-overlay">
+    <div class="overlay-icon">📱</div>
+    <h2 id="t-over-title">Gire su Dispositivo</h2>
+    <p id="t-over-text">Para una mejor experiencia, por favor use esta herramienta en modo horizontal (landscape).</p>
+    <button class="overlay-btn" id="t-over-btn" onclick="document.getElementById('landscape-overlay').style.display='none'">Continuar de todos modos</button>
+</div>
+
+<div class="floating-balance" id="float-bar">
+    <span id="t-float-bal">Balance:</span>
+    <span class="float-val" id="float-val">$0.00</span>
+</div>
 
 <div class="container">
     <header>
@@ -384,6 +277,10 @@
                 <div class="subtitle" id="t-subtitle">Planificación basada en "Unidos en la Imagen de Dios"</div>
             </div>
             <div class="controls">
+                <label class="chk-label">
+                    <input type="checkbox" id="save-data-chk" onchange="handleSaveToggle()">
+                    <span id="t-save">Guardar Sesión</span>
+                </label>
                 <button class="btn-action" onclick="window.print()">🖨 Print</button>
                 <button class="btn-action" onclick="toggleLang()" id="btn-lang">EN / ES</button>
             </div>
@@ -398,7 +295,7 @@
             </div>
             
             <button class="btn-update" onclick="applyIncomeChange()">
-                <span>🔄</span> <span id="btn-update-txt">Actualizar / Update</span>
+                <span>🔄</span> <span id="btn-update-txt">Actualizar</span>
             </button>
 
             <div class="lock-wrapper">
@@ -419,7 +316,7 @@
     <div class="budget-grid">
         <div class="row header-row">
             <div id="h-cat">Categoría & Rango</div>
-            <div style="text-align:center;" id="h-sug">Sugerido</div>
+            <div style="text-align:center;" class="hide-mobile" id="h-sug">Sugerido</div>
             <div style="text-align:right; padding-right:10px;" id="h-act">Tu Plan</div>
         </div>
 
@@ -452,7 +349,10 @@
 </div>
 
 <script>
-    // --- Data Definition ---
+    const STORAGE_KEY = 'budgetPlannerStewardshipData';
+    let lang = 'es';
+    let lockMode = 'percent'; 
+
     const schema = [
         { id: 'tithe', min: 10, max: 10, type: 'must', icon: '🙏' },
         { id: 'pretax', min: 3, max: 25, type: 'must', icon: '🐷' },
@@ -482,7 +382,9 @@
             h_cat: "Categoría & Rango", h_sug: "Sugerido", h_act: "Tu Plan",
             sec1: "1. Obligaciones Prioritarias (Primeros Frutos)", sec2: "2. Gastos de Vida & Familia",
             sugInd: "Ingreso Neto Disp. (Sugerido)", bal: "Tu Balance Final", avg: "Prom",
-            ph_amt: "Monto", btnUpd: "Actualizar"
+            ph_amt: "Monto", btnUpd: "Actualizar", saveChk: "Guardar Sesión",
+            overTitle: "Gire su Dispositivo", overText: "Para una mejor experiencia, use esta herramienta en modo horizontal.", overBtn: "Continuar de todos modos",
+            floatBal: "Balance:"
         },
         en: {
             tithe: "Tithe", pretax: "Pre-tax Savings", tax: "Taxes",
@@ -494,21 +396,18 @@
             h_cat: "Category & Range", h_sug: "Suggested", h_act: "Your Plan",
             sec1: "1. Priority Obligations (First Fruits)", sec2: "2. Living & Family Expenses",
             sugInd: "Suggested NDI", bal: "Your Final Balance", avg: "Avg",
-            ph_amt: "Amount", btnUpd: "Update"
+            ph_amt: "Amount", btnUpd: "Update", saveChk: "Save Session",
+            overTitle: "Rotate Device", overText: "For the best experience, please use this tool in landscape mode.", overBtn: "Continue Anyway",
+            floatBal: "Balance:"
         }
     };
-
-    let lang = 'es';
-    let lockMode = 'percent'; 
 
     function init() {
         const mustDiv = document.getElementById('list-must');
         const expDiv = document.getElementById('list-exp');
-        
         if (!mustDiv || !expDiv) return;
 
-        mustDiv.innerHTML = ''; 
-        expDiv.innerHTML = '';
+        mustDiv.innerHTML = ''; expDiv.innerHTML = '';
 
         schema.forEach(item => {
             const avg = (item.min + item.max) / 2;
@@ -523,16 +422,11 @@
             row.innerHTML = `
                 <div class="col-label">
                     <div class="label-main">
-                        <span>${item.icon}</span>
-                        <span id="txt-${item.id}">...</span>
+                        <span>${item.icon}</span><span id="txt-${item.id}">...</span>
                     </div>
-                    <div class="label-sub">
-                        ${rangeDisplay}
-                    </div>
+                    <div class="label-sub">${rangeDisplay}</div>
                 </div>
-                <div class="col-sug">
-                    <span id="sug-${item.id}">$0</span>
-                </div>
+                <div class="col-sug"><span id="sug-${item.id}">$0</span></div>
                 <div class="col-user">
                     <input type="number" class="inp-money" id="val-${item.id}" placeholder="0.00" onchange="userChangedVal('${item.id}')">
                     <input type="number" class="inp-perc" id="perc-${item.id}" placeholder="%" onchange="userChangedPerc('${item.id}')">
@@ -541,14 +435,76 @@
             (item.type === 'must' ? mustDiv : expDiv).appendChild(row);
         });
         
+        loadFromLocal();
         updateText();
         calculateAll();
     }
 
+    // --- Local Storage Functions ---
+    function handleSaveToggle() {
+        if(document.getElementById('save-data-chk').checked) {
+            saveToLocal();
+        } else {
+            localStorage.removeItem(STORAGE_KEY);
+        }
+    }
+
+    function saveToLocal() {
+        if(!document.getElementById('save-data-chk').checked) return;
+        
+        const data = {
+            iba: document.getElementById('iba').value,
+            lockMode: lockMode,
+            lang: lang,
+            inputs: {}
+        };
+
+        schema.forEach(item => {
+            const valEl = document.getElementById(`val-${item.id}`);
+            const percEl = document.getElementById(`perc-${item.id}`);
+            if(valEl && percEl) {
+                data.inputs[item.id] = { val: valEl.value, perc: percEl.value };
+            }
+        });
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function loadFromLocal() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if(saved) {
+            try {
+                const data = JSON.parse(saved);
+                document.getElementById('save-data-chk').checked = true;
+                
+                if(data.lang) lang = data.lang;
+                if(data.iba) document.getElementById('iba').value = data.iba;
+                if(data.lockMode) {
+                    lockMode = data.lockMode;
+                    document.getElementById('adj-toggle').setAttribute('data-mode', lockMode);
+                }
+                
+                if(data.inputs) {
+                    schema.forEach(item => {
+                        if(data.inputs[item.id]) {
+                            const valEl = document.getElementById(`val-${item.id}`);
+                            const percEl = document.getElementById(`perc-${item.id}`);
+                            if(valEl) valEl.value = data.inputs[item.id].val;
+                            if(percEl) percEl.value = data.inputs[item.id].perc;
+                        }
+                    });
+                }
+            } catch(e) {
+                console.error("Failed to load saved data.", e);
+            }
+        }
+    }
+
+    // --- Logic & Updates ---
     function toggleMode() {
         lockMode = lockMode === 'percent' ? 'value' : 'percent';
-        const toggle = document.getElementById('adj-toggle');
-        toggle.setAttribute('data-mode', lockMode);
+        document.getElementById('adj-toggle').setAttribute('data-mode', lockMode);
+        saveToLocal();
     }
 
     function applyIncomeChange() {
@@ -559,15 +515,12 @@
         schema.forEach(item => {
             const valInput = document.getElementById(`val-${item.id}`);
             const percInput = document.getElementById(`perc-${item.id}`);
-            
             if (!valInput || !percInput) return;
 
             if (lockMode === 'percent') {
                 const currentPerc = parseFloat(percInput.value) || 0;
                 const newVal = (currentPerc / 100) * ibm;
-                if (currentPerc > 0) {
-                    valInput.value = newVal.toFixed(2);
-                }
+                if (currentPerc > 0) valInput.value = newVal.toFixed(2);
             } else {
                 const currentVal = parseFloat(valInput.value) || 0;
                 if (ibm > 0 && currentVal > 0) {
@@ -582,9 +535,7 @@
     function userChangedVal(id) {
         const iba = parseFloat(document.getElementById('iba').value) || 0;
         const val = parseFloat(document.getElementById(`val-${id}`).value) || 0;
-        if(iba > 0) {
-            document.getElementById(`perc-${id}`).value = ((val / (iba/12)) * 100).toFixed(2);
-        }
+        if(iba > 0) document.getElementById(`perc-${id}`).value = ((val / (iba/12)) * 100).toFixed(2);
         calculateAll();
     }
 
@@ -630,14 +581,30 @@
         if(resSugInd) resSugInd.innerText = sugInd.toLocaleString('en-US', {style:'currency', currency:'USD'});
         
         const finalBalance = userInd - userExp;
+        const formattedBal = finalBalance.toLocaleString('en-US', {style:'currency', currency:'USD'});
+        
+        // Update Bottom Bar
         const balEl = document.getElementById('res-balance');
-        if(balEl) {
-            balEl.innerText = finalBalance.toLocaleString('en-US', {style:'currency', currency:'USD'});
+        // Update Floating Bar
+        const floatBar = document.getElementById('float-bar');
+        const floatVal = document.getElementById('float-val');
+
+        if(balEl && floatVal && floatBar) {
+            balEl.innerText = formattedBal;
+            floatVal.innerText = formattedBal;
+            
             if(finalBalance >= 0) {
+                const positiveStr = "+" + formattedBal.replace('+', '').replace('-', '');
                 balEl.className = "res-value positive";
-                balEl.innerText = "+" + balEl.innerText.replace('+', '').replace('-', '');
+                balEl.innerText = positiveStr;
+                
+                floatVal.className = "float-val positive";
+                floatVal.innerText = positiveStr;
+                floatBar.className = "floating-balance positive";
             } else {
                 balEl.className = "res-value negative";
+                floatVal.className = "float-val negative";
+                floatBar.className = "floating-balance negative";
             }
         }
 
@@ -645,14 +612,12 @@
         const bar = document.getElementById('progress-bar');
         if(bar) {
             bar.style.width = Math.min(percentSpent, 100) + "%";
-            if (percentSpent > 100) {
-                bar.style.backgroundColor = "#EF5350"; 
-            } else if (percentSpent > 90) {
-                bar.style.backgroundColor = "#FFA726"; 
-            } else {
-                bar.style.backgroundColor = "#66BB6A"; 
-            }
+            if (percentSpent > 100) bar.style.backgroundColor = "#EF5350"; 
+            else if (percentSpent > 90) bar.style.backgroundColor = "#FFA726"; 
+            else bar.style.backgroundColor = "#66BB6A"; 
         }
+
+        saveToLocal(); // Auto-save if checkbox is checked
     }
 
     function toggleLang() {
@@ -676,6 +641,13 @@
         document.getElementById('t-balance').innerText = t.bal;
         document.getElementById('btn-lang').innerText = lang === 'es' ? 'English' : 'Español';
         document.getElementById('btn-update-txt').innerText = t.btnUpd;
+        document.getElementById('t-save').innerText = t.saveChk;
+        
+        // Overlay and Floating Bar
+        document.getElementById('t-over-title').innerText = t.overTitle;
+        document.getElementById('t-over-text').innerText = t.overText;
+        document.getElementById('t-over-btn').innerText = t.overBtn;
+        document.getElementById('t-float-bal').innerText = t.floatBal;
 
         schema.forEach(item => {
             const txtEl = document.getElementById(`txt-${item.id}`);

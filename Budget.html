@@ -25,7 +25,7 @@
             margin: 0;
             padding: 20px;
             line-height: 1.5;
-            padding-bottom: 80px; /* Space for floating bar */
+            padding-bottom: 80px; 
         }
 
         .container {
@@ -44,14 +44,7 @@
             padding: 20px 30px;
         }
 
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
+        .header-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
         h1 { margin: 0; font-weight: 300; font-size: 1.8rem; letter-spacing: 0.5px; }
         .subtitle { opacity: 0.8; font-size: 0.9rem; margin-top: 5px; font-style: italic; }
 
@@ -66,27 +59,18 @@
         .chk-label input { cursor: pointer; }
 
         .btn-action {
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.2s;
+            background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);
+            color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer;
+            font-size: 0.85rem; transition: all 0.2s;
         }
         .btn-action:hover { background: rgba(255,255,255,0.3); }
+        .btn-tools { background: #FFB74D; color: #3E2723; border: none; font-weight: bold; }
+        .btn-tools:hover { background: #FFA726; }
 
         /* --- Income Panel --- */
         .income-panel {
-            background: #FFF8E1;
-            padding: 25px 30px;
-            border-bottom: 1px solid #FFE0B2;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            flex-wrap: wrap;
-            gap: 20px;
+            background: #FFF8E1; padding: 25px 30px; border-bottom: 1px solid #FFE0B2;
+            display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px;
         }
 
         .income-left { display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap; }
@@ -103,7 +87,6 @@
         }
         .input-group input:focus { outline: none; border-color: var(--accent); }
 
-        /* Update Button */
         .btn-update {
             background-color: var(--primary); color: white; border: none; padding: 0 15px;
             height: 50px; border-radius: 8px; font-weight: bold; font-size: 0.95rem;
@@ -115,19 +98,9 @@
 
         /* Lock Toggle */
         .lock-wrapper { background: white; padding: 5px; border-radius: 8px; border: 1px solid #ddd; }
-        .toggle-switch {
-            display: flex; background: var(--toggle-inactive); border-radius: 6px;
-            position: relative; cursor: pointer; width: 140px; height: 36px;
-        }
-        .toggle-option {
-            flex: 1; text-align: center; line-height: 36px; font-size: 0.8rem;
-            font-weight: 700; z-index: 2; color: #757575; transition: color 0.3s;
-        }
-        .toggle-slider {
-            position: absolute; top: 2px; bottom: 2px; left: 2px; width: calc(50% - 2px);
-            background: white; border-radius: 4px; transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.15); z-index: 1;
-        }
+        .toggle-switch { display: flex; background: var(--toggle-inactive); border-radius: 6px; position: relative; cursor: pointer; width: 140px; height: 36px; }
+        .toggle-option { flex: 1; text-align: center; line-height: 36px; font-size: 0.8rem; font-weight: 700; z-index: 2; color: #757575; transition: color 0.3s; }
+        .toggle-slider { position: absolute; top: 2px; bottom: 2px; left: 2px; width: calc(50% - 2px); background: white; border-radius: 4px; transition: transform 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.15); z-index: 1; }
         .toggle-switch[data-mode="percent"] .toggle-slider { transform: translateX(0); }
         .toggle-switch[data-mode="percent"] .opt-perc { color: var(--primary); }
         .toggle-switch[data-mode="value"] .toggle-slider { transform: translateX(100%); }
@@ -138,29 +111,19 @@
 
         /* --- Grid --- */
         .budget-grid { padding: 20px; }
-
-        .section-title {
-            color: var(--primary); border-bottom: 2px solid var(--primary-light);
-            padding-bottom: 5px; margin: 30px 0 15px 0; font-weight: 600; display: flex; align-items: center; gap: 10px;
-        }
+        .section-title { color: var(--primary); border-bottom: 2px solid var(--primary-light); padding-bottom: 5px; margin: 30px 0 15px 0; font-weight: 600; display: flex; align-items: center; gap: 10px; }
         .section-title svg { width: 20px; height: 20px; fill: var(--primary); }
-
         .row { display: grid; grid-template-columns: 2fr 1.5fr 2fr; gap: 15px; align-items: center; padding: 12px 10px; border-bottom: 1px solid #eee; }
         .row:hover { background: #fafafa; }
         .row.header-row { font-weight: bold; color: var(--text-light); font-size: 0.85rem; text-transform: uppercase; border-bottom: 2px solid #ddd; background: white !important; }
-
         .col-label { display: flex; flex-direction: column; }
         .label-main { font-weight: 500; display: flex; align-items: center; gap: 8px; }
         .label-sub { font-size: 0.8rem; color: var(--text-light); }
         .label-avg { color: var(--accent); font-weight: 600; }
-
         .col-sug { background: #F1F8E9; border-radius: 6px; padding: 8px; text-align: center; color: #33691E; font-weight: 500; border: 1px solid #DCEDC8; }
-
         .col-user { display: flex; justify-content: flex-end; gap: 10px; }
         .inp-money { width: 100px; text-align: right; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; }
         .inp-perc { width: 55px; text-align: center; padding: 6px; border: 1px solid #ccc; border-radius: 4px; background: #f9f9f9; font-size: 0.9rem; }
-        
-        /* Highlight active input based on mode */
         .toggle-switch[data-mode="percent"] ~ .budget-grid .inp-perc { border-color: var(--accent); background: #fff; font-weight: bold; }
         .toggle-switch[data-mode="value"] ~ .budget-grid .inp-money { border-color: var(--accent); background: #fff; font-weight: bold; }
 
@@ -171,7 +134,6 @@
         .res-value { font-size: 2rem; font-weight: 300; }
         .res-value.positive { color: #81C784; }
         .res-value.negative { color: #E57373; }
-
         .progress-container { background: #37474F; height: 8px; width: 100%; margin-top: 10px; border-radius: 4px; overflow: hidden; grid-column: span 2; }
         .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.5s ease; }
 
@@ -181,12 +143,9 @@
             padding: 12px 24px; border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             z-index: 1000; font-size: 1.1rem; font-weight: bold; display: flex; gap: 10px;
             align-items: center; border: 2px solid transparent;
-            transition: border-color 0.3s, opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 1; transform: translateY(0);
+            transition: border-color 0.3s, opacity 0.3s, transform 0.3s;
         }
-        .floating-balance.hidden {
-            opacity: 0; transform: translateY(20px); pointer-events: none;
-        }
+        .floating-balance.hidden { opacity: 0; transform: translateY(20px); pointer-events: none; }
         .floating-balance.positive { border-color: #81C784; }
         .floating-balance.negative { border-color: #E57373; }
         .float-val { font-size: 1.3rem; }
@@ -197,24 +156,36 @@
         #landscape-overlay {
             display: none; position: fixed; inset: 0; background: rgba(38, 50, 56, 0.95);
             color: white; z-index: 9999; flex-direction: column; justify-content: center;
-            align-items: center; text-align: center; padding: 30px; box-sizing: border-box;
-            backdrop-filter: blur(5px);
+            align-items: center; text-align: center; padding: 30px; backdrop-filter: blur(5px);
         }
         .overlay-icon { font-size: 4rem; margin-bottom: 20px; animation: rotatePhone 2s infinite ease-in-out; }
-        .overlay-btn { margin-top: 30px; padding: 12px 24px; background: var(--accent); color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; }
-        
-        @keyframes rotatePhone {
-            0% { transform: rotate(0deg); }
-            50% { transform: rotate(-90deg); }
-            100% { transform: rotate(0deg); }
-        }
+        .overlay-btn { margin-top: 30px; padding: 12px 24px; background: var(--accent); color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; }
+        @keyframes rotatePhone { 0% { transform: rotate(0deg); } 50% { transform: rotate(-90deg); } 100% { transform: rotate(0deg); } }
+        @media screen and (max-width: 768px) and (orientation: portrait) { #landscape-overlay { display: flex; } }
 
-        /* Show overlay ONLY on portrait mobile devices */
-        @media screen and (max-width: 768px) and (orientation: portrait) {
-            #landscape-overlay { display: flex; }
+        /* --- Tools Modal (Pop-up) --- */
+        .modal {
+            display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px); justify-content: center; align-items: center;
         }
+        .modal-content {
+            background-color: #fff; padding: 30px; border-radius: 12px; max-width: 650px; width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; max-height: 85vh; overflow-y: auto;
+        }
+        .close-btn {
+            position: absolute; top: 15px; right: 20px; color: #aaa; font-size: 28px;
+            font-weight: bold; cursor: pointer; line-height: 1;
+        }
+        .close-btn:hover { color: #333; }
+        .tool-category { color: var(--primary); margin-top: 25px; border-bottom: 2px solid var(--primary-light); padding-bottom: 5px; font-size: 1.2rem;}
+        .tools-list { list-style: none; padding: 0; margin-top: 15px;}
+        .tools-list li { margin-bottom: 12px; padding-left: 20px; position: relative;}
+        .tools-list li::before { content: '•'; color: var(--accent); position: absolute; left: 0; font-size: 1.5em; line-height: 0.8; }
+        .tools-list a { color: #1976D2; text-decoration: none; font-weight: bold; }
+        .tools-list a:hover { text-decoration: underline; }
+        .tool-desc { display: block; font-size: 0.85rem; color: #666; margin-top: 3px; }
 
-        /* Responsive Tweaks */
+        /* --- Responsive Tweaks --- */
         @media screen and (max-width: 768px) {
             .row { grid-template-columns: 1fr; gap: 10px; padding: 15px 10px; }
             .col-sug { text-align: left; padding: 5px; background: none; border: none; color: #555; font-size: 0.9rem; }
@@ -228,32 +199,24 @@
             @page { margin: 0.5cm; size: portrait; }
             body { background: white; padding: 0; -webkit-print-color-adjust: exact; font-size: 10pt; }
             .container { box-shadow: none; max-width: 100%; width: 100%; margin: 0; border-radius: 0; }
-            
-            /* Hide non-printable elements */
-            .controls, .btn-update, .lock-wrapper, .progress-container, .floating-balance, #landscape-overlay { display: none !important; }
-
+            .controls, .btn-update, .lock-wrapper, .progress-container, .floating-balance, #landscape-overlay, .modal { display: none !important; }
             header { padding: 10px 0; border-bottom: 2px solid #000; background: none !important; color: #000 !important; margin-bottom: 10px; }
             .header-top { justify-content: center; text-align: center; }
             h1 { font-size: 1.4rem; color: #000; }
             .subtitle { color: #444; font-size: 0.8rem; }
-
             .income-panel { background: none !important; border: 1px solid #999; padding: 5px 15px; margin-bottom: 10px; justify-content: space-around; align-items: center; }
             .input-group label { color: #000; margin-bottom: 2px; }
             .input-group input { border: none; border-bottom: 1px solid #000; background: none; font-size: 1.2rem; color: #000; padding: 0; width: 120px; text-align: left; }
-            
             .budget-grid { padding: 0; }
             .section-title { margin: 10px 0 5px 0; font-size: 0.9rem; border-bottom: 1px solid #000; color: #000; padding-bottom: 2px; }
             .section-title svg { display: none; }
-            
             .row { padding: 3px 0; border-bottom: 1px solid #ccc; grid-template-columns: 2fr 1fr 1fr; gap: 5px; page-break-inside: avoid; }
             .row.header-row { background: #eee !important; color: #000; border-bottom: 1px solid #000; font-size: 0.7rem; }
-
             .label-main span:first-child { display: none; }
             .col-sug { background: none; border: none; padding: 0; color: #000; font-size: 0.85rem; text-align: right; padding-right: 20px; }
             .inp-money, .inp-perc { border: none; background: none; padding: 0; font-size: 0.85rem; color: #000; font-weight: bold; height: auto; }
             .inp-money { width: 80px; text-align: right; }
             .inp-perc { width: 40px; text-align: right; font-size: 0.75rem; color: #555; }
-            
             .results-bar { background: none !important; color: #000 !important; border-top: 2px solid #000; padding: 10px 0; margin-top: 10px; grid-template-columns: 1fr 1fr; }
             .res-value { font-size: 1.4rem; color: #000 !important; }
             html { zoom: 85%; }
@@ -269,6 +232,52 @@
     <button class="overlay-btn" id="t-over-btn" onclick="document.getElementById('landscape-overlay').style.display='none'">Continuar de todos modos</button>
 </div>
 
+<div id="tools-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="document.getElementById('tools-modal').style.display='none'">&times;</span>
+        <h2 id="t-modal-title" style="color: var(--primary); margin-top: 0;">Herramientas para Presupuestos</h2>
+        
+        <h3 class="tool-category" id="t-cat-articles">Estudios y Predicaciones / Artículos</h3>
+        <ul class="tools-list">
+            <li>
+                <a href="https://es.catholic.net/op/articulos/6901/la-virtud-del-ahorro-en-la-familia.html" target="_blank" id="t-link-1">La virtud del ahorro en la familia (Catholic.net)</a>
+                <span class="tool-desc" id="t-desc-1">Perspectiva católica sobre el ahorro y la administración.</span>
+            </li>
+            <li>
+                <a href="https://www.bbva.com/es/salud-financiera/que-es-un-presupuesto-familiar-y-por-que-es-importante-elaborar-uno/" target="_blank" id="t-link-2">¿Qué es un presupuesto familiar? (BBVA)</a>
+                <span class="tool-desc" id="t-desc-2">Por qué es importante elaborar uno.</span>
+            </li>
+            <li>
+                <a href="https://bettermoneyhabits.bankofamerica.com/es/saving-budgeting/creating-a-budget" target="_blank" id="t-link-3">Crear un presupuesto en 6 pasos (Bank of America)</a>
+                <span class="tool-desc" id="t-desc-3">Guía con pasos sencillos.</span>
+            </li>
+        </ul>
+
+        <h3 class="tool-category" id="t-cat-apps">Aplicaciones para Celulares</h3>
+        <ul class="tools-list">
+            <li>
+                <strong>Goodbudget</strong>
+                <span class="tool-desc" id="t-desc-goodbudget">Para planear un presupuesto basado en sobres.</span>
+            </li>
+            <li>
+                <strong>EveryDollar</strong>
+                <span class="tool-desc" id="t-desc-everydollar">Para planear un presupuesto de base cero (versión gratis o de paga).</span>
+            </li>
+            <li>
+                <strong>Monarch Money</strong>
+                <span class="tool-desc" id="t-desc-monarch">Para monitorear gastos y administrar todo en un solo lugar (versión de paga).</span>
+            </li>
+        </ul>
+
+        <h3 class="tool-category" id="t-cat-sheets">Excel o Google Sheets</h3>
+        <ul class="tools-list">
+            <li>
+                <span id="t-desc-sheets">Buscas por <strong>"Presupuesto"</strong> o <strong>"Budget"</strong> en las plantillas predeterminadas de Excel o Google Sheets.</span>
+            </li>
+        </ul>
+    </div>
+</div>
+
 <div class="floating-balance" id="float-bar">
     <span id="t-float-bal">Balance:</span>
     <span class="float-val" id="float-val">$0.00</span>
@@ -282,6 +291,9 @@
                 <div class="subtitle" id="t-subtitle">Planificación basada en "Unidos en la Imagen de Dios"</div>
             </div>
             <div class="controls">
+                <button class="btn-action btn-tools" onclick="document.getElementById('tools-modal').style.display='flex'">
+                    💡 <span id="t-btn-tools">Herramientas</span>
+                </button>
                 <label class="chk-label">
                     <input type="checkbox" id="float-toggle-chk" onchange="handleFloatToggle()" checked>
                     <span id="t-float-toggle">Mostrar Flotante</span>
@@ -364,6 +376,14 @@
     let isFloatEnabled = true;
     let isBottomVisible = false;
 
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+        const modal = document.getElementById('tools-modal');
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
     const schema = [
         { id: 'tithe', min: 10, max: 10, type: 'must', icon: '🙏' },
         { id: 'pretax', min: 3, max: 25, type: 'must', icon: '🐷' },
@@ -384,34 +404,32 @@
 
     const text = {
         es: {
-            tithe: "Diezmo (D)", pretax: "Ahorros Antes de Impuestos", tax: "Impuestos (I)",
-            housing: "Vivienda", food: "Alimentos", auto: "Transporte/Auto", ins: "Seguros Personales",
-            cloth: "Ropa", med: "Médicos/Dentistas", debt: "Pago de Deudas", fun: "Citas y Salidas",
-            save: "Ahorros (Emergencia)", misc: "Misceláneas", kids: "Escuela/Guardería", edu: "Ahorro Universitario",
-            title: "Administración del Hogar", subtitle: 'Planificación basada en "Unidos en la Imagen de Dios"',
-            iba: "Ingresos Brutos Anuales", ibm: "Ingreso Mensual (IBA/12)",
-            h_cat: "Categoría & Rango", h_sug: "Sugerido", h_act: "Tu Plan",
-            sec1: "1. Obligaciones Prioritarias (Primeros Frutos)", sec2: "2. Gastos de Vida & Familia",
-            sugInd: "Ingreso Neto Disp. (Sugerido)", bal: "Tu Balance Final", avg: "Prom",
-            ph_amt: "Monto", btnUpd: "Actualizar", saveChk: "Guardar Sesión",
-            floatToggle: "Mostrar Flotante",
-            overTitle: "Gire su Dispositivo", overText: "Para una mejor experiencia, use esta herramienta en modo horizontal.", overBtn: "Continuar de todos modos",
-            floatBal: "Balance:"
+            tithe: "Diezmo (D)", pretax: "Ahorros Antes de Impuestos", tax: "Impuestos (I)", housing: "Vivienda", food: "Alimentos", auto: "Transporte/Auto", ins: "Seguros Personales", cloth: "Ropa", med: "Médicos/Dentistas", debt: "Pago de Deudas", fun: "Citas y Salidas", save: "Ahorros (Emergencia)", misc: "Misceláneas", kids: "Escuela/Guardería", edu: "Ahorro Universitario",
+            title: "Administración del Hogar", subtitle: 'Planificación basada en "Unidos en la Imagen de Dios"', iba: "Ingresos Brutos Anuales", ibm: "Ingreso Mensual (IBA/12)", h_cat: "Categoría & Rango", h_sug: "Sugerido", h_act: "Tu Plan", sec1: "1. Obligaciones Prioritarias (Primeros Frutos)", sec2: "2. Gastos de Vida & Familia", sugInd: "Ingreso Neto Disp. (Sugerido)", bal: "Tu Balance Final", avg: "Prom", ph_amt: "Monto", btnUpd: "Actualizar", saveChk: "Guardar Sesión", floatToggle: "Mostrar Flotante", overTitle: "Gire su Dispositivo", overText: "Para una mejor experiencia, use esta herramienta en modo horizontal.", overBtn: "Continuar de todos modos", floatBal: "Balance:",
+            // Modal Text
+            btnTools: "Herramientas", modTitle: "Herramientas para Presupuestos", modCat1: "Estudios y Predicaciones / Artículos",
+            modL1: "La virtud del ahorro en la familia (Catholic.net)", modD1: "Perspectiva católica sobre el ahorro y la administración.",
+            modL2: "¿Qué es un presupuesto familiar? (BBVA)", modD2: "Por qué es importante elaborar uno.",
+            modL3: "Crear un presupuesto en 6 pasos (Bank of America)", modD3: "Guía con pasos sencillos.",
+            modCat2: "Aplicaciones para Celulares",
+            modDGood: "Para planear un presupuesto basado en sobres.", 
+            modDEvery: "Para planear un presupuesto de base cero (versión gratis o de paga).", 
+            modDMonarch: "Para monitorear gastos y administrar todo en un solo lugar (versión de paga).",
+            modCat3: "Excel o Google Sheets", modDSheets: "Buscas por <strong>\"Presupuesto\"</strong> o <strong>\"Budget\"</strong> en las plantillas predeterminadas de Excel o Google Sheets."
         },
         en: {
-            tithe: "Tithe", pretax: "Pre-tax Savings", tax: "Taxes",
-            housing: "Housing", food: "Food", auto: "Transport", ins: "Personal Insurance",
-            cloth: "Clothing", med: "Medical/Dental", debt: "Debt Repayment", fun: "Dates & Outings",
-            save: "Savings (Emergency)", misc: "Miscellaneous", kids: "School/Daycare", edu: "College Savings",
-            title: "Household Stewardship", subtitle: 'Planning based on "United in the Image of God"',
-            iba: "Annual Gross Income", ibm: "Monthly Income (AGI/12)",
-            h_cat: "Category & Range", h_sug: "Suggested", h_act: "Your Plan",
-            sec1: "1. Priority Obligations (First Fruits)", sec2: "2. Living & Family Expenses",
-            sugInd: "Suggested NDI", bal: "Your Final Balance", avg: "Avg",
-            ph_amt: "Amount", btnUpd: "Update", saveChk: "Save Session",
-            floatToggle: "Show Float Bar",
-            overTitle: "Rotate Device", overText: "For the best experience, please use this tool in landscape mode.", overBtn: "Continue Anyway",
-            floatBal: "Balance:"
+            tithe: "Tithe", pretax: "Pre-tax Savings", tax: "Taxes", housing: "Housing", food: "Food", auto: "Transport", ins: "Personal Insurance", cloth: "Clothing", med: "Medical/Dental", debt: "Debt Repayment", fun: "Dates & Outings", save: "Savings (Emergency)", misc: "Miscellaneous", kids: "School/Daycare", edu: "College Savings",
+            title: "Household Stewardship", subtitle: 'Planning based on "United in the Image of God"', iba: "Annual Gross Income", ibm: "Monthly Income (AGI/12)", h_cat: "Category & Range", h_sug: "Suggested", h_act: "Your Plan", sec1: "1. Priority Obligations (First Fruits)", sec2: "2. Living & Family Expenses", sugInd: "Suggested NDI", bal: "Your Final Balance", avg: "Avg", ph_amt: "Amount", btnUpd: "Update", saveChk: "Save Session", floatToggle: "Show Float Bar", overTitle: "Rotate Device", overText: "For the best experience, please use this tool in landscape mode.", overBtn: "Continue Anyway", floatBal: "Balance:",
+            // Modal Text
+            btnTools: "Tools & Tips", modTitle: "Budgeting Tools & Resources", modCat1: "Articles & Guides",
+            modL1: "The Virtue of Saving in the Family (Catholic.net)", modD1: "A Catholic perspective on saving and stewardship.",
+            modL2: "What is a family budget? (BBVA)", modD2: "Why it is important to make one.",
+            modL3: "Create a budget in 6 steps (Bank of America)", modD3: "Guide with simple steps.",
+            modCat2: "Mobile Applications",
+            modDGood: "To plan an envelope-based budget.", 
+            modDEvery: "To plan a zero-based budget (free or paid version).", 
+            modDMonarch: "To track expenses and manage everything in one place (paid version).",
+            modCat3: "Excel or Google Sheets", modDSheets: "Search for <strong>\"Budget\"</strong> or <strong>\"Presupuesto\"</strong> in the default templates of Excel or Google Sheets."
         }
     };
 
@@ -455,14 +473,13 @@
         updateFloatingBarVisibility();
     }
 
-    // --- Floating Bar Logic ---
     function setupIntersectionObserver() {
         const resultsBar = document.getElementById('main-results-bar');
         if ('IntersectionObserver' in window && resultsBar) {
             const observer = new IntersectionObserver((entries) => {
                 isBottomVisible = entries[0].isIntersecting;
                 updateFloatingBarVisibility();
-            }, { threshold: 0.1 }); // triggers when 10% of results bar is visible
+            }, { threshold: 0.1 });
             observer.observe(resultsBar);
         }
     }
@@ -476,43 +493,25 @@
     function updateFloatingBarVisibility() {
         const floatBar = document.getElementById('float-bar');
         if (!floatBar) return;
-
-        // Hide if toggle is off OR if the bottom static balance is visible
-        if (isFloatEnabled && !isBottomVisible) {
-            floatBar.classList.remove('hidden');
-        } else {
-            floatBar.classList.add('hidden');
-        }
+        if (isFloatEnabled && !isBottomVisible) floatBar.classList.remove('hidden');
+        else floatBar.classList.add('hidden');
     }
 
-    // --- Local Storage Functions ---
     function handleSaveToggle() {
-        if(document.getElementById('save-data-chk').checked) {
-            saveToLocal();
-        } else {
-            localStorage.removeItem(STORAGE_KEY);
-        }
+        if(document.getElementById('save-data-chk').checked) saveToLocal();
+        else localStorage.removeItem(STORAGE_KEY);
     }
 
     function saveToLocal() {
         if(!document.getElementById('save-data-chk').checked) return;
-        
         const data = {
-            iba: document.getElementById('iba').value,
-            lockMode: lockMode,
-            lang: lang,
-            floatEnabled: isFloatEnabled,
-            inputs: {}
+            iba: document.getElementById('iba').value, lockMode: lockMode, lang: lang, floatEnabled: isFloatEnabled, inputs: {}
         };
-
         schema.forEach(item => {
             const valEl = document.getElementById(`val-${item.id}`);
             const percEl = document.getElementById(`perc-${item.id}`);
-            if(valEl && percEl) {
-                data.inputs[item.id] = { val: valEl.value, perc: percEl.value };
-            }
+            if(valEl && percEl) data.inputs[item.id] = { val: valEl.value, perc: percEl.value };
         });
-
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
 
@@ -522,20 +521,16 @@
             try {
                 const data = JSON.parse(saved);
                 document.getElementById('save-data-chk').checked = true;
-                
                 if(data.lang) lang = data.lang;
                 if(data.iba) document.getElementById('iba').value = data.iba;
-                
                 if (data.floatEnabled !== undefined) {
                     isFloatEnabled = data.floatEnabled;
                     document.getElementById('float-toggle-chk').checked = isFloatEnabled;
                 }
-
                 if(data.lockMode) {
                     lockMode = data.lockMode;
                     document.getElementById('adj-toggle').setAttribute('data-mode', lockMode);
                 }
-                
                 if(data.inputs) {
                     schema.forEach(item => {
                         if(data.inputs[item.id]) {
@@ -546,13 +541,10 @@
                         }
                     });
                 }
-            } catch(e) {
-                console.error("Failed to load saved data.", e);
-            }
+            } catch(e) { console.error("Failed to load saved data.", e); }
         }
     }
 
-    // --- Logic & Updates ---
     function toggleMode() {
         lockMode = lockMode === 'percent' ? 'value' : 'percent';
         document.getElementById('adj-toggle').setAttribute('data-mode', lockMode);
@@ -563,12 +555,10 @@
         const ibaInput = document.getElementById('iba');
         const iba = parseFloat(ibaInput.value) || 0;
         const ibm = iba / 12;
-
         schema.forEach(item => {
             const valInput = document.getElementById(`val-${item.id}`);
             const percInput = document.getElementById(`perc-${item.id}`);
             if (!valInput || !percInput) return;
-
             if (lockMode === 'percent') {
                 const currentPerc = parseFloat(percInput.value) || 0;
                 const newVal = (currentPerc / 100) * ibm;
@@ -601,14 +591,10 @@
     function calculateAll() {
         const iba = parseFloat(document.getElementById('iba').value) || 0;
         const ibm = iba / 12;
-        
         const ibmDisplay = document.getElementById('ibm-val');
         if(ibmDisplay) ibmDisplay.innerText = ibm.toLocaleString('en-US', {style:'currency', currency:'USD'});
 
-        let sugInd = ibm;
-        let userInd = ibm;
-        let userExp = 0;
-        let userTotalSpent = 0;
+        let sugInd = ibm; let userInd = ibm; let userExp = 0; let userTotalSpent = 0;
 
         schema.forEach(item => {
             const avg = (item.min + item.max) / 2;
@@ -618,15 +604,10 @@
 
             const inputEl = document.getElementById(`val-${item.id}`);
             const userAmount = inputEl ? (parseFloat(inputEl.value) || 0) : 0;
-            
             userTotalSpent += userAmount;
 
-            if (item.type === 'must') {
-                sugInd -= sugAmount;
-                userInd -= userAmount;
-            } else {
-                userExp += userAmount;
-            }
+            if (item.type === 'must') { sugInd -= sugAmount; userInd -= userAmount; } 
+            else { userExp += userAmount; }
         });
 
         const resSugInd = document.getElementById('res-sug-ind');
@@ -635,27 +616,19 @@
         const finalBalance = userInd - userExp;
         const formattedBal = finalBalance.toLocaleString('en-US', {style:'currency', currency:'USD'});
         
-        // Update Bottom Bar
         const balEl = document.getElementById('res-balance');
-        // Update Floating Bar
         const floatBar = document.getElementById('float-bar');
         const floatVal = document.getElementById('float-val');
 
         if(balEl && floatVal && floatBar) {
-            balEl.innerText = formattedBal;
-            floatVal.innerText = formattedBal;
-            
+            balEl.innerText = formattedBal; floatVal.innerText = formattedBal;
             if(finalBalance >= 0) {
                 const positiveStr = "+" + formattedBal.replace('+', '').replace('-', '');
-                balEl.className = "res-value positive";
-                balEl.innerText = positiveStr;
-                
-                floatVal.className = "float-val positive";
-                floatVal.innerText = positiveStr;
+                balEl.className = "res-value positive"; balEl.innerText = positiveStr;
+                floatVal.className = "float-val positive"; floatVal.innerText = positiveStr;
                 floatBar.className = "floating-balance positive " + (floatBar.classList.contains('hidden') ? 'hidden' : '');
             } else {
-                balEl.className = "res-value negative";
-                floatVal.className = "float-val negative";
+                balEl.className = "res-value negative"; floatVal.className = "float-val negative";
                 floatBar.className = "floating-balance negative " + (floatBar.classList.contains('hidden') ? 'hidden' : '');
             }
         }
@@ -669,7 +642,7 @@
             else bar.style.backgroundColor = "#66BB6A"; 
         }
 
-        saveToLocal(); // Auto-save if checkbox is checked
+        saveToLocal();
     }
 
     function toggleLang() {
@@ -695,12 +668,27 @@
         document.getElementById('btn-update-txt').innerText = t.btnUpd;
         document.getElementById('t-save').innerText = t.saveChk;
         document.getElementById('t-float-toggle').innerText = t.floatToggle;
+        document.getElementById('t-btn-tools').innerText = t.btnTools;
         
-        // Overlay and Floating Bar
         document.getElementById('t-over-title').innerText = t.overTitle;
         document.getElementById('t-over-text').innerText = t.overText;
         document.getElementById('t-over-btn').innerText = t.overBtn;
         document.getElementById('t-float-bal').innerText = t.floatBal;
+
+        // Modal Updates
+        document.getElementById('t-modal-title').innerText = t.modTitle;
+        document.getElementById('t-cat-articles').innerText = t.modCat1;
+        document.getElementById('t-link-1').innerText = t.modL1; document.getElementById('t-desc-1').innerText = t.modD1;
+        document.getElementById('t-link-2').innerText = t.modL2; document.getElementById('t-desc-2').innerText = t.modD2;
+        document.getElementById('t-link-3').innerText = t.modL3; document.getElementById('t-desc-3').innerText = t.modD3;
+        
+        document.getElementById('t-cat-apps').innerText = t.modCat2;
+        document.getElementById('t-desc-goodbudget').innerText = t.modDGood;
+        document.getElementById('t-desc-everydollar').innerText = t.modDEvery;
+        document.getElementById('t-desc-monarch').innerText = t.modDMonarch;
+
+        document.getElementById('t-cat-sheets').innerText = t.modCat3;
+        document.getElementById('t-desc-sheets').innerHTML = t.modDSheets;
 
         schema.forEach(item => {
             const txtEl = document.getElementById(`txt-${item.id}`);

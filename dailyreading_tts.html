@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,6 +76,19 @@
         </div>
     </header>
 
+    <!-- Date Navigation Bar -->
+    <div class="bg-gray-50 border-b border-gray-200 py-3 px-4 flex justify-center items-center space-x-3 sm:space-x-6 shadow-inner">
+        <button id="btn-prev-day" class="w-10 h-10 text-gray-500 hover:text-indigo-700 hover:bg-indigo-100 rounded-full flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500" title="Previous Day">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        
+        <input type="date" id="date-selector" class="border border-gray-300 rounded-md py-2 px-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium bg-white cursor-pointer hover:border-indigo-400 transition-colors shadow-sm">
+        
+        <button id="btn-next-day" class="w-10 h-10 text-gray-500 hover:text-indigo-700 hover:bg-indigo-100 rounded-full flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500" title="Next Day">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+    </div>
+
     <main class="flex-grow w-full max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         
         <!-- Status / Loading Indicator -->
@@ -149,28 +161,40 @@
             const contentContainer = document.getElementById('content-container');
             const usccbLink = document.getElementById('usccb-link');
 
+            // Date Navigation Elements
+            const btnPrev = document.getElementById('btn-prev-day');
+            const btnNext = document.getElementById('btn-next-day');
+            const dateSelector = document.getElementById('date-selector');
+
             // TTS Buttons
             const btnPlay = document.getElementById('btn-play');
             const btnPause = document.getElementById('btn-pause');
             const btnStop = document.getElementById('btn-stop');
 
-            // Set current date
-            const today = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            dateDisplay.textContent = today.toLocaleDateString('en-US', options);
-
-            // Format date for USCCB URL (MMDDYY)
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const dd = String(today.getDate()).padStart(2, '0');
-            const yy = String(today.getFullYear()).slice(-2);
-            usccbLink.href = `https://bible.usccb.org/bible/readings/${mm}${dd}${yy}.cfm`;
-
             // State for data and speech
+            let currentDate = new Date();
             let readingData = null;
             let synth = window.speechSynthesis;
             let currentUtterance = null;
             let isPaused = false;
             let fullTextToRead = "";
+
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+            function updateDateUI() {
+                // Update Long format display
+                dateDisplay.textContent = currentDate.toLocaleDateString('en-US', options);
+
+                // Update Date Picker (Format: YYYY-MM-DD)
+                const yyyy = currentDate.getFullYear();
+                const mm = String(currentDate.getMonth() + 1).padStart(2, '0');
+                const dd = String(currentDate.getDate()).padStart(2, '0');
+                dateSelector.value = `${yyyy}-${mm}-${dd}`;
+
+                // Format date for USCCB URL (MMDDYY)
+                const yy = String(yyyy).slice(-2);
+                usccbLink.href = `https://bible.usccb.org/bible/readings/${mm}${dd}${yy}.cfm`;
+            }
 
             // Note on Scraping:
             // Fetching directly from 'https://bible.usccb.org' via JS `fetch()` will fail due to CORS policies.
@@ -178,30 +202,19 @@
             // parse it (e.g., with Cheerio or BeautifulSoup), and return JSON to this frontend.
             // For this functional demo, we provide a simulated dataset structure that represents typical readings.
 
-            const mockData = {
-                date: today.toISOString(),
-                readings: [
-                    {
-                        type: 'reading1',
-                        title: 'Reading 1',
-                        citation: '1 Thessalonians 1:1-5, 8b-10',
-                        text: '<p>Paul, Silvanus, and Timothy to the church of the Thessalonians in God the Father and the Lord Jesus Christ: grace to you and peace.</p><p>We give thanks to God always for all of you, remembering you in our prayers, unceasingly calling to mind your work of faith and labor of love and endurance in hope of our Lord Jesus Christ, before our God and Father, knowing, brothers and sisters loved by God, how you were chosen. For our gospel did not come to you in word alone, but also in power and in the Holy Spirit and with much conviction.</p><p>You know what sort of people we were among you for your sake. In every place your faith in God has gone forth, so that we have no need to say anything. For they themselves openly declare about us what sort of reception we had among you, and how you turned to God from idols to serve the living and true God and to await his Son from heaven, whom he raised from the dead, Jesus, who delivers us from the coming wrath.</p>'
-                    },
-                    {
-                        type: 'psalm',
-                        title: 'Responsorial Psalm',
-                        citation: 'Psalm 149:1b-2, 3-4, 5-6a and 9b',
-                        response: 'The Lord takes delight in his people.',
-                        text: '<p><b>R. The Lord takes delight in his people.</b></p><p>Sing to the LORD a new song<br>of praise in the assembly of the faithful.<br>Let Israel be glad in their maker,<br>let the children of Zion rejoice in their king.</p><p><b>R. The Lord takes delight in his people.</b></p><p>Let them praise his name in the festive dance,<br>let them sing praise to him with timbrel and harp.<br>For the LORD loves his people,<br>and he adorns the lowly with victory.</p><p><b>R. The Lord takes delight in his people.</b></p>'
-                    },
-                    {
-                        type: 'gospel',
-                        title: 'Gospel',
+            function getMockData(targetDate) {
+                return {
+                    date: targetDate.toISOString(),
+                    readings: [
+                        {
+                            type: 'reading1',
+                            title: 'Reading 1',
                         citation: 'Matthew 23:13-22',
                         text: '<p>Jesus said to the crowds and to his disciples: "Woe to you, scribes and Pharisees, you hypocrites. You lock the Kingdom of heaven before men. You do not enter yourselves, nor do you allow entrance to those trying to enter.</p><p>"Woe to you, scribes and Pharisees, you hypocrites. You traverse sea and land to make one convert, and when that happens you make him a child of Gehenna twice as much as yourselves.</p><p>"Woe to you, blind guides, who say, \'If one swears by the temple, it means nothing, but if one swears by the gold of the temple, one is obligated.\' Blind fools, which is greater, the gold, or the temple that made the gold sacred? And you say, \'If one swears by the altar, it means nothing, but if one swears by the gift on the altar, one is obligated.\' You blind ones, which is greater, the gift, or the altar that makes the gift sacred? One who swears by the altar swears by it and all upon it; one who swears by the temple swears by it and by him who dwells in it; one who swears by heaven swears by the throne of God and by him who is seated on it."</p>'
-                    }
-                ]
-            };
+                        }
+                    ]
+                };
+            }
 
             function renderReadings(data) {
                 // Clear loading state
@@ -209,7 +222,7 @@
                 contentContainer.classList.remove('hidden');
 
                 // Build plain text string for TTS
-                fullTextToRead = `Daily Readings for ${today.toLocaleDateString('en-US', options)}. `;
+                fullTextToRead = `Daily Readings for ${currentDate.toLocaleDateString('en-US', options)}. `;
 
                 data.readings.forEach(reading => {
                     const sectionId = `section-${reading.type}`;
@@ -236,17 +249,51 @@
                 });
             }
 
-            function fetchReadings() {
+            function loadReadingsForDate() {
+                // Stop any playing TTS when loading new date
+                if (synth) {
+                    synth.cancel();
+                    isPaused = false;
+                    updateTTSButtons('stopped');
+                }
+
+                // Show loading state
+                contentContainer.classList.add('hidden');
+                statusContainer.classList.remove('hidden');
+                statusContainer.className = 'mb-6 p-4 rounded-lg bg-blue-50 text-blue-700 flex items-center shadow-sm';
+                statusIcon.className = 'fa-solid fa-circle-notch fa-spin mr-3 text-xl';
+                statusText.textContent = `Fetching readings for ${currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'})}...`;
+
                 // Simulate network delay
                 setTimeout(() => {
                     try {
-                        readingData = mockData; // Use mock data
+                        readingData = getMockData(currentDate); // Use mock data scoped to selected date
                         renderReadings(readingData);
                     } catch (error) {
                         showError("Failed to load readings. Please try again later.");
                     }
-                }, 1500);
+                }, 800);
             }
+
+            function changeDate(daysOffset) {
+                currentDate.setDate(currentDate.getDate() + daysOffset);
+                updateDateUI();
+                loadReadingsForDate();
+            }
+
+            // Event Listeners for Date Navigation
+            btnPrev.addEventListener('click', () => changeDate(-1));
+            btnNext.addEventListener('click', () => changeDate(1));
+            
+            dateSelector.addEventListener('change', (e) => {
+                if (e.target.value) {
+                    // Parse YYYY-MM-DD avoiding timezone offset issues
+                    const [y, m, d] = e.target.value.split('-');
+                    currentDate = new Date(y, m - 1, d);
+                    updateDateUI();
+                    loadReadingsForDate();
+                }
+            });
 
             function showError(message) {
                 statusContainer.className = 'mb-6 p-4 rounded-lg bg-red-50 text-red-700 flex items-center shadow-sm';
@@ -360,7 +407,8 @@
             });
 
             // Start the application
-            fetchReadings();
+            updateDateUI();
+            loadReadingsForDate();
             initTTS();
         });
     </script>

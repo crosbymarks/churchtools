@@ -3,104 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premarital Class Resources</title>
-    <!-- Load Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Configure Tailwind for the Inter font -->
+    <title>Preparing for Lifelong Partnership</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc; /* Light gray background */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
         }
-        .card {
-            transition: all 0.3s ease;
+
+        /* Top Section */
+        .top-section {
+            background-color: #ffffff;
+            color: #1e40af;
+            text-align: center;
+            padding: 25px 20px;
         }
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        .container-top { max-width: 800px; margin: 0 auto; }
+        .logo { max-width: 120px; margin-bottom: 15px; border-radius: 8px; }
+        h1 { margin: 0 0 5px 0; font-size: 2.5em; }
+        .subtitle { font-size: 1.2em; font-weight: 500; opacity: 0.9; margin: 0; }
+
+        /* Bottom Section */
+        .bottom-section {
+            background-color: #ffffff;
+            color: #1f2937;
+            padding: 40px 20px;
+            min-height: 50vh;
+            display: flex;
+            flex-direction: column;
         }
-        /* Style for external navigation links (No longer used, but kept for future links) */
-        .nav-link {
+        .container-bottom { max-width: 800px; margin: 0 auto; flex: 1; width: 100%; display: flex; flex-direction: column; }
+        .message-container { text-align: center; margin-bottom: 40px; }
+        .message { font-size: 1.2em; margin-bottom: 10px; line-height: 1.5; font-weight: 500;}
+        .submessage { font-size: 1em; opacity: 0.8; }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .cell {
+            box-sizing: border-box;
+            position: relative; 
+            display: flex;
+            align-items: center;
+            text-align: left;
             text-decoration: none;
-            background-color: white;
-            color: #2563eb; /* blue-600 */
-            border: 1px solid #2563eb;
+            padding: 25px;
+            border-radius: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-        .nav-link:hover {
-            background-color: #eff6ff; /* blue-50 */
+        .cell:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Alt-Action Button inside Cell */
+        .alt-action {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            background: rgba(128, 128, 128, 0.15);
+            color: inherit;
+            transition: background 0.2s, transform 0.1s;
+            z-index: 2; 
+        }
+        .alt-action:hover {
+            background: rgba(128, 128, 128, 0.35);
+            transform: scale(1.05);
+        }
+        
+        .emoji { font-size: 2.5em; margin-right: 20px; flex-shrink: 0; }
+        .cell-content { flex-grow: 1; padding-right: 40px; }
+        .cell-title { font-size: 1.3em; font-weight: bold; margin-bottom: 6px; }
+        .cell-desc { font-size: 0.95em; opacity: 0.9; line-height: 1.4; margin: 0; }
+
+        /* Mobile Colors (Simple Alternating) */
+        .cell:nth-child(odd) { background-color: #f0fdf4; color: #15803d; }
+        .cell:nth-child(even) { background-color: #faf5ff; color: #7e22ce; }
+
+        /* Desktop Grid & Checkerboard Colors */
+        @media(min-width: 600px) {
+            .grid { grid-template-columns: 1fr 1fr; }
+            
+            /* Checkerboard Logic */
+            .cell:nth-child(4n+1), .cell:nth-child(4n+4) { background-color: #f0fdf4; color: #15803d; }
+            .cell:nth-child(4n+2), .cell:nth-child(4n+3) { background-color: #faf5ff; color: #7e22ce; }
+        }
+
+        /* Footer */
+        .page-footer {
+            margin-top: auto;
+            padding-top: 30px;
+            text-align: center;
+            font-size: 0.85em;
+            opacity: 0.6;
+            border-top: 1px solid rgba(128, 128, 128, 0.2);
         }
     </style>
 </head>
-<body class="min-h-screen">
+<body>
+    <script id="chooser-config" type="application/json">
+{
+  "logoUrl": "",
+  "pageTitle": "Preparing for Lifelong Partnership",
+  "pageSubtitle": "Financial & Resource Worksheets",
+  "headerBgColor": "#ffffff",
+  "headerTextColor": "#1e40af",
+  "pageMessage": "Welcome to Your Partnership Worksheets",
+  "pageSubMessage": "Click on the resource you need below to navigate to the external financial planning tools and resources.",
+  "bgColor": "#ffffff",
+  "textColor": "#1f2937",
+  "cell1Bg": "#f0fdf4",
+  "cell1Text": "#15803d",
+  "cell2Bg": "#faf5ff",
+  "cell2Text": "#7e22ce",
+  "footerCreator": "",
+  "footerVersion": "1.0",
+  "footerDate": "2026-08-24",
+  "cells": [
+    {
+      "emoji": "💰",
+      "title": "The Budget Planner",
+      "description": "Go to the external sample spending plan worksheet",
+      "link": "https://crosbymarks.github.io/churchtools/Budget.html",
+      "newTab": true
+    },
+    {
+      "emoji": "📈",
+      "title": "Compound Interest Calculator",
+      "description": "Go to the external calculator to model long-term savings",
+      "link": "https://crosbymarks.github.io/churchtools/Compound.html",
+      "newTab": true
+    },
+    {
+      "emoji": "✝️",
+      "title": "Guided Rosary",
+      "description": "Go to the Guided Rosary.",
+      "link": "https://crosbymarks.github.io/churchtools/rosary.html",
+      "newTab": true
+    },
+    {
+      "emoji": "✝️📢",
+      "title": "Outloud - Daily Reading",
+      "description": "Go to the Daily Reading.",
+      "link": "https://example.comhttps://crosbymarks.github.io/churchtools/dailyreading_tts.html",
+      "newTab": false
+    }
+  ]
+}
+    </script>
 
-    <div id="app" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-        <!-- Header -->
-        <header class="text-center mb-10 p-6 bg-white rounded-xl shadow-lg">
-            <h1 class="text-4xl font-extrabold text-blue-800 tracking-tight sm:text-5xl">
-                Preparing for Lifelong Partnership
-            </h1>
-            <p class="mt-2 text-xl text-gray-600">Financial & Resource Worksheets</p>
-        </header>
-
-        <!-- The previous Navigation Tabs block has been removed -->
-
-        <!-- Main Content Area -->
-        <main id="content-container" class="mt-8 p-6 bg-white rounded-xl shadow-lg min-h-[60vh]">
-            <div class="space-y-6">
-                <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Welcome to Your Partnership Worksheets</h2>
-                <p class="text-lg text-gray-600 text-center max-w-2xl mx-auto">
-                    Click on the resource you need below to navigate to the external financial planning tools and resources.
-                </p>
-
-                <!-- Cards linking to the main tools -->
-                <div class="grid md:grid-cols-2 gap-6 pt-8 max-w-4xl mx-auto">
-
-                    <!-- External Link Card: Budget Planner -->
-                    <!-- !!! IMPORTANT: Replace 'href' with your actual external Budget Plan link !!! -->
-                    <a href="Budget.html" target="_blank" class="card block p-6 bg-green-50 rounded-xl border border-green-200 hover:shadow-xl hover:border-green-400">
-                        <div class="flex items-center space-x-4">
-                            <span class="text-3xl text-green-600">💰</span>
-                            <div>
-                                <h3 class="text-xl font-semibold text-green-700">The Budget Planner</h3>
-                                <p class="text-gray-600 mt-1">Go to the external sample spending plan worksheet.</p>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- External Link Card: Compound Interest Calculator -->
-                    <!-- !!! IMPORTANT: Replace 'href' with your actual external Calculator link !!! -->
-                    <a href="Compound.html" target="_blank" class="card block p-6 bg-purple-50 rounded-xl border border-purple-200 hover:shadow-xl hover:border-purple-400">
-                        <div class="flex items-center space-x-4">
-                            <span class="text-3xl text-purple-600">📈</span>
-                            <div>
-                                <h3 class="text-xl font-semibold text-purple-700">Compound Interest Calculator</h3>
-                                <p class="text-gray-600 mt-1">Go to the external calculator to model long-term savings.</p>
-                            </div>
-                        </div>
-                    </a>
-
-
-                    <a href="rosary.html" target="_blank" class="card block p-6 bg-purple-50 rounded-xl border border-purple-200 hover:shadow-xl hover:border-purple-400">
-                        <div class="flex items-center space-x-4">
-                            <span class="text-3xl text-purple-600">📈</span>
-                            <div>
-                                <h3 class="text-xl font-semibold text-purple-700">Guided Rosary</h3>
-                                <p class="text-gray-600 mt-1">Go to the Guided Rosary.</p>
-                            </div>
-                        </div>
-                    </a>
-                    
-                         <!-- Add new cards here for future pages! -->
-                
-                </div>
-            </div>
-        </main>
-
+    <div class="top-section">
+        <div class="container-top">
+            
+            <h1>Preparing for Lifelong Partnership</h1>
+            <div class="subtitle">Financial & Resource Worksheets</div>
+        </div>
     </div>
 
-    <!-- The entire JavaScript block has been removed as it is no longer needed -->
+    <div class="bottom-section">
+        <div class="container-bottom">
+            
+                <div class="message-container">
+                    <div class="message">Welcome to Your Partnership Worksheets</div>
+                    <div class="submessage">Click on the resource you need below to navigate to the external financial planning tools and resources.</div>
+                </div>
+            
 
+            <div class="grid">
+                
+                <a href="https://crosbymarks.github.io/churchtools/Budget.html" class="cell" target="_blank" rel="noopener noreferrer">
+                    <div class="alt-action" title="Open in same tab instead" onclick="event.preventDefault(); window.open('https://crosbymarks.github.io/churchtools/Budget.html', '_self');">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="12" x2="15" y2="12"/><polyline points="12 9 15 12 12 15"/></svg>
+                    </div>
+                    <div class="emoji">💰</div>
+                    <div class="cell-content">
+                        <div class="cell-title">The Budget Planner</div>
+                        <div class="cell-desc">Go to the external sample spending plan worksheet</div>
+                    </div>
+                </a>
+            
+                <a href="https://crosbymarks.github.io/churchtools/Compound.html" class="cell" target="_blank" rel="noopener noreferrer">
+                    <div class="alt-action" title="Open in same tab instead" onclick="event.preventDefault(); window.open('https://crosbymarks.github.io/churchtools/Compound.html', '_self');">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="12" x2="15" y2="12"/><polyline points="12 9 15 12 12 15"/></svg>
+                    </div>
+                    <div class="emoji">📈</div>
+                    <div class="cell-content">
+                        <div class="cell-title">Compound Interest Calculator</div>
+                        <div class="cell-desc">Go to the external calculator to model long-term savings</div>
+                    </div>
+                </a>
+            
+                <a href="https://crosbymarks.github.io/churchtools/rosary.html" class="cell" target="_blank" rel="noopener noreferrer">
+                    <div class="alt-action" title="Open in same tab instead" onclick="event.preventDefault(); window.open('https://crosbymarks.github.io/churchtools/rosary.html', '_self');">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="12" x2="15" y2="12"/><polyline points="12 9 15 12 12 15"/></svg>
+                    </div>
+                    <div class="emoji">✝️</div>
+                    <div class="cell-content">
+                        <div class="cell-title">Guided Rosary</div>
+                        <div class="cell-desc">Go to the Guided Rosary.</div>
+                    </div>
+                </a>
+            
+                <a href="https://example.comhttps://crosbymarks.github.io/churchtools/dailyreading_tts.html" class="cell" >
+                    <div class="alt-action" title="Open in new tab instead" onclick="event.preventDefault(); window.open('https://example.comhttps://crosbymarks.github.io/churchtools/dailyreading_tts.html', '_blank');">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    </div>
+                    <div class="emoji">✝️📢</div>
+                    <div class="cell-content">
+                        <div class="cell-title">Outloud - Daily Reading</div>
+                        <div class="cell-desc">Go to the Daily Reading.</div>
+                    </div>
+                </a>
+            
+            </div>
+
+            <div class="page-footer">1.0 | 2026-08-24</div>
+        </div>
+    </div>
 </body>
 </html>

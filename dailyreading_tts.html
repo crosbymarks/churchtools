@@ -1,1 +1,368 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Catholic Readings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f5f0; /* Off-white, slightly warm background */
+            color: #2d3748;
+        }
+        .reading-text {
+            font-family: 'Merriweather', serif; /* Serif font for better readability of long texts */
+            line-height: 1.8;
+            font-size: 1.125rem;
+        }
+        .reading-text p {
+            margin-bottom: 1.25rem;
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e0; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0; 
+        }
+        .glass-header {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+
+    <header class="glass-header sticky top-0 z-50 px-4 py-3 sm:px-6 lg:px-8 shadow-sm flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-indigo-700 text-white rounded-full flex items-center justify-center text-xl shadow-md">
+                <i class="fa-solid fa-cross"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-gray-900 leading-tight">Daily Readings</h1>
+                <p id="current-date-display" class="text-sm text-gray-500 font-medium"></p>
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-2">
+            <!-- TTS Controls -->
+            <button id="btn-play" class="w-10 h-10 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm" title="Play Reading">
+                <i class="fa-solid fa-play"></i>
+            </button>
+            <button id="btn-pause" class="w-10 h-10 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-full flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 shadow-sm hidden" title="Pause Reading">
+                <i class="fa-solid fa-pause"></i>
+            </button>
+            <button id="btn-stop" class="w-10 h-10 bg-red-50 hover:bg-red-100 text-red-600 rounded-full flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 shadow-sm hidden" title="Stop Reading">
+                <i class="fa-solid fa-stop"></i>
+            </button>
+            
+            <!-- Link to USCCB -->
+            <a id="usccb-link" href="https://bible.usccb.org/daily-bible-reading" target="_blank" class="hidden sm:flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 ml-4">
+                View on USCCB <i class="fa-solid fa-external-link-alt ml-1 text-xs"></i>
+            </a>
+        </div>
+    </header>
+
+    <main class="flex-grow w-full max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        
+        <!-- Status / Loading Indicator -->
+        <div id="status-container" class="mb-6 p-4 rounded-lg bg-blue-50 text-blue-700 flex items-center shadow-sm">
+            <i class="fa-solid fa-circle-notch fa-spin mr-3 text-xl"></i>
+            <span id="status-text" class="font-medium">Fetching today's readings...</span>
+        </div>
+
+        <!-- Content Container (Hidden until loaded) -->
+        <div id="content-container" class="hidden space-y-12 bg-white p-6 sm:p-10 rounded-2xl shadow-sm border border-gray-100">
+            
+            <section id="section-reading1" class="hidden">
+                <div class="mb-4 pb-2 border-b border-gray-200">
+                    <h2 class="text-xs uppercase tracking-widest font-semibold text-gray-500 mb-1">Reading 1</h2>
+                    <h3 id="citation-reading1" class="text-xl font-bold text-gray-800"></h3>
+                </div>
+                <div id="text-reading1" class="reading-text text-gray-800"></div>
+            </section>
+
+            <section id="section-psalm" class="hidden">
+                <div class="mb-4 pb-2 border-b border-gray-200">
+                    <h2 class="text-xs uppercase tracking-widest font-semibold text-gray-500 mb-1">Responsorial Psalm</h2>
+                    <h3 id="citation-psalm" class="text-xl font-bold text-gray-800"></h3>
+                </div>
+                <div id="text-psalm" class="reading-text text-gray-800 italic"></div>
+            </section>
+
+            <section id="section-reading2" class="hidden">
+                <div class="mb-4 pb-2 border-b border-gray-200">
+                    <h2 class="text-xs uppercase tracking-widest font-semibold text-gray-500 mb-1">Reading 2</h2>
+                    <h3 id="citation-reading2" class="text-xl font-bold text-gray-800"></h3>
+                </div>
+                <div id="text-reading2" class="reading-text text-gray-800"></div>
+            </section>
+
+            <section id="section-gospel" class="hidden">
+                <div class="mb-4 pb-2 border-b border-gray-200">
+                    <h2 class="text-xs uppercase tracking-widest font-semibold text-gray-500 mb-1">Gospel</h2>
+                    <h3 id="citation-gospel" class="text-xl font-bold text-gray-800"></h3>
+                </div>
+                <div id="text-gospel" class="reading-text text-gray-800"></div>
+            </section>
+        </div>
+        
+        <!-- Disclaimer -->
+        <p class="text-xs text-gray-400 mt-12 text-center">
+            Note: Due to browser security (CORS), directly scraping the USCCB website from a static page is restricted. 
+            This demo uses simulated data for today based on typical structures, or requires a backend proxy to fetch live data.
+        </p>
+
+    </main>
+
+    <footer class="bg-gray-50 border-t border-gray-200 py-6 mt-auto">
+        <div class="max-w-3xl mx-auto px-4 text-center">
+            <p class="text-sm text-gray-500">
+                Created for reading and listening to daily devotions. <br/>
+                Text from the New American Bible, revised edition.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // UI Elements
+            const dateDisplay = document.getElementById('current-date-display');
+            const statusContainer = document.getElementById('status-container');
+            const statusText = document.getElementById('status-text');
+            const statusIcon = statusContainer.querySelector('i');
+            const contentContainer = document.getElementById('content-container');
+            const usccbLink = document.getElementById('usccb-link');
+
+            // TTS Buttons
+            const btnPlay = document.getElementById('btn-play');
+            const btnPause = document.getElementById('btn-pause');
+            const btnStop = document.getElementById('btn-stop');
+
+            // Set current date
+            const today = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dateDisplay.textContent = today.toLocaleDateString('en-US', options);
+
+            // Format date for USCCB URL (MMDDYY)
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const yy = String(today.getFullYear()).slice(-2);
+            usccbLink.href = `https://bible.usccb.org/bible/readings/${mm}${dd}${yy}.cfm`;
+
+            // State for data and speech
+            let readingData = null;
+            let synth = window.speechSynthesis;
+            let currentUtterance = null;
+            let isPaused = false;
+            let fullTextToRead = "";
+
+            // Note on Scraping:
+            // Fetching directly from 'https://bible.usccb.org' via JS `fetch()` will fail due to CORS policies.
+            // In a real application, you need a backend server (e.g., Node.js, Python) to fetch the HTML,
+            // parse it (e.g., with Cheerio or BeautifulSoup), and return JSON to this frontend.
+            // For this functional demo, we provide a simulated dataset structure that represents typical readings.
+
+            const mockData = {
+                date: today.toISOString(),
+                readings: [
+                    {
+                        type: 'reading1',
+                        title: 'Reading 1',
+                        citation: '1 Thessalonians 1:1-5, 8b-10',
+                        text: '<p>Paul, Silvanus, and Timothy to the church of the Thessalonians in God the Father and the Lord Jesus Christ: grace to you and peace.</p><p>We give thanks to God always for all of you, remembering you in our prayers, unceasingly calling to mind your work of faith and labor of love and endurance in hope of our Lord Jesus Christ, before our God and Father, knowing, brothers and sisters loved by God, how you were chosen. For our gospel did not come to you in word alone, but also in power and in the Holy Spirit and with much conviction.</p><p>You know what sort of people we were among you for your sake. In every place your faith in God has gone forth, so that we have no need to say anything. For they themselves openly declare about us what sort of reception we had among you, and how you turned to God from idols to serve the living and true God and to await his Son from heaven, whom he raised from the dead, Jesus, who delivers us from the coming wrath.</p>'
+                    },
+                    {
+                        type: 'psalm',
+                        title: 'Responsorial Psalm',
+                        citation: 'Psalm 149:1b-2, 3-4, 5-6a and 9b',
+                        response: 'The Lord takes delight in his people.',
+                        text: '<p><b>R. The Lord takes delight in his people.</b></p><p>Sing to the LORD a new song<br>of praise in the assembly of the faithful.<br>Let Israel be glad in their maker,<br>let the children of Zion rejoice in their king.</p><p><b>R. The Lord takes delight in his people.</b></p><p>Let them praise his name in the festive dance,<br>let them sing praise to him with timbrel and harp.<br>For the LORD loves his people,<br>and he adorns the lowly with victory.</p><p><b>R. The Lord takes delight in his people.</b></p>'
+                    },
+                    {
+                        type: 'gospel',
+                        title: 'Gospel',
+                        citation: 'Matthew 23:13-22',
+                        text: '<p>Jesus said to the crowds and to his disciples: "Woe to you, scribes and Pharisees, you hypocrites. You lock the Kingdom of heaven before men. You do not enter yourselves, nor do you allow entrance to those trying to enter.</p><p>"Woe to you, scribes and Pharisees, you hypocrites. You traverse sea and land to make one convert, and when that happens you make him a child of Gehenna twice as much as yourselves.</p><p>"Woe to you, blind guides, who say, \'If one swears by the temple, it means nothing, but if one swears by the gold of the temple, one is obligated.\' Blind fools, which is greater, the gold, or the temple that made the gold sacred? And you say, \'If one swears by the altar, it means nothing, but if one swears by the gift on the altar, one is obligated.\' You blind ones, which is greater, the gift, or the altar that makes the gift sacred? One who swears by the altar swears by it and all upon it; one who swears by the temple swears by it and by him who dwells in it; one who swears by heaven swears by the throne of God and by him who is seated on it."</p>'
+                    }
+                ]
+            };
+
+            function renderReadings(data) {
+                // Clear loading state
+                statusContainer.classList.add('hidden');
+                contentContainer.classList.remove('hidden');
+
+                // Build plain text string for TTS
+                fullTextToRead = `Daily Readings for ${today.toLocaleDateString('en-US', options)}. `;
+
+                data.readings.forEach(reading => {
+                    const sectionId = `section-${reading.type}`;
+                    const citationId = `citation-${reading.type}`;
+                    const textId = `text-${reading.type}`;
+                    
+                    const sectionEl = document.getElementById(sectionId);
+                    const citationEl = document.getElementById(citationId);
+                    const textEl = document.getElementById(textId);
+
+                    if (sectionEl && citationEl && textEl) {
+                        sectionEl.classList.remove('hidden');
+                        citationEl.textContent = reading.citation;
+                        textEl.innerHTML = reading.text;
+
+                        // Create a clean text version for Speech Synthesis
+                        // Remove HTML tags using a temporary DOM element
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = reading.text;
+                        const cleanText = tempDiv.textContent || tempDiv.innerText || "";
+                        
+                        fullTextToRead += `${reading.title}, from ${reading.citation}. ${cleanText}. `;
+                    }
+                });
+            }
+
+            function fetchReadings() {
+                // Simulate network delay
+                setTimeout(() => {
+                    try {
+                        readingData = mockData; // Use mock data
+                        renderReadings(readingData);
+                    } catch (error) {
+                        showError("Failed to load readings. Please try again later.");
+                    }
+                }, 1500);
+            }
+
+            function showError(message) {
+                statusContainer.className = 'mb-6 p-4 rounded-lg bg-red-50 text-red-700 flex items-center shadow-sm';
+                statusIcon.className = 'fa-solid fa-circle-exclamation mr-3 text-xl';
+                statusText.textContent = message;
+            }
+
+            function initTTS() {
+                // Ensure speech synthesis is available
+                if (!('speechSynthesis' in window)) {
+                    btnPlay.style.display = 'none';
+                    console.warn("Text-to-Speech not supported in this browser.");
+                    return;
+                }
+
+                // Handle iOS/Safari requiring user interaction before voice loads
+                synth.onvoiceschanged = () => {
+                    // Voices loaded
+                };
+
+                btnPlay.addEventListener('click', () => {
+                    if (synth.paused && isPaused) {
+                        // Resume playing
+                        synth.resume();
+                        isPaused = false;
+                        updateTTSButtons('playing');
+                    } else {
+                        // Start fresh
+                        startReading();
+                    }
+                });
+
+                btnPause.addEventListener('click', () => {
+                    if (synth.speaking && !synth.paused) {
+                        synth.pause();
+                        isPaused = true;
+                        updateTTSButtons('paused');
+                    }
+                });
+
+                btnStop.addEventListener('click', () => {
+                    stopReading();
+                });
+            }
+
+            function startReading() {
+                // Cancel any ongoing speech
+                synth.cancel();
+
+                if (!fullTextToRead) return;
+
+                currentUtterance = new SpeechSynthesisUtterance(fullTextToRead);
+                
+                // Try to find a good English voice
+                const voices = synth.getVoices();
+                const preferredVoice = voices.find(voice => voice.lang.includes('en-US') && voice.name.includes('Google')) || 
+                                       voices.find(voice => voice.lang.includes('en-GB')) ||
+                                       voices[0];
+                if (preferredVoice) {
+                    currentUtterance.voice = preferredVoice;
+                }
+                
+                currentUtterance.rate = 0.9; // Slightly slower for better comprehension of scripture
+                currentUtterance.pitch = 1.0;
+
+                // Event Listeners for Utterance
+                currentUtterance.onstart = () => {
+                    isPaused = false;
+                    updateTTSButtons('playing');
+                };
+
+                currentUtterance.onend = () => {
+                    updateTTSButtons('stopped');
+                    isPaused = false;
+                };
+
+                currentUtterance.onerror = (event) => {
+                    console.error('Speech synthesis error', event);
+                    updateTTSButtons('stopped');
+                    isPaused = false;
+                };
+
+                synth.speak(currentUtterance);
+            }
+
+            function stopReading() {
+                synth.cancel();
+                isPaused = false;
+                updateTTSButtons('stopped');
+            }
+
+            function updateTTSButtons(state) {
+                if (state === 'playing') {
+                    btnPlay.classList.add('hidden');
+                    btnPause.classList.remove('hidden');
+                    btnStop.classList.remove('hidden');
+                } else if (state === 'paused') {
+                    btnPlay.classList.remove('hidden');
+                    btnPause.classList.add('hidden');
+                    btnStop.classList.remove('hidden');
+                } else if (state === 'stopped') {
+                    btnPlay.classList.remove('hidden');
+                    btnPause.classList.add('hidden');
+                    btnStop.classList.add('hidden');
+                }
+            }
+
+            // Cleanup when leaving page
+            window.addEventListener('beforeunload', () => {
+                if (synth) synth.cancel();
+            });
+
+            // Start the application
+            fetchReadings();
+            initTTS();
+        });
+    </script>
+</body>
+</html>

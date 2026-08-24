@@ -178,7 +178,7 @@
             try {
                 // Attempting to fetch from an API utilizing the RC tradition flag
                 // Note: URL is a placeholder for a functional API like lectio-api
-                const response = await fetch(`https://api.lectionary.org/v1/readings?date=${dateStr}&tradition=rc`);
+                const response = await fetch(`https://lectio-api.org/v1/readings?date=${dateStr}&tradition=rc`);
                 
                 if (!response.ok) throw new Error("API Network response was not ok");
                 
